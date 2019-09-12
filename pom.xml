@@ -147,7 +147,7 @@
 		<zxing.version>3.2.1</zxing.version>
 		<apache.commons.version>3.4</apache.commons.version>
 		<apache.poi.version>3.15</apache.poi.version>
-		<tomcat.version>8.5.31</tomcat.version>
+		<tomcat.version>8.5.45</tomcat.version>
 		<shardingjdbc.version>3.1.0</shardingjdbc.version>
 		<mybatis.version>3.5.2</mybatis.version>
 		<mybatis.spring.version>2.0.2</mybatis.spring.version>
