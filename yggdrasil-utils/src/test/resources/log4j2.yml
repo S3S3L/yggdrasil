@@ -1,0 +1,88 @@
+Configuration:
+  status: info
+  Appenders:
+    Console:
+      name: consoleAppender
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    File:
+    - name: serverAppender
+      fileName: logs/server.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    - name: errorAppender
+      fileName: logs/error.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    - name: commonAppender
+      fileName: logs/common.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    - name: requestAppender
+      fileName: logs/request.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    - name: jobAppender
+      fileName: logs/job.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+    - name: serviceAppender
+      fileName: logs/service.log
+      PatternLayout:
+        pattern: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: serverAppender
+    Logger:
+    - name: error
+      level: error
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: errorAppender
+    - name: warn
+      level: warn
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: info
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: debug
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: common
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: request
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: requestAppender
+    - name: job
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: jobAppender
+    - name: service
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: serviceAppender
