@@ -14,7 +14,7 @@ public class CombinableInteger implements Combinable<Integer> {
     private Integer data;
     private IntegerCombineType type;
 
-    public static enum IntegerCombineType {
+    public enum IntegerCombineType {
         ADD, SUB
     }
 

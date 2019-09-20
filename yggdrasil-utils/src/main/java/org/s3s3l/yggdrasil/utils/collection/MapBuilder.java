@@ -4,13 +4,13 @@ import java.util.Map;
 
 /**
  * <p>
- * </p> 
- * ClassName:MapBuilder <br> 
- * Date:     Oct 30, 2017 3:04:17 PM <br>
- *  
- * @author   kehw_zwei 
- * @version  1.0.0
- * @since    JDK 1.8
+ * </p>
+ * ClassName:MapBuilder <br>
+ * Date: Oct 30, 2017 3:04:17 PM <br>
+ * 
+ * @author kehw_zwei
+ * @version 1.0.0
+ * @since JDK 1.8
  */
 public class MapBuilder<T, U> {
     private Map<T, U> map;
@@ -28,4 +28,3 @@ public class MapBuilder<T, U> {
         return this.map;
     }
 }
-  

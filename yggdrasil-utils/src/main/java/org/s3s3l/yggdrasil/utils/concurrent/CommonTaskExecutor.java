@@ -10,12 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.s3s3l.yggdrasil.bean.combine.Combinable;
-import org.s3s3l.yggdrasil.utils.json.IJacksonHelper;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
 
 /**
  * <p>
@@ -28,8 +24,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
  * @since JDK 1.8
  */
 public class CommonTaskExecutor implements TaskExecutor {
-    private static final IJacksonHelper json = JacksonUtils.create()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private ExecutorService executor;
     private ExecutorBuilder builder;

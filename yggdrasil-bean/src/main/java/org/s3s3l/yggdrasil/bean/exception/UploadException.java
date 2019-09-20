@@ -12,6 +12,11 @@ package org.s3s3l.yggdrasil.bean.exception;
  */
 public class UploadException extends RuntimeException {
 
+    /** 
+     * @since JDK 1.8
+     */  
+    private static final long serialVersionUID = 5894847875304277795L;
+
     public UploadException() {
         super();
     }

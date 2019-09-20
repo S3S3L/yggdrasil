@@ -19,7 +19,7 @@ import org.s3s3l.yggdrasil.bean.exception.ModelConvertException;
 public interface LinkedModel<T> {
 
 	public static <T> List<T> toManagementModel(List<? extends LinkedModel<T>> list) {
-		return list.stream().map(r -> r.convertTo()).collect(Collectors.toList());
+		return list.stream().map(LinkedModel::convertTo).collect(Collectors.toList());
 	}
 
 	public static <U extends LinkedModel<T>, T> List<U> fromManagementModel(List<T> list, Class<U> type) {

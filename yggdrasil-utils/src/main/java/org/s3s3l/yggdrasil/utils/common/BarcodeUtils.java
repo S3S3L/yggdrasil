@@ -30,42 +30,49 @@ import com.google.zxing.common.BitMatrix;
  */
 public class BarcodeUtils {
 
-	public static BufferedImage getBarcodeBufferedStream(String text, int width, int height, Charset charset,
-			BarcodeFormat barcodeFormat) throws WriterException {
-		Map<EncodeHintType, String> hints = new EnumMap<>(EncodeHintType.class);
-		hints.put(EncodeHintType.CHARACTER_SET, charset.name());
-		BitMatrix bitmatrix = new MultiFormatWriter().encode(text, barcodeFormat, width, height, hints);
+    public static BufferedImage
+            getBarcodeBufferedStream(String text, int width, int height, Charset charset, BarcodeFormat barcodeFormat)
+                    throws WriterException {
+        Map<EncodeHintType, String> hints = new EnumMap<>(EncodeHintType.class);
+        hints.put(EncodeHintType.CHARACTER_SET, charset.name());
+        BitMatrix bitmatrix = new MultiFormatWriter().encode(text, barcodeFormat, width, height, hints);
 
-		return toBufferedImage(bitmatrix);
-	}
+        return toBufferedImage(bitmatrix);
+    }
 
-	public static boolean barcodeToFile(String text, int width, int height, Charset charset,
-			BarcodeFormat barcodeFormat, String filePath, FileFormat fileFormat) throws WriterException, IOException {
-		File outputFile = new File(filePath);
-		if (outputFile.isDirectory()) {
-			return false;
-		}
+    public static boolean barcodeToFile(String text,
+            int width,
+            int height,
+            Charset charset,
+            BarcodeFormat barcodeFormat,
+            String filePath,
+            FileFormat fileFormat) throws WriterException,
+            IOException {
+        File outputFile = new File(filePath);
+        if (outputFile.isDirectory()) {
+            return false;
+        }
 
-		if (outputFile.exists()) {
-			Files.delete(outputFile.toPath());
-		}
+        if (outputFile.exists()) {
+            Files.delete(outputFile.toPath());
+        }
 
-		BufferedImage imgBuffer = getBarcodeBufferedStream(text, width, height, charset, barcodeFormat);
+        BufferedImage imgBuffer = getBarcodeBufferedStream(text, width, height, charset, barcodeFormat);
 
-		ImageIO.write(imgBuffer, fileFormat.name(), outputFile);
+        ImageIO.write(imgBuffer, fileFormat.name(), outputFile);
 
-		return true;
-	}
+        return true;
+    }
 
-	private static BufferedImage toBufferedImage(BitMatrix matrix) {
-		int width = matrix.getWidth();
-		int height = matrix.getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				image.setRGB(x, y, matrix.get(x, y) ? Color.BLACK.getRGB() : Color.WHITE.getRGB());
-			}
-		}
-		return image;
-	}
+    private static BufferedImage toBufferedImage(BitMatrix matrix) {
+        int width = matrix.getWidth();
+        int height = matrix.getHeight();
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                image.setRGB(x, y, matrix.get(x, y) ? Color.BLACK.getRGB() : Color.WHITE.getRGB());
+            }
+        }
+        return image;
+    }
 }

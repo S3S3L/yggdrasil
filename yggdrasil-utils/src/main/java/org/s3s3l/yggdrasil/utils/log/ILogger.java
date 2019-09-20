@@ -11,9 +11,9 @@ import org.s3s3l.yggdrasil.utils.log.base.LogHelper.LogLevel;
  * @since JDK 1.8
  */
 public interface ILogger {
-    
+
     ILogger logger(String loggerName);
-    
+
     LogLevel logLevel();
 
     /**
@@ -96,7 +96,7 @@ public interface ILogger {
      * @since JDK 1.8
      */
     void trace(Throwable e, String tag);
-    
+
     /**
      * 记录debug级别日志
      * 
@@ -177,7 +177,7 @@ public interface ILogger {
      * @since JDK 1.8
      */
     void debug(Throwable e, String tag);
-    
+
     /**
      * 记录info级别日志
      * 
@@ -258,7 +258,7 @@ public interface ILogger {
      * @since JDK 1.8
      */
     void info(Throwable e, String tag);
-    
+
     /**
      * 记录warn级别日志
      * 
@@ -339,7 +339,7 @@ public interface ILogger {
      * @since JDK 1.8
      */
     void warn(Throwable e, String tag);
-    
+
     /**
      * 记录error级别日志
      * 

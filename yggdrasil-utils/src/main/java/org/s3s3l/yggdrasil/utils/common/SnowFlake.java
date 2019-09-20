@@ -2,13 +2,13 @@ package org.s3s3l.yggdrasil.utils.common;
 
 /**
  * <p>
- * </p> 
- * ClassName:SnowFlake <br> 
- * Date:     Apr 22, 2019 3:55:09 PM <br>
- *  
- * @author   kehw_zwei 
- * @version  1.0.0
- * @since    JDK 1.8
+ * </p>
+ * ClassName:SnowFlake <br>
+ * Date: Apr 22, 2019 3:55:09 PM <br>
+ * 
+ * @author kehw_zwei
+ * @version 1.0.0
+ * @since JDK 1.8
  */
 public class SnowFlake {
     /**
@@ -19,9 +19,9 @@ public class SnowFlake {
     /**
      * 每一部分占用的位数
      */
-    private static final long SEQUENCE_BIT = 12; //序列号占用的位数
-    private static final long MACHINE_BIT = 5;   //机器标识占用的位数
-    private static final long DATACENTER_BIT = 5;//数据中心占用的位数
+    private static final long SEQUENCE_BIT = 12; // 序列号占用的位数
+    private static final long MACHINE_BIT = 5; // 机器标识占用的位数
+    private static final long DATACENTER_BIT = 5;// 数据中心占用的位数
 
     /**
      * 每一部分的最大值
@@ -37,10 +37,10 @@ public class SnowFlake {
     private static final long DATACENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT;
     private static final long TIMESTMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT;
 
-    private long datacenterId;  //数据中心
-    private long machineId;     //机器标识
-    private long sequence = 0L; //序列号
-    private long lastStmp = -1L;//上一次时间戳
+    private long datacenterId; // 数据中心
+    private long machineId; // 机器标识
+    private long sequence = 0L; // 序列号
+    private long lastStmp = -1L;// 上一次时间戳
 
     public SnowFlake(long datacenterId, long machineId) {
         if (datacenterId > MAX_DATACENTER_NUM || datacenterId < 0) {
@@ -65,23 +65,23 @@ public class SnowFlake {
         }
 
         if (currStmp == lastStmp) {
-            //相同毫秒内，序列号自增
+            // 相同毫秒内，序列号自增
             sequence = (sequence + 1) & MAX_SEQUENCE;
-            //同一毫秒的序列数已经达到最大
+            // 同一毫秒的序列数已经达到最大
             if (sequence == 0L) {
                 currStmp = getNextMill();
             }
         } else {
-            //不同毫秒内，序列号置为0
+            // 不同毫秒内，序列号置为0
             sequence = 0L;
         }
 
         lastStmp = currStmp;
 
-        return (currStmp - START_STMP) << TIMESTMP_LEFT //时间戳部分
-                | datacenterId << DATACENTER_LEFT       //数据中心部分
-                | machineId << MACHINE_LEFT             //机器标识部分
-                | sequence;                             //序列号部分
+        return (currStmp - START_STMP) << TIMESTMP_LEFT // 时间戳部分
+                | datacenterId << DATACENTER_LEFT // 数据中心部分
+                | machineId << MACHINE_LEFT // 机器标识部分
+                | sequence; // 序列号部分
     }
 
     private long getNextMill() {

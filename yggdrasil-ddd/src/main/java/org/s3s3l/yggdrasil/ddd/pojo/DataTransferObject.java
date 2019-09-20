@@ -1,4 +1,3 @@
-
 package org.s3s3l.yggdrasil.ddd.pojo;
 
 /**

@@ -1,8 +1,8 @@
 
 package org.s3s3l.yggdrasil.starter.redis.feature;
 
+import org.s3s3l.yggdrasil.spring.env.ConfigurationResolver;
 import org.s3s3l.yggdrasil.starter.redis.DefaultRedisClientConfiguration;
-import org.s3s3l.yggdrasil.utils.spring.env.ConfigurationResolver;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
 import org.yaml.snakeyaml.Yaml;

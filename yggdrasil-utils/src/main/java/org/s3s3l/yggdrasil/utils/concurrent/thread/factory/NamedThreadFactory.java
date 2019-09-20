@@ -5,13 +5,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>
- * </p> 
- * ClassName:NamedThreadFactory <br> 
- * Date:     Aug 23, 2018 11:12:27 AM <br>
- *  
- * @author   kehw_zwei 
- * @version  1.0.0
- * @since    JDK 1.8
+ * </p>
+ * ClassName:NamedThreadFactory <br>
+ * Date: Aug 23, 2018 11:12:27 AM <br>
+ * 
+ * @author kehw_zwei
+ * @version 1.0.0
+ * @since JDK 1.8
  */
 public class NamedThreadFactory implements ThreadFactory {
     private static final AtomicInteger poolNumber = new AtomicInteger(1);
@@ -21,7 +21,9 @@ public class NamedThreadFactory implements ThreadFactory {
 
     public NamedThreadFactory(String name) {
         SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+        group = (s != null) ? s.getThreadGroup()
+                : Thread.currentThread()
+                        .getThreadGroup();
         namePrefix = "pool-" + poolNumber.getAndIncrement() + "-" + name + "-thread-";
     }
 
@@ -38,4 +40,3 @@ public class NamedThreadFactory implements ThreadFactory {
     }
 
 }
-  

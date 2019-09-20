@@ -4,7 +4,7 @@ package org.s3s3l.yggdrasil.starter.rabbitmq;
 import java.util.Map.Entry;
 
 import org.s3s3l.yggdrasil.starter.rabbitmq.MultiRabbitmqConfiguartion.RabbitmqConfiguartion;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -55,10 +55,10 @@ public class MultiRabbitmqAutoConfigure implements ImportBeanDefinitionRegistrar
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 
     }
-    
+
     public void multiRabbitmqAutoConfigure(MultiRabbitmqConfiguartion configuration, BeanDefinitionRegistry registry) {
         logger.trace("Starting auto-configuring multiple datasource.");
-        String configurationStr = JacksonUtils.defaultHelper.toJsonString(configuration);
+        String configurationStr = JacksonUtils.defaultHelper.toStructuralString(configuration);
         logger.debug("Multiple datasource configuration. '{}'", configurationStr);
 
         logger.trace("Starting registering common datasources.");
@@ -69,7 +69,7 @@ public class MultiRabbitmqAutoConfigure implements ImportBeanDefinitionRegistrar
 
         }
         logger.trace("Finished registering common datasources.");
-        
+
     }
 
     private MultiRabbitmqConfiguartion resolveConfiguration() {

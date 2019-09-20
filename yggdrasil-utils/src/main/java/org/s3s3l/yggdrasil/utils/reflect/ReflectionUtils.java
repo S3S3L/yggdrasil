@@ -15,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.s3s3l.yggdrasil.annotation.FromJson;
 import org.s3s3l.yggdrasil.annotation.FromObject;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
 import org.s3s3l.yggdrasil.utils.log.base.LogHelper;
 import org.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,7 +41,7 @@ public abstract class ReflectionUtils {
      * 
      * @param data
      * @param type
-     * @return 
+     * @return
      * @since JDK 1.8
      */
     public static <T> T deserialize(T data, Class<T> type) {
@@ -71,7 +71,7 @@ public abstract class ReflectionUtils {
                     }
                     try {
                         ref.setFieldValue(field.getName(),
-                                JacksonUtils.defaultHelper.toObject(json, new TypeReference<Object>(){
+                                JacksonUtils.defaultHelper.toObject(json, new TypeReference<Object>() {
                                     @Override
                                     public Type getType() {
                                         return field.getGenericType();
@@ -92,7 +92,7 @@ public abstract class ReflectionUtils {
      * 
      * @param data
      * @param type
-     * @return 
+     * @return
      * @since JDK 1.8
      */
     public static <T> T serialize(T data, Class<T> type) {
@@ -117,7 +117,7 @@ public abstract class ReflectionUtils {
                         return;
                     }
                     try {
-                        ref.setFieldValue(field.getName(), JacksonUtils.defaultHelper.toJsonString(obj));
+                        ref.setFieldValue(field.getName(), JacksonUtils.defaultHelper.toStructuralString(obj));
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         logger.warn("set field value fail.", e);
                         return;
