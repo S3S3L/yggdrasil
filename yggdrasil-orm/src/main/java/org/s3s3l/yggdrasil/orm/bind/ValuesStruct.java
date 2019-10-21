@@ -54,7 +54,7 @@ public class ValuesStruct implements DataBindNode {
 
         if (first) {
             String fields = String.join(",", validatedNodes.stream()
-                    .map(r -> r.getName())
+                    .map(ColumnStruct::getName)
                     .collect(Collectors.toList()));
             struct.setSql(String.format("(%s) VALUES (%s)", fields, values));
         } else {
