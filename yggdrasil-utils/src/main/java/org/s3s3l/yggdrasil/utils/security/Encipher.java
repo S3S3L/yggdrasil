@@ -10,25 +10,25 @@ package org.s3s3l.yggdrasil.utils.security;
  */
 public interface Encipher {
 
-	/**
-	 * 
-	 * 加密字符串
-	 * 
-	 * @param src
-	 *            源字符串
-	 * @return 加密后的字符串
-	 * @since JDK 1.8
-	 */
-	String encrypt(String src);
+    /**
+     * 
+     * 加密字符串
+     * 
+     * @param src
+     *            源字符串
+     * @return 加密后的字符串
+     * @since JDK 1.8
+     */
+    String encrypt(String src);
 
-	/**
-	 * 
-	 * 解密字符串
-	 * 
-	 * @param src
-	 *            源字符串
-	 * @return 解密后的字符串
-	 * @since JDK 1.8
-	 */
-	String decrypt(String src);
+    /**
+     * 
+     * 解密字符串
+     * 
+     * @param src
+     *            源字符串
+     * @return 解密后的字符串
+     * @since JDK 1.8
+     */
+    String decrypt(String src);
 }

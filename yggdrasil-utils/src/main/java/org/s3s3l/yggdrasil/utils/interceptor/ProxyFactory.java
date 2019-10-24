@@ -16,61 +16,63 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  */
 public class ProxyFactory {
 
-	/**
-	 * 
-	 * 为对象构建代理对象
-	 * 
-	 * @author kehw_zwei
-	 * @param object
-	 *            目标对象
-	 * @param implCls
-	 *            实现类
-	 * @param handler
-	 *            处理器
-	 * @return 代理对象
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @since JDK 1.8
-	 */
-	public Object getProxy(Object object,
-			Class<?> implCls,
-			Class<? extends InterceptorHandler> handlerType,
-			Interceptor... interceptors) throws InstantiationException, IllegalAccessException {
-		Verify.notEmpty(interceptors);
+    /**
+     * 
+     * 为对象构建代理对象
+     * 
+     * @author kehw_zwei
+     * @param object
+     *            目标对象
+     * @param implCls
+     *            实现类
+     * @param handler
+     *            处理器
+     * @return 代理对象
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @since JDK 1.8
+     */
+    public Object getProxy(Object object,
+            Class<?> implCls,
+            Class<? extends InterceptorHandler> handlerType,
+            Interceptor... interceptors) throws InstantiationException,
+            IllegalAccessException {
+        Verify.notEmpty(interceptors);
 
-		return getProxy(object, implCls, handlerType, Arrays.asList(interceptors));
-	}
+        return getProxy(object, implCls, handlerType, Arrays.asList(interceptors));
+    }
 
-	/**
-	 * 
-	 * 为对象构建代理对象
-	 * 
-	 * @author kehw_zwei
-	 * @param object
-	 *            目标对象
-	 * @param implCls
-	 *            实现类
-	 * @param handler
-	 *            处理器
-	 * @return 代理对象
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @since JDK 1.8
-	 */
-	public Object getProxy(Object object,
-			Class<?> implCls,
-			Class<? extends InterceptorHandler> handlerType,
-			Collection<Interceptor> interceptors) throws InstantiationException, IllegalAccessException {
-		Verify.notNull(object);
-		Verify.notNull(implCls);
-		Verify.notNull(handlerType);
-		Verify.notNull(interceptors);
+    /**
+     * 
+     * 为对象构建代理对象
+     * 
+     * @author kehw_zwei
+     * @param object
+     *            目标对象
+     * @param implCls
+     *            实现类
+     * @param handler
+     *            处理器
+     * @return 代理对象
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @since JDK 1.8
+     */
+    public Object getProxy(Object object,
+            Class<?> implCls,
+            Class<? extends InterceptorHandler> handlerType,
+            Collection<Interceptor> interceptors) throws InstantiationException,
+            IllegalAccessException {
+        Verify.notNull(object);
+        Verify.notNull(implCls);
+        Verify.notNull(handlerType);
+        Verify.notNull(interceptors);
 
-		InterceptorHandler handler = handlerType.newInstance();
+        InterceptorHandler handler = handlerType.newInstance();
 
-		handler.setTarget(object);
-		handler.addInterceptor(interceptors);
+        handler.setTarget(object);
+        handler.addInterceptor(interceptors);
 
-		return Proxy.newProxyInstance(implCls.getClassLoader(), implCls.getInterfaces(), handler);
-	}
+        return Proxy.newProxyInstance(implCls.getClassLoader(), implCls.getInterfaces(), handler);
+    }
 }

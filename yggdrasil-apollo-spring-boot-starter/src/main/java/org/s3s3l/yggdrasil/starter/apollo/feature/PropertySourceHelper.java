@@ -11,11 +11,10 @@ import java.util.function.Function;
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.Document;
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.FieldDoc;
 import org.s3s3l.yggdrasil.starter.apollo.DocumentProcessException;
-import org.s3s3l.yggdrasil.utils.apollo.ConfigFileChangedProcessor;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
-import org.s3s3l.yggdrasil.utils.json.IJacksonHelper;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.env.YamlPropertySourceLoader;
@@ -47,10 +46,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class PropertySourceHelper {
     private static final Yaml snakeYaml = new Yaml();
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final IJacksonHelper json = JacksonUtils.create();
-    private final IJacksonHelper yml = JacksonUtils.create(new YAMLFactory());
-    private final IJacksonHelper xml = JacksonUtils.create(new XmlFactory());
-    private final IJacksonHelper prop = JacksonUtils.create(new JavaPropsFactory());
+    private final JacksonHelper json = JacksonUtils.create();
+    private final JacksonHelper yml = JacksonUtils.create(new YAMLFactory());
+    private final JacksonHelper xml = JacksonUtils.create(new XmlFactory());
+    private final JacksonHelper prop = JacksonUtils.create(new JavaPropsFactory());
 
     private final ConfigurableEnvironment environment;
     private final Map<Class<? extends ConfigFileChangedProcessor>, ConfigFileChangedProcessor> processors = new ConcurrentHashMap<>();
@@ -184,7 +183,7 @@ public class PropertySourceHelper {
     }
 
     private TreeNode
-            getContentTree(String defaultContent, String content, IJacksonHelper helper, TreeNodeProcesser processer) {
+            getContentTree(String defaultContent, String content, JacksonHelper helper, TreeNodeProcesser processer) {
         if (StringUtils.isEmpty(defaultContent)) {
             return processer.process(content, helper);
         }
@@ -203,7 +202,7 @@ public class PropertySourceHelper {
         }
 
         current.set(pres[pres.length - 1], (JsonNode) node);
-        buildPropertySource(String.join(".", docName, key), yml.toJsonBytes(root)).forEach(ps -> {
+        buildPropertySource(String.join(".", docName, key), yml.toStructuralBytes(root)).forEach(ps -> {
             MutablePropertySources propertySources = environment.getPropertySources();
             if (propertySources.contains(ps.getName())) {
                 propertySources.replace(ps.getName(), ps);
@@ -217,7 +216,7 @@ public class PropertySourceHelper {
         ConfigFile configFile = ConfigService.getConfigFile(doc.getName(), doc.getFormat());
         configFile.addChangeListener(event -> triggerProcessors((c, e, n) -> {
             List<PropertySource<?>> psList = buildPropertySource(doc.getName(),
-                    yml.toJsonBytes(func.apply(event.getNewValue())));
+                    yml.toStructuralBytes(func.apply(event.getNewValue())));
             psList.forEach(ps -> environment.getPropertySources()
                     .replace(doc.getName(), ps));
         }, doc, event.getNewValue()));
@@ -227,7 +226,7 @@ public class PropertySourceHelper {
     }
 
     private void processDocument(Document doc, Function<String, TreeNode> func, String content) {
-        List<PropertySource<?>> psList = buildPropertySource(doc.getName(), yml.toJsonBytes(func.apply(content)));
+        List<PropertySource<?>> psList = buildPropertySource(doc.getName(), yml.toStructuralBytes(func.apply(content)));
         switch (doc.getLocation()
                 .getType()) {
             case AFTER:
@@ -304,7 +303,7 @@ public class PropertySourceHelper {
     @FunctionalInterface
     private interface TreeNodeProcesser {
 
-        JsonNode process(String content, IJacksonHelper helper);
+        JsonNode process(String content, JacksonHelper helper);
     }
 
     private abstract static class Processers {

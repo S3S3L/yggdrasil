@@ -85,16 +85,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<!-- Yggdrasil -->
 		<dependency>
@@ -104,6 +98,10 @@
 		<dependency>
 			<groupId>org.s3s3l.yggdrasil</groupId>
 			<artifactId>yggdrasil-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.s3s3l.yggdrasil</groupId>
+			<artifactId>yggdrasil-spring</artifactId>
 		</dependency>
 		<!-- Mybatis -->
 		<dependency>

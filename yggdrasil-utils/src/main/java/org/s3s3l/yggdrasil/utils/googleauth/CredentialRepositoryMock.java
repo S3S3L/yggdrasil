@@ -4,15 +4,6 @@ import java.util.List;
 
 import com.warrenstrange.googleauth.ICredentialRepository;
 
-/**
- * <p>
- * </p>
- * Date: Sep 12, 2019 4:46:03 PM <br>
- * 
- * @author kehw_zwei
- * @version 1.0.0
- * @since JDK 1.8
- */
 public class CredentialRepositoryMock implements ICredentialRepository {
     /**
      * Name of the environment property used by this mock to retrieve the fake

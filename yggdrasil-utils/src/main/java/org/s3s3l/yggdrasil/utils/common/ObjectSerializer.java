@@ -1,14 +1,4 @@
 package org.s3s3l.yggdrasil.utils.common;
-/**
- * <p>
- * </p> 
- * ClassName:ObjectSerializer <br> 
- * Date:     Sep 20, 2017 8:18:11 PM <br>
- *  
- * @author   kehw_zwei 
- * @version  1.0.0
- * @since    JDK 1.8
- */
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +8,17 @@ import java.io.ObjectOutputStream;
 
 import org.s3s3l.yggdrasil.bean.exception.ObjectSerializeException;
 
+/**
+ * 
+ * <p>
+ * </p>
+ * ClassName: ObjectSerializer <br>
+ * date: Sep 20, 2019 4:46:07 PM <br>
+ * 
+ * @author kehw_zwei
+ * @version 1.0.0
+ * @since JDK 1.8
+ */
 public abstract class ObjectSerializer {
 
     public static byte[] serialize(Object obj) {

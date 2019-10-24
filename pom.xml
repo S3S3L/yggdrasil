@@ -15,6 +15,18 @@
 	</scm>
 
 	<modules>
+	    <module>yggdrasil-compress</module>
+	    <module>yggdrasil-spring</module>
+	    <module>yggdrasil-mybatis</module>
+	    <module>yggdrasil-web</module>
+	    <module>yggdrasil-redis</module>
+	    <module>yggdrasil-http</module>
+	    <module>yggdrasil-es</module>
+	    <module>yggdrasil-document</module>
+	    <module>yggdrasil-resource</module>
+	    <module>yggdrasil-orm</module>
+	    <module>yggdrasil-persistence</module>
+	    <module>yggdrasil-cache</module>
 		<module>yggdrasil-utils</module>
 		<module>yggdrasil-bean</module>
 		<module>yggdrasil-ddd</module>
@@ -175,6 +187,66 @@
 				<scope>import</scope>
 			</dependency>
 			<!-- Yggdrasil -->
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-compress</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-spring</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-mybatis</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-web</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-redis</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-http</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-es</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-document</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-resource</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-orm</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-persistence</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.s3s3l.yggdrasil</groupId>
+				<artifactId>yggdrasil-cache</artifactId>
+				<version>${yggdrasil.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.s3s3l.yggdrasil</groupId>
 				<artifactId>yggdrasil-bean</artifactId>

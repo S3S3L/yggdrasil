@@ -29,8 +29,8 @@ public interface TaskExecutor {
     <T> T execute(List<Callable<T>> tasks, Combinable<T> combine);
 
     <T, U> T execute(Function<U, T> task, List<U> conditions, Combinable<T> combine);
-    
+
     void stopAll();
-    
+
     boolean awaitTermination(long timeout, TimeUnit unit);
 }

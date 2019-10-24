@@ -3,7 +3,7 @@ package org.s3s3l.yggdrasil.starter.apollo;
 import org.s3s3l.yggdrasil.starter.apollo.feature.PropertySourceHelper;
 import org.s3s3l.yggdrasil.starter.apollo.feature.StringToObjectConverter;
 import org.s3s3l.yggdrasil.starter.apollo.feature.TreeNodeConverter;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -27,8 +27,7 @@ import com.ctrip.framework.apollo.ConfigService;
  * @since JDK 1.8
  */
 @ConditionalOnProperty(prefix = ApolloConfiguration.PREFIX, name = "enable", havingValue = "true")
-public class ApolloAutoConfigure
-        implements EnvironmentPostProcessor, Ordered {
+public class ApolloAutoConfigure implements EnvironmentPostProcessor, Ordered {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ApolloConfiguration configuration;
     private ConfigurableEnvironment environment;
@@ -59,7 +58,7 @@ public class ApolloAutoConfigure
         this.configuration = Binder.get(environment)
                 .bind(ApolloConfiguration.PREFIX, ApolloConfiguration.class)
                 .orElse(new ApolloConfiguration());
-        String confStr = JacksonUtils.defaultHelper.toJsonString(this.configuration);
+        String confStr = JacksonUtils.defaultHelper.toStructuralString(this.configuration);
         logger.info("Apollo configuration loaded. {}", confStr);
     }
 

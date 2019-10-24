@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.s3s3l.yggdrasil.utils.json.IJacksonHelper;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.TypeDescriptor;
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class StringToObjectConverter implements GenericConverter {
 
     private static final Set<ConvertiblePair> CONVERTIBLE_TYPES;
-    private static final Map<String, IJacksonHelper> PARSERS = new HashMap<>();
+    private static final Map<String, JacksonHelper> PARSERS = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     static {
@@ -64,7 +64,7 @@ public class StringToObjectConverter implements GenericConverter {
     }
 
     private Object toObject(Object source, TypeDescriptor targetType) {
-        for (Entry<String, IJacksonHelper> paser : PARSERS.entrySet()) {
+        for (Entry<String, JacksonHelper> paser : PARSERS.entrySet()) {
             Object result = tryParse((String) source, paser, targetType.getType());
             if (result != null) {
                 return result;
@@ -74,7 +74,7 @@ public class StringToObjectConverter implements GenericConverter {
         return null;
     }
 
-    private Object tryParse(String source, Entry<String, IJacksonHelper> helper, Class<?> tr) {
+    private Object tryParse(String source, Entry<String, JacksonHelper> helper, Class<?> tr) {
         try {
             return helper.getValue()
                     .toObject(source, tr);

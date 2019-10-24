@@ -45,7 +45,8 @@ public class GoogleAuthUtils {
         if (StringUtils.isEmpty(userName)) {
             return StringUtils.EMPTY_STRING;
         }
-        return new GoogleAuthenticator().createCredentials(userName).getKey();
+        return new GoogleAuthenticator().createCredentials(userName)
+                .getKey();
     }
 
     /**
@@ -72,9 +73,12 @@ public class GoogleAuthUtils {
      * @since JDK 1.8
      */
     public static String getQrcodeBase64(String userName, String secretKey, int width, int height)
-            throws WriterException, IOException {
+            throws WriterException,
+            IOException {
 
-        StringBuilder sb = new StringBuilder("otpauth://totp/").append(userName).append("?secret=").append(secretKey);
+        StringBuilder sb = new StringBuilder("otpauth://totp/").append(userName)
+                .append("?secret=")
+                .append(secretKey);
         BufferedImage imgBuffer = BarcodeUtils.getBarcodeBufferedStream(sb.toString(), width, height,
                 StandardCharsets.UTF_8, BarcodeFormat.QR_CODE);
 
@@ -85,7 +89,7 @@ public class GoogleAuthUtils {
                 .append(Base64.encodeBase64String(buff.toByteArray()));
         return base64String.toString();
     }
-    
+
     public static byte[] base64ToImage(String base64String) {
         return Base64.decodeBase64(base64String.replaceFirst(StringUtils.BASE64HEADER, ""));
     }

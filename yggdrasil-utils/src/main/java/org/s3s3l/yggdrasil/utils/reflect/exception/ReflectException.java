@@ -10,29 +10,29 @@ package org.s3s3l.yggdrasil.utils.reflect.exception;
  */
 public class ReflectException extends RuntimeException {
 
-	/**
-	 * @since JDK 1.8
-	 */
-	private static final long serialVersionUID = -8343923497347525699L;
+    /**
+     * @since JDK 1.8
+     */
+    private static final long serialVersionUID = -8343923497347525699L;
 
-	public ReflectException() {
-		super();
-	}
+    public ReflectException() {
+        super();
+    }
 
-	public ReflectException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    public ReflectException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
-	public ReflectException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ReflectException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public ReflectException(String message) {
-		super(message);
-	}
+    public ReflectException(String message) {
+        super(message);
+    }
 
-	public ReflectException(Throwable cause) {
-		super(cause);
-	}
+    public ReflectException(Throwable cause) {
+        super(cause);
+    }
 
 }

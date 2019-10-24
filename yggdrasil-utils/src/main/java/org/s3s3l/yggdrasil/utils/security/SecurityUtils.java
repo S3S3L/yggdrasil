@@ -24,7 +24,7 @@ public abstract class SecurityUtils {
     private static final Pattern upperCasePattern = Pattern.compile("[A-Z]+");
     private static final Pattern specialSymbolsPattern = Pattern.compile("[!@#$%^&*()_\\+\\-={}.\\[\\]:;\"'<\\?>,/]+");
     private static final Pattern numberPattern = Pattern.compile("\\d+");
-    
+
     private static final String DIGIT = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);

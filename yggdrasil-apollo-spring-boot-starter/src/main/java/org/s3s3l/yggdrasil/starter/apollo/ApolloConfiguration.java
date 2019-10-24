@@ -2,9 +2,9 @@ package org.s3s3l.yggdrasil.starter.apollo;
 
 import java.util.List;
 
-import org.s3s3l.yggdrasil.utils.apollo.ConfigFileChangedProcessor;
+import org.s3s3l.yggdrasil.spring.env.LocationType;
+import org.s3s3l.yggdrasil.starter.apollo.feature.ConfigFileChangedProcessor;
 import org.s3s3l.yggdrasil.utils.file.FileFormat;
-import org.s3s3l.yggdrasil.utils.spring.env.LocationType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
@@ -41,7 +41,7 @@ public class ApolloConfiguration {
         private String target;
         private Class<? extends ConfigFileChangedProcessor>[] processors;
         private List<FieldDoc> fieldDoc;
-        
+
         @Override
         public int compareTo(Document o) {
             return this.priority - o.getPriority();

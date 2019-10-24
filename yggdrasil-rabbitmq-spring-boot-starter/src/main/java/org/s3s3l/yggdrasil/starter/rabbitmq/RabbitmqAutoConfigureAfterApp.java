@@ -1,6 +1,6 @@
 package org.s3s3l.yggdrasil.starter.rabbitmq;
 
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -38,12 +38,11 @@ public class RabbitmqAutoConfigureAfterApp
     public void onApplicationEvent(ApplicationReadyEvent event) {
         logger.trace("Starting auto-configuring soav2.");
         ConfigurableApplicationContext ctx = event.getApplicationContext();
-        
+
         MultiRabbitmqConfiguartion configuration = ctx.getBean(MultiRabbitmqConfiguartion.class);
-        String configurationStr = JacksonUtils.defaultHelper.toJsonString(configuration);
+        String configurationStr = JacksonUtils.defaultHelper.toStructuralString(configuration);
         logger.debug("soav2 configuration '{}'", configurationStr);
-        
-        
+
         logger.trace("Finished auto-configuring soav2.");
     }
 

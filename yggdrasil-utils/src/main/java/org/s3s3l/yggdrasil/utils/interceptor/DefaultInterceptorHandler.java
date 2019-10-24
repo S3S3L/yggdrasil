@@ -51,7 +51,8 @@ public class DefaultInterceptorHandler implements InterceptorHandler {
             }
         } catch (InvocationTargetException e) {
             for (Interceptor interceptor : interceptorChain) {
-                result = interceptor.exception(result, StringUtils.EMPTY_STRING, proxy, method, e.getTargetException(), args);
+                result = interceptor.exception(result, StringUtils.EMPTY_STRING, proxy, method, e.getTargetException(),
+                        args);
             }
         } finally {
             for (Interceptor interceptor : interceptorChain) {

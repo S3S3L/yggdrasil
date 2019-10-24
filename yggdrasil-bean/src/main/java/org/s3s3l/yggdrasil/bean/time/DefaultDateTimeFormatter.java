@@ -12,7 +12,8 @@ import java.time.format.DateTimeFormatter;
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class DefaultDateTimeFormatter {
+public abstract class DefaultDateTimeFormatter {
+    private DefaultDateTimeFormatter() {}
 
 	public static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

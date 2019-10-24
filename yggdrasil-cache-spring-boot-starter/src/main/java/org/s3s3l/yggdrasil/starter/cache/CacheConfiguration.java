@@ -3,8 +3,8 @@ package org.s3s3l.yggdrasil.starter.cache;
 import java.util.function.Supplier;
 
 import org.s3s3l.yggdrasil.annotation.apollo.ApolloConfiguration;
-import org.s3s3l.yggdrasil.utils.cache.compressor.CompressProperties;
-import org.s3s3l.yggdrasil.utils.compressor.Compressor;
+import org.s3s3l.yggdrasil.cache.compressor.CompressProperties;
+import org.s3s3l.yggdrasil.compress.Compressor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

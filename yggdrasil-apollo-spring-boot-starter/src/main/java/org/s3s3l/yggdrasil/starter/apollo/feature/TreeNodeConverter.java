@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.s3s3l.yggdrasil.utils.json.IJacksonHelper;
-import org.s3s3l.yggdrasil.utils.json.JacksonUtils;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
+import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
 
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 public class TreeNodeConverter implements GenericConverter {
 
     private static final Set<ConvertiblePair> CONVERTIBLE_TYPES;
-    private static final IJacksonHelper json = JacksonUtils.create()
+    private static final JacksonHelper json = JacksonUtils.create()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     static {
@@ -50,7 +50,7 @@ public class TreeNodeConverter implements GenericConverter {
         if (source == null || !TreeNode.class.isAssignableFrom(sourceClass) || !(source instanceof TreeNode)) {
             return null;
         }
-        if(targetType.isArray()) {
+        if (targetType.isArray()) {
             return json.convert(source, new TypeReference() {
                 @Override
                 public Type getType() {

@@ -25,10 +25,10 @@ import org.s3s3l.yggdrasil.utils.security.SecurityUtils;
  */
 public abstract class BaseEncipher implements Encipher {
 
-	protected SecretKey secretKey = null;
-	protected Cipher cipher;
-	protected Integer keySize;
-	protected String key;
+    protected SecretKey secretKey = null;
+    protected Cipher cipher;
+    protected Integer keySize;
+    protected String key;
 
     public BaseEncipher(final String ALGORITHM) {
         try {
@@ -54,75 +54,75 @@ public abstract class BaseEncipher implements Encipher {
         }
     }
 
-	public Integer getKeySize() {
-		return keySize;
-	}
+    public Integer getKeySize() {
+        return keySize;
+    }
 
-	public void setKeySize(Integer keySize) {
-		this.keySize = keySize;
-	}
+    public void setKeySize(Integer keySize) {
+        this.keySize = keySize;
+    }
 
-	public SecretKey getSecretKey() {
-		return secretKey;
-	}
+    public SecretKey getSecretKey() {
+        return secretKey;
+    }
 
-	public void setSecretKey(SecretKey secretKey) {
-		this.secretKey = secretKey;
-	}
+    public void setSecretKey(SecretKey secretKey) {
+        this.secretKey = secretKey;
+    }
 
-	public Cipher getCipher() {
-		return cipher;
-	}
+    public Cipher getCipher() {
+        return cipher;
+    }
 
-	public void setCipher(Cipher cipher) {
-		this.cipher = cipher;
-	}
+    public void setCipher(Cipher cipher) {
+        this.cipher = cipher;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	@Override
-	public String encrypt(String src) {
+    @Override
+    public String encrypt(String src) {
 
-		if (secretKey == null || secretKey.isDestroyed()) {
-			throw new IllegalArgumentException("SecretKey not set.");
-		}
+        if (secretKey == null || secretKey.isDestroyed()) {
+            throw new IllegalArgumentException("SecretKey not set.");
+        }
 
-		byte[] result;
+        byte[] result;
 
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-			byte[] srcBytes = src.getBytes(StandardCharsets.UTF_8);
-			result = cipher.doFinal(srcBytes);
-		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-			throw new IllegalArgumentException(e);
-		}
-		return SecurityUtils.bytes2Hex(result);
-	}
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] srcBytes = src.getBytes(StandardCharsets.UTF_8);
+            result = cipher.doFinal(srcBytes);
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return SecurityUtils.bytes2Hex(result);
+    }
 
-	@Override
-	public String decrypt(String src) {
+    @Override
+    public String decrypt(String src) {
 
-		if (secretKey == null || secretKey.isDestroyed()) {
-			throw new IllegalArgumentException("SecretKey not set.");
-		}
+        if (secretKey == null || secretKey.isDestroyed()) {
+            throw new IllegalArgumentException("SecretKey not set.");
+        }
 
-		byte[] result;
+        byte[] result;
 
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, secretKey);
-			byte[] srcBytes = SecurityUtils.hex2Bytes(src);
-			result = cipher.doFinal(srcBytes);
-		} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-			throw new IllegalArgumentException(e);
-		}
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] srcBytes = SecurityUtils.hex2Bytes(src);
+            result = cipher.doFinal(srcBytes);
+        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            throw new IllegalArgumentException(e);
+        }
 
-		return new String(result, StandardCharsets.UTF_8);
-	}
+        return new String(result, StandardCharsets.UTF_8);
+    }
 
 }

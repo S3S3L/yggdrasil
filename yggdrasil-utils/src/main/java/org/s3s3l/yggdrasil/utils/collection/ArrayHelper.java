@@ -5,13 +5,13 @@ import java.util.Arrays;
 
 /**
  * <p>
- * </p> 
- * ClassName:ArrayHelper <br> 
- * Date:     May 17, 2019 5:13:31 PM <br>
- *  
- * @author   kehw_zwei 
- * @version  1.0.0
- * @since    JDK 1.8
+ * </p>
+ * ClassName:ArrayHelper <br>
+ * Date: May 17, 2019 5:13:31 PM <br>
+ * 
+ * @author kehw_zwei
+ * @version 1.0.0
+ * @since JDK 1.8
  */
 public abstract class ArrayHelper {
 
@@ -44,4 +44,3 @@ public abstract class ArrayHelper {
         return prefixAndJoin(delimiter, prefix);
     }
 }
-  

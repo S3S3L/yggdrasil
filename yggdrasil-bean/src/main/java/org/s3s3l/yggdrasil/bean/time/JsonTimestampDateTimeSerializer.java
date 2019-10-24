@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
@@ -19,8 +18,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class JsonTimestampDateTimeSerializer extends JsonSerializer<Timestamp> {
 
 	@Override
-	public void serialize(Timestamp value, JsonGenerator gen, SerializerProvider serializers) throws IOException,
-			JsonProcessingException {
+	public void serialize(Timestamp value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		gen.writeString(value.toLocalDateTime().format(formatter));
 	}
