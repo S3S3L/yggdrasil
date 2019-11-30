@@ -32,6 +32,7 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.vscode/
 
 # Eclipse Core
 *.project

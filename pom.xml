@@ -173,7 +173,7 @@
 		<okhttp.version>2.5.0</okhttp.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<opencsv.version>4.1</opencsv.version>
-		<apollo.client.version>1.2.0-hb</apollo.client.version>
+		<apollo.client.version>1.4.0</apollo.client.version>
 	</properties>
 
 	<dependencyManagement>
