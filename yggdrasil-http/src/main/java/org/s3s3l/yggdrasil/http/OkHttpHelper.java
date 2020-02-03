@@ -167,18 +167,19 @@ public class OkHttpHelper implements HttpHelper {
             Map<String, String> headers,
             JsonFactory factory,
             HttpMethod method) {
-        MediaType requestMediaType = MediaType.parse(mediaType);
-        RequestBody requestBody = RequestBody.create(requestMediaType, content);
-        Builder builder = new Request.Builder().url(url);
+        Builder builder = new Request.Builder();
         switch (method) {
             case GET:
-                builder.get();
+                builder.url(StringUtils.isEmpty(content) ? url : String.join("?", url, content))
+                        .get();
                 break;
             case POST:
-                builder.post(requestBody);
+                builder.url(url)
+                        .post(RequestBody.create(MediaType.parse(mediaType), content));
                 break;
             case PUT:
-                builder.put(requestBody);
+                builder.url(url)
+                        .put(RequestBody.create(MediaType.parse(mediaType), content));
                 break;
             default:
                 throw new HttpException(400, "Invalid method");
@@ -195,11 +196,11 @@ public class OkHttpHelper implements HttpHelper {
         }
 
         Request request = builder.build();
-        logger.info("doPost: request, {}", request);
+        logger.info("doRequest: request, {}", request);
         try {
             Response response = client.newCall(request)
                     .execute();
-            logger.info("doPost: response, {}", response);
+            logger.info("doRequest: response, {}", response);
             if (response.code() >= 400) {
                 String msg = response.message();
                 logger.error("Request fail. Code {}, message {}.", response.code(), msg);
@@ -288,39 +289,7 @@ public class OkHttpHelper implements HttpHelper {
      */
     @Override
     public HttpResponse<JsonNode> doGet(String url, String content, Map<String, String> headers, JsonFactory factory) {
-
-        Builder builder = new Request.Builder().url(StringUtils.isEmpty(content) ? url : String.join("?", url, content))
-                .get();
-        if (headers != null) {
-            for (Entry<String, String> entry : headers.entrySet()) {
-                builder.addHeader(entry.getKey(), entry.getValue()
-                        .replaceAll("[\n\r]", ""));
-            }
-        }
-
-        Request request = builder.build();
-        logger.debug("doGet: request, {}", request);
-        try {
-            Response response = client.newCall(request)
-                    .execute();
-            logger.debug("doGet: response, {}", response);
-            if (response.code() >= 400) {
-                String msg = response.message();
-                logger.error("Request fail. Code {}, message {}.", response.code(), msg);
-                throw new HttpException(response.code(), "Request fail.");
-            }
-
-            try (ResponseBody body = response.body()) {
-                return new HttpResponse<JsonNode>().setBody(JacksonUtils.create(factory)
-                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                        .toTreeNode(body.byteStream()))
-                        .setCode(response.code())
-                        .setHeaders(response.headers()
-                                .toMultimap());
-            }
-        } catch (IOException e) {
-            throw new HttpException(e);
-        }
+        return doRequest(url, null, null, content, headers, factory, HttpMethod.GET);
     }
 
     @Override
@@ -334,13 +303,12 @@ public class OkHttpHelper implements HttpHelper {
             Response response = client.newCall(new Builder().url(url)
                     .build())
                     .execute();
-            if(response.code() >= 400) {
+            if (response.code() >= 400) {
                 String msg = response.message();
                 logger.error("Request fail. Code {}, message {}.", response.code(), msg);
                 throw new HttpException(response.code(), "Request fail.");
             }
-            return response
-                    .body()
+            return response.body()
                     .byteStream();
         } catch (IOException e) {
             throw new HttpException(e);

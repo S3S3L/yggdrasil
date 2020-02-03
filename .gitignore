@@ -78,3 +78,6 @@ classes/artifacts/
 .gitconfig
 logs/
 *.versionsBackup
+
+# Mac file system
+.DS_Store

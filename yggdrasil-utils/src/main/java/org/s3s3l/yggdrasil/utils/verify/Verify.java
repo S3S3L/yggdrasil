@@ -737,6 +737,13 @@ public abstract class Verify {
         fixedLength(string, length, String.format("[Verify failed] - the string length must be %d.", length));
     }
 
+    public static void largerThan(Object src, Number compare, String message) {
+        if (!(src instanceof Number)) {
+            throw new VerifyException(message);
+        }
+        largerThan((Number) src, compare, message);
+    }
+
     public static void largerThan(Number src, Number compare, String message) {
         if (src.doubleValue() <= compare.doubleValue()) {
             throw new VerifyException(message);
@@ -757,6 +764,13 @@ public abstract class Verify {
     public static void notLargerThan(Number src, Number compare) {
         notLargerThan(src, compare, String
                 .format("[Verify failed] - provided number must not be larger than %s, but it is %s", compare, src));
+    }
+
+    public static void lessThan(Object src, Number compare, String message) {
+        if (!(src instanceof Number)) {
+            throw new VerifyException(message);
+        }
+        lessThan((Number) src, compare, message);
     }
 
     public static void lessThan(Number src, Number compare, String message) {
@@ -799,6 +813,16 @@ public abstract class Verify {
 
     public static void assertNotEquals(Object src, Object compare, String message) {
         if ((src == null && compare != null) || (src != null && src.equals(compare))) {
+            throw new VerifyException(message);
+        }
+    }
+
+    public static void isMatch(Object src, String regex) {
+        isMatch(src, regex, String.format("[Verify failed] - String '%s' dose not match regex '%s'", src, regex));
+    }
+
+    public static void isMatch(Object src, String regex, String message) {
+        if (!(src instanceof String) || !StringUtils.isMatch((String) src, regex)) {
             throw new VerifyException(message);
         }
     }

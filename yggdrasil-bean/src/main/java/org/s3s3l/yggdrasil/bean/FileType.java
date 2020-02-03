@@ -16,7 +16,8 @@ public enum FileType {
 	PROPERTIES(1, new String[] { "properties" }),
 	YAML(2, new String[] { "yaml", "yml" }),
 	XML(3, new String[] { "xml" }),
-	JSON(4, new String[] { "json" });
+	JSON(4, new String[] { "json" }),
+    CLASS(4, new String[] { "class" });
 
 	private int value;
 	private String[] extensions;

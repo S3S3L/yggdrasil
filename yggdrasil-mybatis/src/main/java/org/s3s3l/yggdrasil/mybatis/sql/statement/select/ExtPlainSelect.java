@@ -47,7 +47,7 @@ public class ExtPlainSelect extends PlainSelect {
         this.setJoins(plainSelect.getJoins());
         this.setWhere(plainSelect.getWhere());
         this.setOracleHierarchical(plainSelect.getOracleHierarchical());
-        this.setGroupByColumnReferences(plainSelect.getGroupByColumnReferences());
+        this.setGroupByElement(plainSelect.getGroupBy());
         this.setHaving(plainSelect.getHaving());
         this.setLimit(plainSelect.getLimit());
         this.setOrderByElements(plainSelect.getOrderByElements());
@@ -65,7 +65,8 @@ public class ExtPlainSelect extends PlainSelect {
         List<Join> joins = this.getJoins();
         Expression where = this.getWhere();
         OracleHierarchicalExpression oracleHierarchical = this.getOracleHierarchical();
-        List<Expression> groupByColumnReferences = this.getGroupByColumnReferences();
+        List<Expression> groupByColumnReferences = this.getGroupBy()
+                .getGroupByExpressions();
         Expression having = this.getHaving();
         ExtLimit limit = new ExtLimit(this.getLimit(), databaseType);
         List<OrderByElement> orderByElements = this.getOrderByElements();

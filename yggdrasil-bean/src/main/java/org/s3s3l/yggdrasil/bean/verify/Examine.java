@@ -94,6 +94,18 @@ public @interface Examine {
      * @since JDK 1.8
      */
     boolean withinTheCollection() default false;
-    
+
+    /**
+     * 数字大小比较的标准值
+     * 
+     * @return
+     */
     int standard() default 0;
+
+    /**
+     * 正则匹配的正则表达式
+     * 
+     * @return
+     */
+    String regex() default "";
 }

@@ -618,7 +618,7 @@ public abstract class FileUtils {
             throw new ResourceNotFoundException("Input file not found.");
         }
 
-        if (out.exists() && out.isDirectory()) {
+        if (out.isDirectory()) {
             throw new VerifyException("Output file is a directory.");
         }
 
@@ -640,6 +640,8 @@ public abstract class FileUtils {
         if (!ws.exists()) {
             ws.mkdirs();
         }
+
+        // 计算文件按分片大小分片的起始和结束位置，结束位置在行中的会延长到行尾
         List<FilePart> fileParts;
         try {
             final long sourceSize = Files.size(in.toPath());
@@ -649,6 +651,7 @@ public abstract class FileUtils {
             throw new ResourceProcessException(e);
         }
 
+        // 根据每行的hash值进行分片
         List<Callable<Set<File>>> shardJobs = new LinkedList<>();
         for (FilePart filePart : fileParts) {
             shardJobs.add(() -> hashShard(in, filePart.startOfPart, filePart.endOfPart, taskWorkspace, actualShardNum,
@@ -658,6 +661,7 @@ public abstract class FileUtils {
         Set<File> shardFiles = executeCallsStream(shardJobs, executor).flatMap(Set::stream)
                 .collect(Collectors.toSet());
 
+        // 对每个分片文件执行去重策略
         try (OutputStream os = new FileOutputStream(out)) {
             List<Callable<Boolean>> calls = new LinkedList<>();
             for (File shardFile : shardFiles) {
@@ -678,6 +682,7 @@ public abstract class FileUtils {
             throws IOException {
         long shardSize = Files.size(shardFile.toPath());
         if (shardSize > maxShardSize) {
+            // 使用改进后的hashShard而不是按大小强制分片
             Map<String, Path> shardSplits = split(shardFile.getAbsolutePath(),
                     Paths.get(shardFile.getParent(), shardFile.getName()
                             .concat("_split"))
@@ -690,6 +695,7 @@ public abstract class FileUtils {
                     deduplication(shardSplit.toFile(), shardOs);
                 }
             }
+            // TODO 判断合并后的文件是否过大，如果过大则将hash槽位扩大后重复执行hashShard和每个分片的去重，直到合并文件大小符合预期或者所有分片无重复数据
             return deduplication(mergeFile, os);
         } else {
             return deduplication(shardFile, os);

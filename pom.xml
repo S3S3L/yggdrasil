@@ -169,7 +169,7 @@
 		<lmax.version>3.3.5</lmax.version>
 		<drewnoakes.version>2.10.1</drewnoakes.version>
 		<reflections.version>0.9.10</reflections.version>
-		<jsqlparser.version>1.0</jsqlparser.version>
+		<jsqlparser.version>3.1</jsqlparser.version>
 		<okhttp.version>2.5.0</okhttp.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<opencsv.version>4.1</opencsv.version>

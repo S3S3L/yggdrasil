@@ -1,6 +1,5 @@
 package org.s3s3l.yggdrasil.mybatis.sql;
 
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,6 +9,7 @@ import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
+import net.sf.jsqlparser.parser.StringProvider;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
@@ -25,7 +25,7 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 public class SqlParserUtils {
 
     public static String getCountingSqlBySqlParser(String baseSql) throws ParseException {
-        CCJSqlParser parser = new CCJSqlParser(new StringReader(baseSql));
+        CCJSqlParser parser = new CCJSqlParser(new StringProvider(baseSql));
         PlainSelect select = parser.PlainSelect();
         select.setSelectItems(Arrays.asList(new SelectExpressionItem(new Column("COUNT(*)"))));
         select.setLimit(null);

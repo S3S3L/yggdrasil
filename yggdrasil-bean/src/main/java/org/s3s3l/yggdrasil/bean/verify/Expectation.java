@@ -22,5 +22,6 @@ public enum Expectation {
     IS_INTERFACE,
     EXAMINED,
     LARGER_THAN,
-    LESS_THAN;
+    LESS_THAN,
+    MATCH;
 }

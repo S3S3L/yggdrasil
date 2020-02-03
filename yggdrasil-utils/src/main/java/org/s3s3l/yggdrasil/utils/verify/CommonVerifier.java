@@ -161,6 +161,15 @@ public class CommonVerifier implements Verifier {
             case IS_INTERFACE:
                 Verify.isInterface(fieldType, examine.msg());
                 break;
+            case MATCH:
+                Verify.isMatch(value, examine.regex(), examine.msg());
+                break;
+            case LARGER_THAN:
+                Verify.largerThan(value, examine.standard(), examine.msg());
+                break;
+            case LESS_THAN:
+                Verify.lessThan(value, examine.standard(), examine.msg());
+                break;
             default:
                 break;
         }
