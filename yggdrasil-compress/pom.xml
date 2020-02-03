@@ -65,7 +65,7 @@
 	<parent>
 		<groupId>org.s3s3l.yggdrasil</groupId>
 		<artifactId>yggdrasil-parent</artifactId>
-		<version>3.5.1-SNAPSHOT</version>
+		<version>3.5.1-RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -79,6 +79,19 @@
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
 			<classifier>linux_amd64</classifier>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.github.luben</groupId>
+			<artifactId>zstd-jni</artifactId>
+			<classifier>darwin_x86_64</classifier>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.github.luben</groupId>
+			<artifactId>zstd-jni</artifactId>
+			<classifier>win_amd64</classifier>
+			<optional>true</optional>
 		</dependency>
 		<!-- Compile -->
 		<dependency>
@@ -94,16 +107,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<!-- Maven服务器地址 -->
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>${nexus.url}/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>${nexus.url}/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
 </project>

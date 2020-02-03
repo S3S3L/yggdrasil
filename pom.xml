@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.s3s3l.yggdrasil</groupId>
 	<artifactId>yggdrasil-parent</artifactId>
-	<version>3.5.1-SNAPSHOT</version>
+	<version>3.5.1-RELEASE</version>
 	<packaging>pom</packaging>
 	
 	<scm>
@@ -159,11 +159,11 @@
 		<zxing.version>3.2.1</zxing.version>
 		<apache.commons.version>3.4</apache.commons.version>
 		<apache.poi.version>3.15</apache.poi.version>
-		<tomcat.version>8.5.45</tomcat.version>
+		<tomcat.version>8.5.50</tomcat.version>
 		<shardingjdbc.version>3.1.0</shardingjdbc.version>
 		<mybatis.version>3.5.2</mybatis.version>
 		<mybatis.spring.version>2.0.2</mybatis.spring.version>
-		<log4j.version>1.2.14</log4j.version>
+		<log4j.version>1.2.17</log4j.version>
 		<fastjson.version>1.2.56</fastjson.version>
 		<zstd.version>1.3.7-3</zstd.version>
 		<lmax.version>3.3.5</lmax.version>
@@ -305,6 +305,18 @@
 				<version>${zstd.version}</version>
 				<classifier>linux_amd64</classifier>
 			</dependency>
+			<dependency>
+				<groupId>com.github.luben</groupId>
+				<artifactId>zstd-jni</artifactId>
+				<version>${zstd.version}</version>
+				<classifier>darwin_x86_64</classifier>
+			</dependency>
+			<dependency>
+				<groupId>com.github.luben</groupId>
+				<artifactId>zstd-jni</artifactId>
+				<version>${zstd.version}</version>
+				<classifier>win_amd64</classifier>
+			</dependency>
 			<!-- thumbnailator -->
 			<dependency>
 				<groupId>net.coobird</groupId>
@@ -434,5 +446,16 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
+	<distributionManagement>
+		<snapshotRepository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/S3S3L/yggdrasil/</url>
+		</snapshotRepository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/S3S3L/yggdrasil/</url>
+		</repository>
+	</distributionManagement>
 
 </project>

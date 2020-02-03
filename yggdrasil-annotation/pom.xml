@@ -64,6 +64,6 @@
     <parent>
         <groupId>org.s3s3l.yggdrasil</groupId>
         <artifactId>yggdrasil-parent</artifactId>
-        <version>3.5.1-SNAPSHOT</version>
+        <version>3.5.1-RELEASE</version>
     </parent>
 </project>
