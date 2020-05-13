@@ -1,6 +1,7 @@
 package org.s3s3l.yggdrasil.bean.verify;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -23,7 +24,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 @Retention(RUNTIME)
-@Target({ TYPE, FIELD })
+@Target({ TYPE, FIELD, METHOD })
 @Repeatable(Examines.class)
 public @interface Examine {
 
@@ -39,7 +40,7 @@ public @interface Examine {
      * 
      * specify effective scope
      * 
-     * @return 
+     * @return
      * @since JDK 1.8
      */
     String scope() default "";
@@ -48,7 +49,7 @@ public @interface Examine {
      * 
      * specify effective scopes
      * 
-     * @return 
+     * @return
      * @since JDK 1.8
      */
     String[] scopes() default {};

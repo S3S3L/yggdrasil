@@ -18,7 +18,11 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @author kehw_zwei
  * @version 1.0.0
  * @since JDK 1.8
+ * @deprecated 各方面性能上
+ *             {@code PropertyDescriptorReflectionBean}占优，请用{@code PropertyDescriptorReflectionBean}来替代使用。
+ * @see PropertyDescriptorReflectionBean
  */
+@Deprecated
 public class Reflection<T> implements ReflectionBean {
 
     private T obj;
@@ -68,7 +72,7 @@ public class Reflection<T> implements ReflectionBean {
         return result;
     }
 
-    public void setFieldValue(String fieldName, Object fieldValue) throws IllegalAccessException {
+    public void setFieldValue(String fieldName, Object fieldValue) {
         Field field = getField(fieldName);
         if (field != null) {
             Object value;
@@ -96,11 +100,15 @@ public class Reflection<T> implements ReflectionBean {
             }
             field.setAccessible(true);
 
-            field.set(obj, value);
+            try {
+                field.set(obj, value);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new ReflectException(e);
+            }
         }
     }
 
-    public void fill(Properties prop) throws IllegalAccessException {
+    public void fill(Properties prop) {
         Verify.notNull(prop);
         for (Entry<Object, Object> entry : prop.entrySet()) {
             String key = entry.getKey()
@@ -111,7 +119,7 @@ public class Reflection<T> implements ReflectionBean {
         }
     }
 
-    public void fill(Map<String, Object> map) throws IllegalAccessException {
+    public void fill(Map<String, Object> map) {
         Verify.notNull(map);
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();

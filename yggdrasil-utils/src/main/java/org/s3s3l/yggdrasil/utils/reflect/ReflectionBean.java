@@ -34,9 +34,9 @@ public interface ReflectionBean {
      * @throws IllegalAccessException
      *             {@link IllegalAccessException}
      */
-    void setFieldValue(String fieldName, Object fieldValue) throws IllegalAccessException;
+    void setFieldValue(String fieldName, Object fieldValue);
 
-    void fill(Properties prop) throws IllegalAccessException;
+    void fill(Properties prop);
 
-    void fill(Map<String, Object> map) throws IllegalAccessException;
+    void fill(Map<String, Object> map);
 }

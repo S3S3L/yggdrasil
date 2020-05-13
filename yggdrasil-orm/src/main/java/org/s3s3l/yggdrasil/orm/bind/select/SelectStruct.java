@@ -1,10 +1,13 @@
-package org.s3s3l.yggdrasil.orm.bind;
+package org.s3s3l.yggdrasil.orm.bind.select;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
+import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
+import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -26,7 +29,7 @@ public class SelectStruct implements DataBindNode {
     private Map<String, String> map = new HashMap<>();
 
     public void addNode(ColumnStruct node) {
-        map.put(node.getName(), node.getAlias());
+        map.put(node.getMeta().getName(), node.getMeta().getAlias());
         this.nodes.add(node);
     }
 

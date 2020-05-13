@@ -1,8 +1,10 @@
-package org.s3s3l.yggdrasil.orm.bind;
+package org.s3s3l.yggdrasil.orm.bind.condition;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
+import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -11,18 +13,18 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * 
  * <p>
  * </p>
- * ClassName: SetStruct <br>
- * date: Sep 20, 2019 11:29:34 AM <br>
+ * ClassName: ConditionStruct <br>
+ * date: Sep 20, 2019 11:29:03 AM <br>
  * 
  * @author kehw_zwei
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class SetStruct implements DataBindNode {
+public class ConditionStruct implements DataBindNode {
 
-    private List<SetNode> nodes = new ArrayList<>();
+    private List<RawConditionNode> nodes = new ArrayList<>();
 
-    public void addNode(SetNode node) {
+    public void addNode(RawConditionNode node) {
         this.nodes.add(node);
     }
 
@@ -35,20 +37,25 @@ public class SetStruct implements DataBindNode {
         }
 
         SqlStruct struct = new SqlStruct();
-        struct.setSql(" SET");
+        boolean hasCondition = false;
 
         for (DataBindNode node : nodes) {
             SqlStruct nodeStruct = node.toSqlStruct(bean);
             if (nodeStruct == null) {
                 continue;
             }
-            struct.appendSql(",")
-                    .appendSql(nodeStruct.getSql());
+
+            if (!hasCondition) {
+                struct.setSql(" WHERE");
+                hasCondition = true;
+            }
+
+            struct.appendSql(nodeStruct.getSql());
             struct.addParams(nodeStruct.getParams());
         }
 
         struct.setSql(struct.getSql()
-                .replaceFirst(",", StringUtils.EMPTY_STRING));
+                .replaceFirst("AND", StringUtils.EMPTY_STRING));
 
         return struct;
     }

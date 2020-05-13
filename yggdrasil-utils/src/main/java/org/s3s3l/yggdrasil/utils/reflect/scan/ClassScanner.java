@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -84,7 +85,8 @@ public class ClassScanner implements Scanner {
             return clzSet;
         }
 
-        for (File file : folder.listFiles()) {
+        for (File file : Optional.ofNullable(folder.listFiles())
+                .orElse(new File[] {})) {
             if (isClassFile(file)) {
                 String className = getClassName(file.getName());
                 if (StringUtils.isEmpty(className)) {

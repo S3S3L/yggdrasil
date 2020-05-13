@@ -16,17 +16,18 @@ import javax.sql.DataSource;
 import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
-import org.s3s3l.yggdrasil.orm.bind.express.DefaultExpressFactory;
 import org.s3s3l.yggdrasil.orm.bind.express.ExpressFactory;
+import org.s3s3l.yggdrasil.orm.bind.express.common.DefaultExpressFactory;
 import org.s3s3l.yggdrasil.orm.exception.DataMapException;
 import org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -39,9 +40,8 @@ import org.slf4j.LoggerFactory;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Slf4j
 public class DefaultSqlExecutor implements SqlExecutor {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ExpressFactory expressFactory = new DefaultExpressFactory();
     private ValidatorFactory validatorFactory = new DefaultValidatorFactory();
@@ -54,13 +54,13 @@ public class DefaultSqlExecutor implements SqlExecutor {
 
     @Override
     public <T> int insert(List<T> model, Class<T> modelClass) {
-        Verify.notNull(model);
+        Verify.notEmpty(model);
         Verify.notNull(modelClass);
 
         DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
         SqlStruct sqlStruct = express.getInsert(model);
         String sql = sqlStruct.getSql();
-        logger.debug("Excuting sql [{}].", sql);
+        log.debug("Excuting sql [{}].", sql);
         try (Connection conn = datasource.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 setParams(sqlStruct, preparedStatement);
@@ -74,13 +74,13 @@ public class DefaultSqlExecutor implements SqlExecutor {
 
     @Override
     public <T> int delete(T model, Class<T> modelClass) {
-        Verify.notNull(model);
+        Verify.notEmpty(model);
         Verify.notNull(modelClass);
 
         DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
         SqlStruct sqlStruct = express.getDelete(model);
         String sql = sqlStruct.getSql();
-        logger.debug("Excuting sql [{}].", sql);
+        log.debug("Excuting sql [{}].", sql);
         try (Connection conn = datasource.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 setParams(sqlStruct, preparedStatement);
@@ -100,7 +100,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
         SqlStruct sqlStruct = express.getUpdate(model);
         String sql = sqlStruct.getSql();
-        logger.debug("Excuting sql [{}].", sql);
+        log.debug("Excuting sql [{}].", sql);
         try (Connection conn = datasource.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 setParams(sqlStruct, preparedStatement);
@@ -120,7 +120,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
         SqlStruct sqlStruct = express.getSelect(model);
         String sql = sqlStruct.getSql();
-        logger.debug("Excuting sql [{}].", sql);
+        log.debug("Excuting sql [{}].", sql);
         try (Connection conn = datasource.getConnection()) {
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 setParams(sqlStruct, preparedStatement);
@@ -157,17 +157,20 @@ public class DefaultSqlExecutor implements SqlExecutor {
         try {
             while (rs.next()) {
                 T result = resultType.newInstance();
-                Reflection<T> reflection = Reflection.create(result);
+                ReflectionBean reflection = new PropertyDescriptorReflectionBean(result);
 
                 for (int i = 1; i <= metaData.getColumnCount(); i++) {
                     String columnLabel = metaData.getColumnLabel(i);
                     String fieldName = express.getAlias(metaData.getColumnName(i));
+                    
                     Field field = CollectionUtils.getFirst(fields, r -> r.getName()
                             .equalsIgnoreCase(fieldName));
                     Object resultData = rs.getObject(columnLabel);
+                    
                     if (field.isAnnotationPresent(Column.class)) {
                         Type fieldType = field.getGenericType();
                         Class<?> fieldClass = field.getType();
+                        
                         resultData = field.getAnnotation(Column.class)
                                 .typeHandler()
                                 .newInstance()

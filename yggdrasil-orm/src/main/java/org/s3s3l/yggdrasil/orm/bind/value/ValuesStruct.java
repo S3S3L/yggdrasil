@@ -1,9 +1,13 @@
-package org.s3s3l.yggdrasil.orm.bind;
+package org.s3s3l.yggdrasil.orm.bind.value;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
+import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
+import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
@@ -20,9 +24,9 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  */
 public class ValuesStruct implements DataBindNode {
 
-    private List<ColumnStruct> nodes = new ArrayList<>();
+    private List<ColumnMeta> nodes = new ArrayList<>();
 
-    public void addNode(ColumnStruct node) {
+    public void addNode(ColumnMeta node) {
         this.nodes.add(node);
     }
 
@@ -40,7 +44,7 @@ public class ValuesStruct implements DataBindNode {
         // .isValid(bean.getFieldValue(r.getField()
         // .getName())))
         // .collect(Collectors.toList());
-        List<ColumnStruct> validatedNodes = this.nodes;
+        List<ColumnMeta> validatedNodes = this.nodes;
 
         if (validatedNodes.isEmpty()) {
             return null;
@@ -54,7 +58,7 @@ public class ValuesStruct implements DataBindNode {
 
         if (first) {
             String fields = String.join(",", validatedNodes.stream()
-                    .map(ColumnStruct::getName)
+                    .map(ColumnMeta::getName)
                     .collect(Collectors.toList()));
             struct.setSql(String.format("(%s) VALUES (%s)", fields, values));
         } else {

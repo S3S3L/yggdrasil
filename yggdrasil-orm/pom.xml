@@ -83,6 +83,11 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
 		</dependency>
+		<!-- sqlParser -->
+		<dependency>
+			<groupId>com.github.jsqlparser</groupId>
+			<artifactId>jsqlparser</artifactId>
+		</dependency>
 		<!-- Log -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -1,5 +1,9 @@
-package org.s3s3l.yggdrasil.orm.bind;
+package org.s3s3l.yggdrasil.orm.bind.set;
 
+import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
+import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
+import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -15,18 +19,16 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class SetNode extends ColumnStruct {
+public class SetNode implements DataBindNode {
+
+    private ColumnMeta meta;
 
     public SetNode() {
 
     }
 
     public SetNode(ColumnStruct column) {
-        this.setName(column.getName());
-        this.setAlias(column.getAlias());
-        this.setField(column.getField());
-        this.setTableAlias(column.getTableAlias());
-        this.setValidator(column.getValidator());
+        this.meta = column.getMeta();
     }
 
     @Override
@@ -35,21 +37,22 @@ public class SetNode extends ColumnStruct {
 
         SqlStruct struct = new SqlStruct();
 
-        if (StringUtils.isEmpty(this.getName()) || this.getField() == null || this.getValidator() == null) {
+        if (StringUtils.isEmpty(this.meta.getName()) || this.meta.getField() == null
+                || this.meta.getValidator() == null) {
             return null;
         }
 
-        Object param = bean.getFieldValue(this.getField()
+        Object param = bean.getFieldValue(this.meta.getField()
                 .getName());
 
-        if (!this.getValidator()
+        if (!this.meta.getValidator()
                 .isValid(param)) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder(" ");
 
-        sb.append(this.getName())
+        sb.append(this.meta.getName())
                 .append(" = ?");
 
         struct.setSql(sb.toString());

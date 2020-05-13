@@ -1,10 +1,9 @@
 package org.s3s3l.yggdrasil.spring.analyzer;
 
-import org.s3s3l.yggdrasil.utils.log.ILogger;
-import org.s3s3l.yggdrasil.utils.log.base.LogHelper;
-import org.s3s3l.yggdrasil.utils.log.base.LogHelper.LogLevel;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.boot.diagnostics.FailureAnalyzer;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -16,13 +15,12 @@ import org.springframework.boot.diagnostics.FailureAnalyzer;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Slf4j
 public class DefaultStartupFailureAnalyzer implements FailureAnalyzer {
-
-    private ILogger logger = LogHelper.create(LogLevel.ERROR);
 
     @Override
     public FailureAnalysis analyze(Throwable failure) {
-        logger.error(failure);
+        log.error("FailureAnalysis", failure);
         return null;
     }
 

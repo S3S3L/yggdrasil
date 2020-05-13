@@ -10,10 +10,11 @@ import org.s3s3l.yggdrasil.bean.verify.Examine;
 import org.s3s3l.yggdrasil.bean.verify.Examines;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
-import org.s3s3l.yggdrasil.utils.log.base.LogHelper;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
-import org.slf4j.Logger;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -25,8 +26,16 @@ import org.slf4j.Logger;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Slf4j
 public class CommonVerifier implements Verifier {
-    private final Logger logger = LogHelper.getLogger(getClass());
+
+    @Override
+    public void tryVerify(Object param, Class<?> type) {
+        if (param == null) {
+            throw new VerifyException("Param is null.");
+        }
+        doVerify(param, type, "");
+    }
 
     @Override
     public <T> void verify(T param, Class<T> type) {
@@ -50,7 +59,7 @@ public class CommonVerifier implements Verifier {
                                     .getName()));
         }
 
-        Reflection<?> ref = Reflection.create(param);
+        ReflectionBean ref = new PropertyDescriptorReflectionBean(param);
         for (Field field : ReflectionUtils.getFields(type)) {
             Object value = ref.getFieldValue(field.getName());
             if (field.isAnnotationPresent(Examine.class)) {
@@ -133,21 +142,21 @@ public class CommonVerifier implements Verifier {
                 break;
             case EXAMINED:
                 if (fieldType.isPrimitive()) {
-                    logger.warn("Expectation [EXAMINED] only effect on 'non primitive' type.");
+                    log.warn("Expectation [EXAMINED] only effect on 'non primitive' type.");
                     break;
                 }
                 doVerify(value, value.getClass(), scope);
                 break;
             case LENGTH_LIMIT:
                 if (examine.length() <= 0) {
-                    logger.warn("Length limit not set. Skip. {}.{} [{}]", type.getName(), field.getName(), value);
+                    log.warn("Length limit not set. Skip. {}.{} [{}]", type.getName(), field.getName(), value);
                     break;
                 }
                 Verify.lenthLimit(value, examine.length(), examine.msg());
                 break;
             case FIXED_LENGTH:
                 if (examine.length() <= 0) {
-                    logger.warn("Length limit not set. Skip. {}.{} [{}]", type.getName(), field.getName(), value);
+                    log.warn("Length limit not set. Skip. {}.{} [{}]", type.getName(), field.getName(), value);
                     break;
                 }
                 Verify.fixedLength(value, examine.length(), examine.msg());

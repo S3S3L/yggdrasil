@@ -12,6 +12,8 @@ package org.s3s3l.yggdrasil.utils.verify;
  */
 public interface Verifier {
 
+    void tryVerify(Object param, Class<?> type);
+
     <T> void verify(T param, Class<T> type);
 
     <T> void verify(T param, Class<T> type, String scope);

@@ -25,6 +25,9 @@ public class ArrayTypeHandler implements TypeHandler {
 
     @Override
     public Object toJDBCType(Object param) {
+        if (param == null) {
+            return null;
+        }
         Class<?> type = param.getClass();
         if (type.isArray()) {
             if (param instanceof double[]) {

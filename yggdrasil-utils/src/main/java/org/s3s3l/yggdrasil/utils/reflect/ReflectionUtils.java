@@ -15,12 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.s3s3l.yggdrasil.annotation.FromJson;
 import org.s3s3l.yggdrasil.annotation.FromObject;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-import org.s3s3l.yggdrasil.utils.log.base.LogHelper;
 import org.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
-import org.slf4j.Logger;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -32,8 +32,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Slf4j
 public abstract class ReflectionUtils {
-    private static final Logger logger = LogHelper.getLogger(ReflectionUtils.class);
 
     /**
      * 
@@ -45,7 +45,7 @@ public abstract class ReflectionUtils {
      * @since JDK 1.8
      */
     public static <T> T deserialize(T data, Class<T> type) {
-        Reflection<T> ref = Reflection.create(data);
+        ReflectionBean ref = new PropertyDescriptorReflectionBean(data);
         Set<Field> fields = getFields(type);
         fields.stream()
                 .filter(r -> r.isAnnotationPresent(FromJson.class))
@@ -57,7 +57,7 @@ public abstract class ReflectionUtils {
                                 .equals(f.getName()))
                                 .orElseThrow(() -> new NoSuchFieldException(fromJson.value()));
                     } catch (NoSuchFieldException e) {
-                        logger.warn("field not found", e);
+                        log.warn("field not found", e);
                         return;
                     }
 
@@ -77,13 +77,13 @@ public abstract class ReflectionUtils {
                                         return field.getGenericType();
                                     }
                                 }));
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
-                        logger.warn("set field value fail.", e);
+                    } catch (IllegalArgumentException e) {
+                        log.warn("set field value fail.", e);
                         return;
                     }
                 });
 
-        return ref.getObj();
+        return data;
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class ReflectionUtils {
      * @since JDK 1.8
      */
     public static <T> T serialize(T data, Class<T> type) {
-        Reflection<T> ref = Reflection.create(data);
+        ReflectionBean ref = new PropertyDescriptorReflectionBean(data);
         Set<Field> fields = getFields(type);
         fields.stream()
                 .filter(r -> r.isAnnotationPresent(FromObject.class) && r.getType() == String.class)
@@ -108,7 +108,7 @@ public abstract class ReflectionUtils {
                                 .equals(f.getName()))
                                 .orElseThrow(() -> new NoSuchFieldException(fromObject.value()));
                     } catch (NoSuchFieldException e) {
-                        logger.warn("field not found", e);
+                        log.warn("field not found", e);
                         return;
                     }
 
@@ -118,20 +118,20 @@ public abstract class ReflectionUtils {
                     }
                     try {
                         ref.setFieldValue(field.getName(), JacksonUtils.defaultHelper.toStructuralString(obj));
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
-                        logger.warn("set field value fail.", e);
+                    } catch (IllegalArgumentException e) {
+                        log.warn("set field value fail.", e);
                         return;
                     }
                 });
 
-        return ref.getObj();
+        return data;
     }
 
     public static <T> T clone(T src, Class<T> type) {
         try {
-            Reflection<T> srcReflection = Reflection.create(src);
+            ReflectionBean srcReflection = new PropertyDescriptorReflectionBean(src);
             T result = type.newInstance();
-            Reflection<T> targetReflection = Reflection.create(result);
+            ReflectionBean targetReflection = new PropertyDescriptorReflectionBean(result);
             for (Field field : getFields(type)) {
                 String fieldName = field.getName();
                 targetReflection.setFieldValue(fieldName, srcReflection.getFieldValue(fieldName));

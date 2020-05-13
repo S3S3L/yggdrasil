@@ -1,12 +1,14 @@
 package org.s3s3l.yggdrasil.orm.bind;
 
-import java.lang.reflect.Field;
-
-import org.s3s3l.yggdrasil.orm.handler.TypeHandler;
-import org.s3s3l.yggdrasil.orm.validator.Validator;
+import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -19,62 +21,13 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ColumnStruct implements DataBindNode {
 
-    private String name;
-    private String alias;
-    private String tableAlias;
-    private Field field;
-    private Validator validator;
-    private TypeHandler typeHandler;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getTableAlias() {
-        return tableAlias;
-    }
-
-    public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public void setField(Field field) {
-        this.field = field;
-    }
-
-    public Validator getValidator() {
-        return validator;
-    }
-
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-
-    public TypeHandler getTypeHandler() {
-        return typeHandler;
-    }
-
-    public void setTypeHandler(TypeHandler typeHandler) {
-        this.typeHandler = typeHandler;
-    }
+    private ColumnMeta meta;
 
     @Override
     public SqlStruct toSqlStruct(ReflectionBean bean) {
@@ -82,23 +35,26 @@ public class ColumnStruct implements DataBindNode {
 
         SqlStruct struct = new SqlStruct();
 
-        if (StringUtils.isEmpty(this.name) || this.field == null || this.validator == null) {
+        if (StringUtils.isEmpty(this.meta.getName()) || this.meta.getField() == null
+                || this.meta.getValidator() == null) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder(" ");
 
-        if (!StringUtils.isEmpty(this.tableAlias)) {
-            sb.append(this.tableAlias)
+        if (!StringUtils.isEmpty(this.meta.getTableAlias())) {
+            sb.append(this.meta.getTableAlias())
                     .append(".");
         }
 
-        sb.append(this.name);
+        sb.append(this.meta.getName());
 
-        sb.append(String.format(" AS %s", StringUtils.isEmpty(this.alias) ? this.name : this.alias));
+        sb.append(String.format(" AS %s",
+                StringUtils.isEmpty(this.meta.getAlias()) ? this.meta.getName() : this.meta.getAlias()));
 
         struct.setSql(sb.toString());
 
         return struct;
     }
+
 }
