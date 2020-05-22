@@ -1,4 +1,4 @@
-package org.s3s3l.yggdrasil.orm.exec;
+package org.s3s3l.yggdrasil.orm.exception;
 
 /**
  * 

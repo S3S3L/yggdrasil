@@ -7,6 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
+import org.s3s3l.yggdrasil.orm.validator.DefaultValidator;
+import org.s3s3l.yggdrasil.orm.validator.Validator;
 
 /**
  * 
@@ -24,11 +26,15 @@ import org.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
 @Documented
 public @interface Condition {
 
+    String column() default "";
+
     boolean forSelect() default true;
 
     boolean forUpdate() default false;
 
     boolean forDelete() default false;
+
+    Class<? extends Validator> validator() default DefaultValidator.class;
 
     ComparePattern pattern() default ComparePattern.EQUAL;
 }

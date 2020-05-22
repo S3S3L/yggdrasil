@@ -1,4 +1,4 @@
-package org.s3s3l.yggdrasil.orm.bind;
+package org.s3s3l.yggdrasil.orm.bind.sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import org.s3s3l.yggdrasil.utils.common.StringUtils;
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class SqlStruct {
+public class DefaultSqlStruct implements SqlStruct {
 
     private String sql = StringUtils.EMPTY_STRING;
     private List<Object> params = new ArrayList<>();
@@ -26,12 +26,12 @@ public class SqlStruct {
         this.params.addAll(Arrays.asList(param));
     }
 
-    public SqlStruct addParams(List<Object> params) {
+    public DefaultSqlStruct addParams(List<Object> params) {
         this.params.addAll(params);
         return this;
     }
 
-    public SqlStruct appendSql(String sql) {
+    public DefaultSqlStruct appendSql(String sql) {
         this.sql = new StringBuilder(this.sql == null ? StringUtils.EMPTY_STRING : this.sql).append(sql)
                 .toString();
         return this;
@@ -41,10 +41,12 @@ public class SqlStruct {
         this.sql = sql;
     }
 
+    @Override
     public String getSql() {
         return sql;
     }
 
+    @Override
     public List<Object> getParams() {
         return params;
     }

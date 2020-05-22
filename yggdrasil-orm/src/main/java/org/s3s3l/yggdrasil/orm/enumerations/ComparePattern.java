@@ -22,7 +22,9 @@ public enum ComparePattern {
     NON_NULL("IS NULL"),
     START_WITH("LIKE"),
     END_WITH("LIKE"),
-    LIKE("LIKE");
+    LIKE("LIKE"),
+    
+    IN("IN");
 
     private String operator;
 

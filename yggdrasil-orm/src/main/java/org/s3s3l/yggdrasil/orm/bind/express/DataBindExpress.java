@@ -2,7 +2,7 @@ package org.s3s3l.yggdrasil.orm.bind.express;
 
 import java.util.List;
 
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 
 /**
  * 

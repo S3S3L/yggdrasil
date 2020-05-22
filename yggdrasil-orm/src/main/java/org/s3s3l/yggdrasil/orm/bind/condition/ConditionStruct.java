@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -36,7 +37,7 @@ public class ConditionStruct implements DataBindNode {
             return null;
         }
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
         boolean hasCondition = false;
 
         for (DataBindNode node : nodes) {

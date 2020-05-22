@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
 import org.s3s3l.yggdrasil.orm.bind.express.ExpressFactory;
+import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
 
 /**
@@ -24,15 +25,17 @@ public class DefaultExpressFactory implements ExpressFactory {
 
     private final Map<Class<?>, DataBindExpress> dataBindExpresses = new ConcurrentHashMap<>();
     private final Lock expressBindLock = new ReentrantLock();
+    private final TypeHandlerManager typeHandlerManager = new TypeHandlerManager();
 
     @Override
     public <T> DataBindExpress getDataBindExpress(Class<T> modelType, ValidatorFactory validatorFactory) {
-        if (dataBindExpresses.containsKey(modelType)) {
-            return dataBindExpresses.get(modelType);
+        DataBindExpress dataBindExpress = dataBindExpresses.get(modelType);
+        if (dataBindExpress != null) {
+            return dataBindExpress;
         }
         expressBindLock.lock();
         try {
-            DataBindExpress dataBindExpress = new DefaultDataBindExpress(modelType, validatorFactory);
+            dataBindExpress = new DefaultDataBindExpress(modelType, validatorFactory, this.typeHandlerManager);
             dataBindExpresses.put(modelType, dataBindExpress);
             return dataBindExpress;
         } finally {

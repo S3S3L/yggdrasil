@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -35,7 +36,7 @@ public class ValuesStruct implements DataBindNode {
         return toSqlStruct(bean, false);
     }
 
-    public SqlStruct toSqlStruct(ReflectionBean bean, boolean first) {
+    public DefaultSqlStruct toSqlStruct(ReflectionBean bean, boolean first) {
         Verify.notNull(bean);
 
         // TODO 是否要过滤有效字段
@@ -50,7 +51,7 @@ public class ValuesStruct implements DataBindNode {
             return null;
         }
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         String values = String.join(",", validatedNodes.stream()
                 .map(r -> " ?")

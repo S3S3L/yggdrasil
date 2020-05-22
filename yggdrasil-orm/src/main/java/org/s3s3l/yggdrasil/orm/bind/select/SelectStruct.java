@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
@@ -45,7 +46,7 @@ public class SelectStruct implements DataBindNode {
     public SqlStruct toSqlStruct(ReflectionBean bean) {
         Verify.notNull(bean);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         for (DataBindNode node : nodes) {
             SqlStruct nodeStruct = node.toSqlStruct(bean);

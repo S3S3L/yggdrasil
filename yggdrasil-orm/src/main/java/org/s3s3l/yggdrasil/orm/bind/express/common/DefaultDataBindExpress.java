@@ -7,19 +7,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.Table;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
-import org.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
+import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
 import org.s3s3l.yggdrasil.orm.bind.condition.ConditionStruct;
 import org.s3s3l.yggdrasil.orm.bind.condition.RawConditionNode;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
 import org.s3s3l.yggdrasil.orm.bind.select.SelectStruct;
 import org.s3s3l.yggdrasil.orm.bind.set.SetNode;
 import org.s3s3l.yggdrasil.orm.bind.set.SetStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
 import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
+import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
@@ -39,6 +41,8 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @since JDK 1.8
  */
 public class DefaultDataBindExpress implements DataBindExpress {
+    private final ValidatorFactory validatorFactory;
+    private final TypeHandlerManager typeHandlerManager;
 
     private ConditionStruct selectCondition = new ConditionStruct();
     private ConditionStruct updateCondtion = new ConditionStruct();
@@ -47,10 +51,11 @@ public class DefaultDataBindExpress implements DataBindExpress {
     private SetStruct set = new SetStruct();
     private ValuesStruct values = new ValuesStruct();
     private Table table = new Table();
-    private ValidatorFactory validatorFactory;
 
-    public DefaultDataBindExpress(Class<?> modelType, ValidatorFactory validatorFactory) {
+    public DefaultDataBindExpress(Class<?> modelType, ValidatorFactory validatorFactory,
+            TypeHandlerManager typeHandlerManager) {
         this.validatorFactory = validatorFactory;
+        this.typeHandlerManager = typeHandlerManager;
         express(modelType);
     }
 
@@ -62,11 +67,11 @@ public class DefaultDataBindExpress implements DataBindExpress {
     @Override
     public synchronized DataBindExpress express(Class<?> modelType) {
         Verify.notNull(modelType);
-        if (!modelType.isAnnotationPresent(SqlModel.class)) {
+        if (!modelType.isAnnotationPresent(TableDefine.class)) {
             throw new DataBindExpressException("No 'SqlModel' annotation found.");
         }
 
-        SqlModel sqlModel = modelType.getAnnotation(SqlModel.class);
+        TableDefine sqlModel = modelType.getAnnotation(TableDefine.class);
 
         if (StringUtils.isEmpty(sqlModel.table())) {
             throw new DataBindExpressException("Table name can`t be empty.");
@@ -83,21 +88,15 @@ public class DefaultDataBindExpress implements DataBindExpress {
 
             Column column = field.getAnnotation(Column.class);
 
-            ColumnStruct columnStruct;
-            try {
-                columnStruct = ColumnStruct.builder()
-                        .meta(ColumnMeta.builder()
-                                .field(field)
-                                .name(StringUtils.isEmpty(column.name()) ? field.getName() : column.name())
-                                .alias(field.getName())
-                                .validator(this.validatorFactory.getValidator(column.validator()))
-                                .typeHandler(column.typeHandler()
-                                        .newInstance())
-                                .build())
-                        .build();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            ColumnStruct columnStruct = ColumnStruct.builder()
+                    .meta(ColumnMeta.builder()
+                            .field(field)
+                            .name(StringUtils.isEmpty(column.name()) ? field.getName() : column.name())
+                            .alias(field.getName())
+                            .validator(this.validatorFactory.getValidator(column.validator()))
+                            .typeHandler(typeHandlerManager.getOrNew(column.typeHandler()))
+                            .build())
+                    .build();
 
             colums.add(columnStruct);
             this.select.addNode(columnStruct);
@@ -130,10 +129,10 @@ public class DefaultDataBindExpress implements DataBindExpress {
     public SqlStruct getInsert(List<?> models) {
         Verify.notEmpty(models);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         AtomicBoolean first = new AtomicBoolean(true);
-        List<SqlStruct> valueStructs = models.stream()
+        List<DefaultSqlStruct> valueStructs = models.stream()
                 .map(r -> this.values.toSqlStruct(new PropertyDescriptorReflectionBean(r), first.getAndSet(false)))
                 .collect(Collectors.toList());
 
@@ -151,7 +150,7 @@ public class DefaultDataBindExpress implements DataBindExpress {
     public SqlStruct getDelete(Object model) {
         Verify.notNull(model);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         SqlStruct deleteStruct = this.deleteCondtion.toSqlStruct(new PropertyDescriptorReflectionBean(model));
 
@@ -169,7 +168,7 @@ public class DefaultDataBindExpress implements DataBindExpress {
     public SqlStruct getUpdate(Object model) {
         Verify.notNull(model);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(model);
         SqlStruct setStruct = this.set.toSqlStruct(ref);
@@ -192,7 +191,7 @@ public class DefaultDataBindExpress implements DataBindExpress {
     public SqlStruct getSelect(Object model) {
         Verify.notNull(model);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(model);
         SqlStruct selectStruct = this.select.toSqlStruct(ref);

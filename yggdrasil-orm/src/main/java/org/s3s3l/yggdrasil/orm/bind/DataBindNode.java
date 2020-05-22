@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.orm.bind;
 
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 
 /**

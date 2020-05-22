@@ -13,12 +13,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.s3s3l.yggdrasil.orm.bind.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
 import org.s3s3l.yggdrasil.orm.bind.express.ExpressFactory;
 import org.s3s3l.yggdrasil.orm.bind.express.common.DefaultExpressFactory;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.exception.DataMapException;
+import org.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
 import org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
@@ -46,6 +47,10 @@ public class DefaultSqlExecutor implements SqlExecutor {
     private ExpressFactory expressFactory = new DefaultExpressFactory();
     private ValidatorFactory validatorFactory = new DefaultValidatorFactory();
     private DataSource datasource;
+
+    public DefaultSqlExecutor(DataSource datasource) {
+        this.datasource = datasource;
+    }
 
     @Override
     public void setDataSource(DataSource datasource) {
@@ -162,15 +167,15 @@ public class DefaultSqlExecutor implements SqlExecutor {
                 for (int i = 1; i <= metaData.getColumnCount(); i++) {
                     String columnLabel = metaData.getColumnLabel(i);
                     String fieldName = express.getAlias(metaData.getColumnName(i));
-                    
+
                     Field field = CollectionUtils.getFirst(fields, r -> r.getName()
                             .equalsIgnoreCase(fieldName));
                     Object resultData = rs.getObject(columnLabel);
-                    
+
                     if (field.isAnnotationPresent(Column.class)) {
                         Type fieldType = field.getGenericType();
                         Class<?> fieldClass = field.getType();
-                        
+
                         resultData = field.getAnnotation(Column.class)
                                 .typeHandler()
                                 .newInstance()

@@ -19,19 +19,59 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  */
 public abstract class BeanUtils {
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition buildBeanDefinition(Class<?> beanType) {
         return buildBeanDefinition(null, null, null, null, beanType);
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param props
+     *            属性值(fieldName -> object)
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition buildBeanDefinition(Map<String, Object> props, Class<?> beanType) {
         return buildBeanDefinition(props, null, null, null, beanType);
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param props
+     *            属性值(fieldName -> object)
+     * @param refs
+     *            属性值(fieldName -> beanName)
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition
             buildBeanDefinition(Map<String, Object> props, Map<String, String> refs, Class<?> beanType) {
         return buildBeanDefinition(props, refs, null, null, beanType);
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param props
+     *            属性值(fieldName -> object)
+     * @param refs
+     *            属性值(fieldName -> beanName)
+     * @param constructArgsRef
+     *            构造方法参数(beanName)
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition buildBeanDefinition(Map<String, Object> props,
             Map<String, String> refs,
             String[] constructArgsRef,
@@ -39,10 +79,34 @@ public abstract class BeanUtils {
         return buildBeanDefinition(props, refs, constructArgsRef, null, beanType);
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param constructArgs
+     *            构造方法参数(object)
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition buildBeanDefinition(Object[] constructArgs, Class<?> beanType) {
         return buildBeanDefinition(null, null, null, constructArgs, beanType);
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param props
+     *            属性值(fieldName -> object)
+     * @param refs
+     *            属性值(fieldName -> beanName)
+     * @param constructArgsRef
+     *            构造方法参数(beanName)
+     * @param constructArgs
+     *            构造方法参数(object)
+     * @param beanType
+     *            类型
+     * @return
+     */
     public static BeanDefinition buildBeanDefinition(Map<String, Object> props,
             Map<String, String> refs,
             String[] constructArgsRef,
@@ -71,6 +135,21 @@ public abstract class BeanUtils {
         return builder.getBeanDefinition();
     }
 
+    /**
+     * 构建BeanDefinition
+     * 
+     * @param beanType
+     *            类型
+     * @param factoryBeanName
+     *            工厂beanName
+     * @param factoryMethod
+     *            工厂方法名
+     * @param args
+     *            工厂方法入参(object)
+     * @param refs
+     *            工厂方法入参(beanName)
+     * @return
+     */
     public static BeanDefinition buildBeanDefinitionForFactoryMethod(Class<?> beanType,
             String factoryBeanName,
             String factoryMethod,

@@ -17,6 +17,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.s3s3l.yggdrasil.configuration.datasource.DatasourceConfiguration;
 import org.s3s3l.yggdrasil.configuration.datasource.SwitchableDatasourceConfiguration;
 import org.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
+import org.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import org.s3s3l.yggdrasil.spring.BeanUtils;
 import org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.AutoSwitchDatasourceConfiguration;
 import org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.DatasourceName;
@@ -67,6 +68,7 @@ import io.shardingsphere.shardingjdbc.jdbc.core.datasource.ShardingDataSource;
 public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String BEAN_NAME = "multiDatasourceAutoConfigure";
     private static final String DATASOURCE_TAIL = "Datasource";
+    private static final String EXECUTOR_TAIL = "Executor";
     private static final String SHARDING_DATASOURCE_TAIL = "ShardingDatasource";
     private static final String SWITCHABLE_DATASOURCE_TAIL = "SwitchableDatasource";
     private static final String TRANSACTION_TAIL = "TransactionManager";
@@ -230,13 +232,20 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             BeanDefinition dataSource) throws IOException {
         registerDatasource(registry, datasourceName, dataSource);
 
-        registerMybatisBean(mybatisConf, datasourceName, registry, key);
+        if (mybatisConf != null) {
+            registerMybatisBean(mybatisConf, datasourceName, registry, key);
+        }
     }
 
     private void registerDatasource(BeanDefinitionRegistry registry, String datasourceName, BeanDefinition dataSource) {
         logger.trace("Starting registering datasource definition '{}'.", datasourceName);
         registry.registerBeanDefinition(datasourceName, dataSource);
         logger.trace("Finished registering datasource definition '{}'.", datasourceName);
+
+        logger.trace("Starting registering datasource executor definition '{}'.", datasourceName);
+        registry.registerBeanDefinition(datasourceName + EXECUTOR_TAIL,
+                BeanUtils.buildBeanDefinition(null, null, new String[] { datasourceName }, DefaultSqlExecutor.class));
+        logger.trace("Finished registering datasource executor definition '{}'.", datasourceName);
     }
 
     private void registerMybatisBean(MybatisConfiguration mybatisConf,

@@ -1,5 +1,7 @@
 package org.s3s3l.yggdrasil.orm.bind;
 
+import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
+import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
@@ -33,7 +35,7 @@ public class ColumnStruct implements DataBindNode {
     public SqlStruct toSqlStruct(ReflectionBean bean) {
         Verify.notNull(bean);
 
-        SqlStruct struct = new SqlStruct();
+        DefaultSqlStruct struct = new DefaultSqlStruct();
 
         if (StringUtils.isEmpty(this.meta.getName()) || this.meta.getField() == null
                 || this.meta.getValidator() == null) {
