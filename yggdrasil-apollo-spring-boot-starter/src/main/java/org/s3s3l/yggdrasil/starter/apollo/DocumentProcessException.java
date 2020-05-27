@@ -12,6 +12,11 @@ package org.s3s3l.yggdrasil.starter.apollo;
  */
 public class DocumentProcessException extends RuntimeException {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5177986590385880589L;
+
     public DocumentProcessException() {
         super();
     }

@@ -28,8 +28,6 @@ public class ApolloConfiguration {
     public static final String PREFIX = "yggdrasil.apollo";
 
     private boolean enable;
-    private String meta;
-    private String appId;
     private List<Document> docs;
 
     @Data

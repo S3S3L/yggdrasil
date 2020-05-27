@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.Document;
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.FieldDoc;
+import org.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
 import org.s3s3l.yggdrasil.starter.apollo.DocumentProcessException;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
@@ -81,6 +82,9 @@ public class PropertySourceHelper {
             case Properties:
                 processPropDocument(doc);
                 break;
+            case TXT:
+            default:
+                throw new ResourceProcessException("doc for format '" +doc.getFormat() + "' is not support");
         }
         logger.info("Finished process document '{}'", doc.getName());
     }

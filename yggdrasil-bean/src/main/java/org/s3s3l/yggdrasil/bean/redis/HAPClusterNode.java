@@ -20,5 +20,5 @@ import lombok.Data;
 public class HAPClusterNode {
 
     private List<HAPNode> clusterConfig;
-    private GenericObjectPoolConfig poolConfig;
+    private GenericObjectPoolConfig<?> poolConfig;
 }

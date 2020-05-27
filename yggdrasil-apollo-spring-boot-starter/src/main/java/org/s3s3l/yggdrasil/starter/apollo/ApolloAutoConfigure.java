@@ -14,8 +14,6 @@ import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import com.ctrip.framework.apollo.ConfigService;
-
 /**
  * <p>
  * </p>
@@ -46,8 +44,6 @@ public class ApolloAutoConfigure implements EnvironmentPostProcessor, Ordered {
                 .addConverter(new TreeNodeConverter());
         this.environment.getConversionService()
                 .addConverter(new StringToObjectConverter());
-        ConfigService.setMetaDomain(configuration.getMeta());
-        ConfigService.setAppId(configuration.getAppId());
         configuration.getDocs()
                 .stream()
                 .sorted()

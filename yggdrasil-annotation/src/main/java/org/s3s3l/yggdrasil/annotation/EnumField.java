@@ -20,6 +20,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
 public @interface EnumField {
-    Class<? extends Enum> value();
+    Class<? extends Enum<?>> value();
     
 }
