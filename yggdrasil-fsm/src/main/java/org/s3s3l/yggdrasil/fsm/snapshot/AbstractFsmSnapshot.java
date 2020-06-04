@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.s3s3l.yggdrasil.fsm.AbstractFsm;
 import org.s3s3l.yggdrasil.persistence.snapshot.ByteArraySnapshot;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 
@@ -27,7 +28,7 @@ public abstract class AbstractFsmSnapshot<T extends AbstractFsm> extends Version
     public Map<byte[], byte[]> toMap() {
         Map<byte[], byte[]> map = new HashMap<>();
         Class<?> type = getClass();
-        Reflection<AbstractFsmSnapshot<T>> reflection = Reflection.create(this);
+        ReflectionBean reflection = new PropertyDescriptorReflectionBean(this);
         for (Field field : ReflectionUtils.getFields(type)) {
             String fieldName = field.getName();
             if (ByteArraySnapshot.class.isAssignableFrom(field.getType())) {

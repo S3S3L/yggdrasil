@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.cfg.ConfigFeature;
+
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.s3s3l.yggdrasil.orm.exception.DataSourceInitalizingException;
@@ -13,13 +16,11 @@ import org.s3s3l.yggdrasil.resource.prop.PropertyResourceLoader;
 import org.s3s3l.yggdrasil.resource.yaml.YAMLResourceLoader;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.file.FileUtils;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.cfg.ConfigFeature;
 
 /**
  * 
@@ -39,7 +40,7 @@ public class JdbcDataSourceFactory implements DataSourceFactory {
     public javax.sql.DataSource getDataSource(Properties config) {
 
         PoolProperties poolProp = new PoolProperties();
-        Reflection<PoolProperties> poolPropRef = Reflection.create(poolProp);
+        ReflectionBean poolPropRef = new PropertyDescriptorReflectionBean(poolProp);
         DataSource datasource = new DataSource();
         try {
             poolPropRef.fill(config);
@@ -54,7 +55,7 @@ public class JdbcDataSourceFactory implements DataSourceFactory {
     public javax.sql.DataSource getDataSource(Map<String, Object> config) {
 
         PoolProperties poolProp = new PoolProperties();
-        Reflection<PoolProperties> poolPropRef = Reflection.create(poolProp);
+        ReflectionBean poolPropRef = new PropertyDescriptorReflectionBean(poolProp);
         DataSource datasource = new DataSource();
         try {
             poolPropRef.fill(config);

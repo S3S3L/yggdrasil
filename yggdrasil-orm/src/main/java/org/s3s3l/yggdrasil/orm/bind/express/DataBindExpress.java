@@ -16,7 +16,6 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
  * @since JDK 1.8
  */
 public interface DataBindExpress {
-
     DataBindExpress express(Class<?> modelType);
 
     String getAlias(String name);

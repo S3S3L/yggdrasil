@@ -20,8 +20,7 @@ import org.s3s3l.yggdrasil.orm.bind.express.common.DefaultExpressFactory;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.exception.DataMapException;
 import org.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
-import org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory;
-import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
+import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
@@ -44,12 +43,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultSqlExecutor implements SqlExecutor {
 
+    private final MetaManager metaManager;
     private ExpressFactory expressFactory = new DefaultExpressFactory();
-    private ValidatorFactory validatorFactory = new DefaultValidatorFactory();
     private DataSource datasource;
 
-    public DefaultSqlExecutor(DataSource datasource) {
+    public DefaultSqlExecutor(DataSource datasource, MetaManager metaManager) {
         this.datasource = datasource;
+        this.metaManager = metaManager;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notEmpty(model);
         Verify.notNull(modelClass);
 
-        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
+        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, metaManager);
         SqlStruct sqlStruct = express.getInsert(model);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
@@ -82,7 +82,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notEmpty(model);
         Verify.notNull(modelClass);
 
-        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
+        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, metaManager);
         SqlStruct sqlStruct = express.getDelete(model);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
@@ -102,7 +102,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notNull(model);
         Verify.notNull(modelClass);
 
-        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
+        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, metaManager);
         SqlStruct sqlStruct = express.getUpdate(model);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
@@ -122,7 +122,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notNull(model);
         Verify.notNull(modelClass);
 
-        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, validatorFactory);
+        DataBindExpress express = this.expressFactory.getDataBindExpress(modelClass, metaManager);
         SqlStruct sqlStruct = express.getSelect(model);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
@@ -154,7 +154,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notNull(resultType);
         Verify.notNull(rs);
 
-        DataBindExpress express = this.expressFactory.getDataBindExpress(resultType, validatorFactory);
+        DataBindExpress express = this.expressFactory.getDataBindExpress(resultType, metaManager);
         List<T> resultList = new ArrayList<>();
         ResultSetMetaData metaData = rs.getMetaData();
         Set<Field> fields = ReflectionUtils.getFields(resultType);

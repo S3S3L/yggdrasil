@@ -11,6 +11,11 @@ package org.s3s3l.yggdrasil.fsm.exception;
  */
 public class TransitionException extends RuntimeException {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7390559143369761352L;
+
     public TransitionException() {
         super();
     }

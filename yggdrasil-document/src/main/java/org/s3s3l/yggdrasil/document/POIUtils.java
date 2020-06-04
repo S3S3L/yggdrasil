@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -38,11 +40,10 @@ import org.s3s3l.yggdrasil.document.excel.handler.impl.POICellStyleBuilder;
 import org.s3s3l.yggdrasil.document.excel.handler.impl.POIFontBuilder;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.common.TypeUtils;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * <p>
@@ -215,7 +216,7 @@ public class POIUtils implements WorkbookBuilder {
         }
 
         while (rowIterator.hasNext()) {
-            Reflection<?> rowValue = Reflection.create(rowIterator.next());
+            ReflectionBean rowValue = new PropertyDescriptorReflectionBean(rowIterator.next());
 
             // 创建正文行
             Row row = sheet.createRow(rowIndex.getAndIncrement());

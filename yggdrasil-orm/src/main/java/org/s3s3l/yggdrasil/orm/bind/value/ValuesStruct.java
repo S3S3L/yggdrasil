@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;

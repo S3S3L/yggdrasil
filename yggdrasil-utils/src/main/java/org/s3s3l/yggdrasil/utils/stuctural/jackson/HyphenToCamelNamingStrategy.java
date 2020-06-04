@@ -15,6 +15,10 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrat
  * @since JDK 1.8
  */
 public class HyphenToCamelNamingStrategy extends PropertyNamingStrategyBase {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4816517548506971756L;
     private static final char HYPHEN = '-';
 
     @Override

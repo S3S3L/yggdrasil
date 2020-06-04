@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.s3s3l.yggdrasil</groupId>
 	<artifactId>yggdrasil-parent</artifactId>
-	<version>3.5.1-RELEASE</version>
+	<version>3.6.0-RELEASE</version>
 	<packaging>pom</packaging>
 	
 	<scm>

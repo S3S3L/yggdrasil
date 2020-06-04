@@ -8,7 +8,7 @@ import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.ValueListExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 
-public class ArrayValue extends ValueListExpression implements Expression {
+public class ArrayValue extends ValueListExpression {
 
     public ArrayValue(Expression... expressions) {
         this.setExpressionList(new ExpressionList(expressions));

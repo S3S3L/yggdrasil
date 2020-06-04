@@ -11,6 +11,11 @@ package org.s3s3l.yggdrasil.fsm.exception;
  */
 public class ShotingException extends RuntimeException {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6439260658107215670L;
+
     public ShotingException() {
         super();
     }

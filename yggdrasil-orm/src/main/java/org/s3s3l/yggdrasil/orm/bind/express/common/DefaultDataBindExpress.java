@@ -23,6 +23,7 @@ import org.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
 import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
 import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
+import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
@@ -44,6 +45,7 @@ public class DefaultDataBindExpress implements DataBindExpress {
     private final ValidatorFactory validatorFactory;
     private final TypeHandlerManager typeHandlerManager;
 
+    // TODO 优化成使用MetaManager
     private ConditionStruct selectCondition = new ConditionStruct();
     private ConditionStruct updateCondtion = new ConditionStruct();
     private ConditionStruct deleteCondtion = new ConditionStruct();
@@ -52,10 +54,9 @@ public class DefaultDataBindExpress implements DataBindExpress {
     private ValuesStruct values = new ValuesStruct();
     private Table table = new Table();
 
-    public DefaultDataBindExpress(Class<?> modelType, ValidatorFactory validatorFactory,
-            TypeHandlerManager typeHandlerManager) {
-        this.validatorFactory = validatorFactory;
-        this.typeHandlerManager = typeHandlerManager;
+    public DefaultDataBindExpress(Class<?> modelType, MetaManager metaManager) {
+        this.validatorFactory = metaManager.getValidatorFactory();
+        this.typeHandlerManager = metaManager.getTypeHandlerManager();
         express(modelType);
     }
 

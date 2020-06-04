@@ -1,6 +1,6 @@
 package org.s3s3l.yggdrasil.orm.bind.express;
 
-import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
+import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 
 /**
  * 
@@ -15,5 +15,5 @@ import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
  */
 public interface ExpressFactory {
 
-    <T> DataBindExpress getDataBindExpress(Class<T> modelType, ValidatorFactory validatorFactory);
+    <T> DataBindExpress getDataBindExpress(Class<T> modelType, MetaManager metaManager);
 }

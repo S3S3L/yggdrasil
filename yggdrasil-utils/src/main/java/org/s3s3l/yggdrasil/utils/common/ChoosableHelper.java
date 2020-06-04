@@ -3,7 +3,8 @@ package org.s3s3l.yggdrasil.utils.common;
 import java.lang.reflect.Field;
 
 import org.s3s3l.yggdrasil.bean.condition.Choosable;
-import org.s3s3l.yggdrasil.utils.reflect.Reflection;
+import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
+import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 
 /**
@@ -20,8 +21,8 @@ public class ChoosableHelper {
 
     public static void applyChoosableCondition(Object condition, Object source) throws IllegalArgumentException,
             IllegalAccessException {
-        Reflection<?> ref = Reflection.create(condition);
-        Reflection<?> srcRef = Reflection.create(source);
+        ReflectionBean ref = new PropertyDescriptorReflectionBean(condition);
+        ReflectionBean srcRef = new PropertyDescriptorReflectionBean(source);
         for (Field field : ReflectionUtils.getFields(condition.getClass())) {
             if (!Choosable.class.isAssignableFrom(field.getType())) {
                 continue;

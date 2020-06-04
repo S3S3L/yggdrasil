@@ -11,6 +11,11 @@ package org.s3s3l.yggdrasil.fsm.exception;
  */
 public class RestoreException extends RuntimeException {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 9106502717480395444L;
+
     public RestoreException() {
         super();
     }
