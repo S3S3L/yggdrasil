@@ -1,0 +1,5 @@
+org.springframework.boot.env.EnvironmentPostProcessor= \
+org.s3s3l.yggdrasil.starter.apollo.ApolloAutoConfigure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
+org.s3s3l.yggdrasil.utils.spring.env.ConfigurationBindingPostProcesser, \
+org.s3s3l.yggdrasil.starter.apollo.feature.ProcessorContext

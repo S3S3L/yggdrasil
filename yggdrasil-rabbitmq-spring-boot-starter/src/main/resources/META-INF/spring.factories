@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.s3s3l.yggdrasil.starter.rabbitmq.RabbitmqAutoConfigure,\
+org.s3s3l.yggdrasil.starter.rabbitmq.RabbitmqAutoConfigureAfterApp,\
+org.s3s3l.yggdrasil.starter.rabbitmq.RabbitmqAutoConfigureAfterSoa
