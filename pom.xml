@@ -159,7 +159,7 @@
 		<googleauth.versioin>0.5.0</googleauth.versioin>
 		<zxing.version>3.2.1</zxing.version>
 		<apache.commons.version>3.4</apache.commons.version>
-		<apache.poi.version>3.15</apache.poi.version>
+		<apache.poi.version>4.1.2</apache.poi.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<shardingjdbc.version>3.1.0</shardingjdbc.version>
 		<mybatis.version>3.5.2</mybatis.version>
