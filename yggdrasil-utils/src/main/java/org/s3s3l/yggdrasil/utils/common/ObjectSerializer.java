@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.s3s3l.yggdrasil.bean.exception.ObjectSerializeException;
+import org.s3s3l.yggdrasil.utils.security.SecurityUtils;
 
 /**
  * 
@@ -32,11 +33,19 @@ public abstract class ObjectSerializer {
         }
     }
 
-    public static Object desrialize(byte[] bytes) {
+    public static Object deserialize(byte[] bytes) {
         try (ObjectInputStream oin = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
             return oin.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new ObjectSerializeException(e);
         }
+    }
+
+    public static String serializeAsString(Object obj) {
+        return SecurityUtils.bytes2Hex(serialize(obj));
+    }
+
+    public static Object deserializeFromString(String str) {
+        return deserialize(SecurityUtils.hex2Bytes(str));
     }
 }

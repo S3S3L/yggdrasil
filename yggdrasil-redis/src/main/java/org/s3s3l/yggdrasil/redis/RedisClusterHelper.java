@@ -31,19 +31,21 @@ import redis.clients.jedis.GeoCoordinate;
 import redis.clients.jedis.GeoRadiusResponse;
 import redis.clients.jedis.GeoUnit;
 import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.Tuple;
-import redis.clients.jedis.params.geo.GeoRadiusParam;
+import redis.clients.jedis.params.GeoRadiusParam;
+import redis.clients.jedis.params.SetParams;
 
-public class RedisClusterHelper implements InitializableRedis<HAPClusterNode> {
+public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jedis>> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private StructuralHelper jsonHelper = JacksonUtils.defaultHelper;
     private JedisCluster cluster;
 
-    public static RedisClusterHelper create(Set<HAPNode> clusterNodes, GenericObjectPoolConfig<?> poolConfig) {
+    public static RedisClusterHelper create(Set<HAPNode> clusterNodes, GenericObjectPoolConfig<Jedis> poolConfig) {
         RedisClusterHelper operation = new RedisClusterHelper();
         operation.cluster = new JedisCluster(clusterNodes.stream()
                 .map(r -> new HostAndPort(r.getHost(), r.getPort()))
@@ -52,7 +54,7 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode> {
     }
 
     @Override
-    public void init(HAPClusterNode configuration) {
+    public void init(HAPClusterNode<Jedis> configuration) {
         cluster = new JedisCluster(configuration.getClusterConfig()
                 .stream()
                 .map(r -> new HostAndPort(r.getHost(), r.getPort()))
@@ -86,19 +88,18 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode> {
     @Override
     public void set(String key, String value, long seconds) {
         Verify.notLargerThan(seconds, Integer.MAX_VALUE);
-        execute(jedis -> jedis.setex(key, (int) seconds, value));
+        execute(jedis -> jedis.setex(key, seconds, value));
     }
 
     @Override
     public void set(byte[] key, byte[] value, long seconds) {
-        Verify.notLargerThan(seconds, Integer.MAX_VALUE);
         logger.trace("cache set. key: {}, value: {}, expire: {}", key, value, seconds);
-        execute(jedis -> jedis.setex(key, (int) seconds, value));
+        execute(jedis -> jedis.setex(key, seconds, value));
     }
 
     @Override
-    public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
-        return execute(jedis -> jedis.set(key, value, nxxx, expx, time));
+    public String set(final String key, final String value, final SetParams params) {
+        return execute(jedis -> jedis.set(key, value, params));
     }
 
     @Override
@@ -114,7 +115,7 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode> {
     @Override
     public boolean expire(String key, long seconds) {
         if (cluster.exists(key)) {
-            cluster.expire(key, (int) seconds);
+            cluster.expire(key, seconds);
             return true;
         } else {
             return false;

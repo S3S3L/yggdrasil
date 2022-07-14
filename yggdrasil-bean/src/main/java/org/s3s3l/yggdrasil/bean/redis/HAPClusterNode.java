@@ -17,8 +17,8 @@ import lombok.Data;
  * @since JDK 1.8
  */
 @Data
-public class HAPClusterNode {
+public class HAPClusterNode<T> {
 
     private List<HAPNode> clusterConfig;
-    private GenericObjectPoolConfig<?> poolConfig;
+    private GenericObjectPoolConfig<T> poolConfig;
 }

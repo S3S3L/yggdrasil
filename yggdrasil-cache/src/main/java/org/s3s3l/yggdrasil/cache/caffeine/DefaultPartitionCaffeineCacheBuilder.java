@@ -33,7 +33,7 @@ public class DefaultPartitionCaffeineCacheBuilder implements PartitionCaffeineCa
                 .maximumSize(500)
                 .build(key -> {
                     byte[] value = redis.hget(ScopeKeyGenerator.redisKeyGenerator.apply(scope), key);
-                    return value == null ? null : ObjectSerializer.desrialize(value);
+                    return value == null ? null : ObjectSerializer.deserialize(value);
                 });
     }
 

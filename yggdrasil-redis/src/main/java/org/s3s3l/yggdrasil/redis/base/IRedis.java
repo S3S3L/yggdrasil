@@ -11,7 +11,8 @@ import redis.clients.jedis.GeoUnit;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.Tuple;
-import redis.clients.jedis.params.geo.GeoRadiusParam;
+import redis.clients.jedis.params.GeoRadiusParam;
+import redis.clients.jedis.params.SetParams;
 
 public interface IRedis {
 
@@ -27,7 +28,7 @@ public interface IRedis {
 
     void set(byte[] key, byte[] value, long seconds);
 
-    String set(final String key, final String value, final String nxxx, final String expx, final long time);
+    String set(final String key, final String value, final SetParams params);
 
     boolean del(String key);
 

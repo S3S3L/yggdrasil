@@ -31,7 +31,7 @@ public class RedisObjectCacheLoader implements CacheLoader<byte[], Object> {
 
     @Override
     public Object load(byte[] key) throws Exception {
-        return ObjectSerializer.desrialize(redis.hget(scope, key));
+        return ObjectSerializer.deserialize(redis.hget(scope, key));
     }
 
 }

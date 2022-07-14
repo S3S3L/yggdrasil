@@ -2,7 +2,6 @@ package org.s3s3l.yggdrasil.starter.apollo;
 
 import java.util.List;
 
-import org.s3s3l.yggdrasil.spring.env.LocationType;
 import org.s3s3l.yggdrasil.starter.apollo.feature.ConfigFileChangedProcessor;
 import org.s3s3l.yggdrasil.utils.file.FileFormat;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -57,5 +56,9 @@ public class ApolloConfiguration {
     public static class Location {
         private LocationType type;
         private String target;
+    }
+
+    public static enum LocationType {
+        AFTER, BEFORE, FIRST, LAST
     }
 }

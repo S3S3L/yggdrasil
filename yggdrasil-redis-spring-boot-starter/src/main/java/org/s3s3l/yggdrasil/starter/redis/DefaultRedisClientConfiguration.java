@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
 import lombok.ToString;
+import redis.clients.jedis.Jedis;
 
 /**
  * <p>
@@ -33,5 +34,5 @@ public class DefaultRedisClientConfiguration {
     private String primary;
     private Set<String> requiredInstances;
     private Map<String, RedisClusterConfiguration> masterSlave;
-    private Map<String, HAPClusterNode> cluster;
+    private Map<String, HAPClusterNode<Jedis>> cluster;
 }

@@ -27,7 +27,7 @@ public class SerializableCompressor implements ObjectCompressor<Object> {
 
     @Override
     public Object decompress(byte[] bytes) {
-        return ObjectSerializer.desrialize(this.compressor.decompress(bytes));
+        return ObjectSerializer.deserialize(this.compressor.decompress(bytes));
     }
 
 }

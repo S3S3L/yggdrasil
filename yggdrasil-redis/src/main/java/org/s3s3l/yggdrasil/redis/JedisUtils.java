@@ -1,7 +1,7 @@
 package org.s3s3l.yggdrasil.redis;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,7 +34,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.Tuple;
-import redis.clients.jedis.params.geo.GeoRadiusParam;
+import redis.clients.jedis.params.GeoRadiusParam;
+import redis.clients.jedis.params.SetParams;
 
 public class JedisUtils implements InitializableRedis<JedisConfiguration> {
 
@@ -63,7 +64,7 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
         poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(config.getMaxTotal());
         poolConfig.setMaxIdle(config.getMaxIdle());
-        poolConfig.setMaxWaitMillis(config.getMaxWaitMillis());
+        poolConfig.setMaxWait(config.getMaxWaitMillis());
         jedisPool = new JedisPool(poolConfig, config.getHostName(), config.getPort(), config.getTimeout(),
                 config.getPassword(), config.getDatabase());
     }
@@ -107,8 +108,8 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
     }
 
     @Override
-    public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
-        return execute(jedis -> jedis.set(key, value, nxxx, expx, time));
+    public String set(final String key, final String value, final SetParams params) {
+        return execute(jedis -> jedis.set(key, value, params));
     }
 
     @Override
@@ -293,7 +294,7 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
         private int timeout;
         private int maxTotal;
         private int maxIdle;
-        private long maxWaitMillis;
+        private Duration maxWaitMillis;
 
         public String getHostName() {
             return config.getHostName();
@@ -368,11 +369,11 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
             return this;
         }
 
-        public long getMaxWaitMillis() {
+        public Duration getMaxWaitMillis() {
             return maxWaitMillis;
         }
 
-        public JedisConfiguration setMaxWaitMillis(long maxWaitMillis) {
+        public JedisConfiguration setMaxWaitMillis(Duration maxWaitMillis) {
             this.maxWaitMillis = maxWaitMillis;
             return this;
         }
@@ -498,8 +499,6 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
         return execute(jedis -> {
             try (Transaction transaction = jedis.multi()) {
                 return call.apply(transaction);
-            } catch (IOException e) {
-                throw new RedisExcuteException(e);
             }
         });
     }

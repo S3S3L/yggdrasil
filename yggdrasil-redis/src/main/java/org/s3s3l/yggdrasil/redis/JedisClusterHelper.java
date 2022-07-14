@@ -1,6 +1,5 @@
 package org.s3s3l.yggdrasil.redis;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +39,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.Tuple;
-import redis.clients.jedis.params.geo.GeoRadiusParam;
+import redis.clients.jedis.params.GeoRadiusParam;
+import redis.clients.jedis.params.SetParams;
 
 /**
  * <p>
@@ -210,8 +210,8 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     }
 
     @Override
-    public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
-        return execute(jedis -> jedis.set(key, value, nxxx, expx, time), Action.WRITE);
+    public String set(final String key, final String value, final SetParams params) {
+        return execute(jedis -> jedis.set(key, value, params), Action.WRITE);
     }
 
     @Override
@@ -522,8 +522,6 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
         return execute(jedis -> {
             try (Transaction transaction = jedis.multi()) {
                 return call.apply(transaction);
-            } catch (IOException e) {
-                throw new RedisExcuteException(e);
             }
         }, Action.WRITE);
     }
