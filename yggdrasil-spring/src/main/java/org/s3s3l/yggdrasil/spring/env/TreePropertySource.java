@@ -35,11 +35,11 @@ public class TreePropertySource extends EnumerablePropertySource<TreeNode> {
     public TreePropertySource(String name, String prefix, TreeNode source) {
         super(name, source);
         String[] pres = prefix.split("\\.");
-        ObjectNode root = JacksonUtils.defaultHelper.createObjectNode();
+        ObjectNode root = JacksonUtils.JSON.createObjectNode();
         ObjectNode current = root;
         for (int i = 0; i < pres.length - 1; i++) {
             String pre = pres[i];
-            ObjectNode node = JacksonUtils.defaultHelper.createObjectNode();
+            ObjectNode node = JacksonUtils.JSON.createObjectNode();
             current.set(pre, node);
             current = node;
         }
@@ -75,10 +75,10 @@ public class TreePropertySource extends EnumerablePropertySource<TreeNode> {
         if (node.isValueNode()) {
             return JacksonUtils.getValue((ValueNode) node);
         } else if (node.isObject()) {
-            return JacksonUtils.defaultHelper.treeToValue(node, Object.class);
+            return JacksonUtils.JSON.treeToValue(node, Object.class);
             // return node.toString();
         } else if (node.isArray()) {
-            return JacksonUtils.defaultHelper.convert(node, new TypeReference<List<Object>>() {
+            return JacksonUtils.JSON.convert(node, new TypeReference<List<Object>>() {
             });
             // return node.toString();
         }

@@ -40,7 +40,7 @@ public class RabbitmqAutoConfigureAfterApp
         ConfigurableApplicationContext ctx = event.getApplicationContext();
 
         MultiRabbitmqConfiguartion configuration = ctx.getBean(MultiRabbitmqConfiguartion.class);
-        String configurationStr = JacksonUtils.defaultHelper.toStructuralString(configuration);
+        String configurationStr = JacksonUtils.JSON.toStructuralString(configuration);
         logger.debug("soav2 configuration '{}'", configurationStr);
 
         logger.trace("Finished auto-configuring soav2.");

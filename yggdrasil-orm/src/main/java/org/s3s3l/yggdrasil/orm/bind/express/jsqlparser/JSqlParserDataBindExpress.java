@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
 import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.DeleteBuilder;
 import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.InsertBuilder;
@@ -21,6 +20,7 @@ import org.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
 import org.s3s3l.yggdrasil.orm.exception.DataMapException;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.orm.meta.ConditionMeta;
+import org.s3s3l.yggdrasil.orm.meta.GroupByMeta;
 import org.s3s3l.yggdrasil.orm.meta.LimitMeta;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.orm.meta.OffsetMeta;
@@ -29,6 +29,7 @@ import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
+import org.s3s3l.yggdrasil.utils.verify.Verify;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
@@ -63,30 +64,34 @@ import net.sf.jsqlparser.util.SelectUtils;
 
 public class JSqlParserDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
-    private Class<?> modelType;
+    // private Class<?> modelType;
 
-    public JSqlParserDataBindExpress(Class<?> modelType, MetaManager metaManager) {
+    public JSqlParserDataBindExpress(MetaManager metaManager) {
         this.metaManager = metaManager;
-        express(modelType);
+        // express(modelType);
     }
 
-    @Override
-    public DataBindExpress express(Class<?> modelType) {
-        if (!this.metaManager.isResolved(modelType)) {
-            throw new ResourceNotFoundException("type '" + modelType.getName() + "' have not been resolved.");
-        }
-        this.modelType = modelType;
-        return this;
-    }
+    // @Override
+    // public DataBindExpress express(Class<?> modelType) {
+    // if (!this.metaManager.isResolved(modelType)) {
+    // throw new ResourceNotFoundException("type '" + modelType.getName() + "' have
+    // not been resolved.");
+    // }
+    // this.modelType = modelType;
+    // return this;
+    // }
 
-    @Override
-    public String getAlias(String name) {
-        return this.metaManager.getAlias(modelType, name);
-    }
+    // @Override
+    // public String getAlias(String name) {
+    // return this.metaManager.getAlias(modelType, name);
+    // }
 
     @Override
     public SqlStruct getInsert(List<?> models) {
-        TableMeta table = this.metaManager.getTable(this.modelType);
+        Verify.notEmpty(models);
+
+        Class<?> modelType = models.get(0).getClass();
+        TableMeta table = this.metaManager.getTable(modelType);
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         List<Column> insertColumns = new LinkedList<>();
         List<ExpressionList> expressionLists = new LinkedList<>();
@@ -139,11 +144,13 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getDelete(Object model) {
+    public SqlStruct getDelete(Object condition) {
+        Class<?> conditionType = condition.getClass();
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
-        TableMeta table = this.metaManager.getTable(this.modelType);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getDeleteCondition(this.modelType),
-                new PropertyDescriptorReflectionBean(model));
+        TableMeta table = this.metaManager.getTable(conditionType);
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getDeleteCondition(
+                conditionType),
+                new PropertyDescriptorReflectionBean(condition));
         sqlStruct.appendSql(new DeleteBuilder().table(new Table(table.getName()))
                 .where(whereStruct.getExpression())
                 .build()
@@ -153,21 +160,25 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getUpdate(Object model) {
+    public SqlStruct getUpdate(Object source, Object condition) {
+        Class<?> sourceType = source.getClass();
+        Class<?> conditionType = condition.getClass();
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
-        TableMeta table = this.metaManager.getTable(this.modelType);
-        ReflectionBean rb = new PropertyDescriptorReflectionBean(model);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getUpdateCondition(this.modelType),
-                new PropertyDescriptorReflectionBean(model));
+        TableMeta table = this.metaManager.getTable(sourceType);
+        ReflectionBean rb = new PropertyDescriptorReflectionBean(source);
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getUpdateCondition(
+                conditionType),
+                new PropertyDescriptorReflectionBean(condition));
         UpdateBuilder builder = new UpdateBuilder().table(new Table(table.getName()));
         for (ColumnMeta columnMeta : table.getColumns()) {
             String fieldName = columnMeta.getField()
                     .getName();
-            if (!rb.hasField(fieldName)) {
+            Object fieldValue = rb.getFieldValue(fieldName);
+            if (!rb.hasField(fieldName) || !columnMeta.getValidator().isValid(fieldValue)) {
                 continue;
             }
             builder.addSet(new Column(columnMeta.getName()), new JdbcParameter());
-            sqlStruct.addParam(rb.getFieldValue(fieldName));
+            sqlStruct.addParam(fieldValue);
         }
         builder.where(whereStruct.getExpression());
         sqlStruct.addParam(whereStruct.getParams());
@@ -177,28 +188,32 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getSelect(Object model) {
+    public SqlStruct getSelect(Object condition) {
+        Class<?> conditionType = condition.getClass();
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
-        ReflectionBean rb = new PropertyDescriptorReflectionBean(model);
-        TableMeta table = metaManager.getTable(modelType);
-        OffsetMeta offset = metaManager.getOffset(modelType);
-        LimitMeta limit = metaManager.getLimit(modelType);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getSelectCondition(modelType), rb);
+        ReflectionBean rb = new PropertyDescriptorReflectionBean(condition);
+        TableMeta table = metaManager.getTable(conditionType);
+        OffsetMeta offset = metaManager.getOffset(conditionType);
+        LimitMeta limit = metaManager.getLimit(conditionType);
+        GroupByMeta groupBy = metaManager.getGroupBy(conditionType);
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getSelectCondition(conditionType), rb);
+
+        boolean hasGroupBy = groupBy != null && !CollectionUtils.isEmpty(groupBy.getColumns());
         SelectBuilder builder = new SelectBuilder().table(new Table(table.getName()))
                 .selectItems(table.getColumns()
                         .stream()
+                        .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
                         .map(col -> {
                             SelectExpressionItem selectItem = new SelectExpressionItem(new Column(col.getName()));
                             selectItem.setAlias(new Alias(col.getAlias()));
                             return selectItem;
                         })
                         .collect(Collectors.toList()))
-                .groupByExpressions(metaManager.getGroupBy(modelType)
-                        .getColumns()
+                .groupByExpressions(groupBy.getColumns()
                         .stream()
                         .map(Column::new)
                         .collect(Collectors.toList()))
-                .orderByElements(metaManager.getOrderBy(modelType)
+                .orderByElements(metaManager.getOrderBy(conditionType)
                         .stream()
                         .map(obm -> {
                             OrderByElement ob = new OrderByElement();

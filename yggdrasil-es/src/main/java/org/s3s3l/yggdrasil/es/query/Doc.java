@@ -27,7 +27,7 @@ public class Doc implements QueryBlock {
 
     @Override
     public String toQueryString() {
-        return String.format("\"doc\": %s", JacksonUtils.nonNull.toStructuralString(doc));
+        return String.format("\"doc\": %s", JacksonUtils.NONNULL_JSON.toStructuralString(doc));
     }
 
 }

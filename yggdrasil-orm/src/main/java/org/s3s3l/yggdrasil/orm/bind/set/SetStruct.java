@@ -10,6 +10,9 @@ import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 /**
  * 
  * <p>
@@ -21,6 +24,8 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class SetStruct implements DataBindNode {
 
     private List<SetNode> nodes = new ArrayList<>();

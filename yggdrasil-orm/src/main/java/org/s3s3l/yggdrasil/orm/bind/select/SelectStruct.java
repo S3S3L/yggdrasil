@@ -11,7 +11,8 @@ import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
-import org.s3s3l.yggdrasil.utils.verify.Verify;
+
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -24,38 +25,35 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@NoArgsConstructor
 public class SelectStruct implements DataBindNode {
 
     private List<ColumnStruct> nodes = new ArrayList<>();
     private Map<String, String> map = new HashMap<>();
+
+    public SelectStruct(List<ColumnStruct> nodes) {
+        this.nodes = nodes;
+        nodes.forEach(node -> map.put(node.getMeta().getName(), node.getMeta().getAlias()));
+    }
 
     public void addNode(ColumnStruct node) {
         map.put(node.getMeta().getName(), node.getMeta().getAlias());
         this.nodes.add(node);
     }
 
-    public String getAlias(String name) {
-        if (map.containsKey(name)) {
-            return map.get(name);
-        }
-
-        return name;
-    }
-
     @Override
     public SqlStruct toSqlStruct(ReflectionBean bean) {
-        Verify.notNull(bean);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
         for (DataBindNode node : nodes) {
             SqlStruct nodeStruct = node.toSqlStruct(bean);
-            struct.appendSql(",")
+            struct.appendSql(", ")
                     .appendSql(nodeStruct.getSql());
         }
 
         struct.setSql(struct.getSql()
-                .replaceFirst(",", StringUtils.EMPTY_STRING));
+                .replaceFirst(", ", StringUtils.EMPTY_STRING));
 
         return struct;
     }

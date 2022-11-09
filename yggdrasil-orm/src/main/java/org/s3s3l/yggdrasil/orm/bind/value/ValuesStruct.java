@@ -1,15 +1,22 @@
 package org.s3s3l.yggdrasil.orm.bind.value;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
+import org.s3s3l.yggdrasil.orm.handler.TypeHandler;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -22,12 +29,18 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class ValuesStruct implements DataBindNode {
 
     private List<ColumnMeta> nodes = new ArrayList<>();
 
     public void addNode(ColumnMeta node) {
         this.nodes.add(node);
+    }
+
+    public void addNodes(Collection<ColumnMeta> nodes) {
+        this.nodes.addAll(nodes);
     }
 
     @Override
@@ -52,24 +65,56 @@ public class ValuesStruct implements DataBindNode {
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
-        String values = String.join(",", validatedNodes.stream()
-                .map(r -> " ?")
+        String values = String.join(", ", validatedNodes.stream()
+                .map(r -> {
+                    Class<?> fieldType = r.getField().getType();
+                    Object fieldValue = bean.getFieldValue(r.getField().getName());
+                    TypeHandler typeHandler = r.getTypeHandler();
+
+                    if (fieldType.isArray()) {
+                        StringBuilder sb = new StringBuilder("ARRAY[");
+                        List<String> paramPlaceHolders = new LinkedList<>();
+                        if (r.getValidator()
+                                .isValid(fieldValue)) {
+                            Arrays.stream(((Object[]) fieldValue))
+                                    .forEach(obj -> {
+                                        struct.addParam(typeHandler
+                                                .toJDBCType(obj));
+                                        paramPlaceHolders.add("?");
+                                    });
+                        }
+                        sb.append(String.join(",", paramPlaceHolders)).append("]");
+                        return sb.toString();
+                    } else if (Collection.class.isAssignableFrom(fieldType)) {
+                        StringBuilder sb = new StringBuilder("ARRAY[");
+                        List<String> paramPlaceHolders = new LinkedList<>();
+                        if (r.getValidator()
+                                .isValid(fieldValue)) {
+                            ((Collection<?>) fieldValue)
+                                    .forEach(obj -> {
+                                        struct.addParam(typeHandler
+                                                .toJDBCType(obj));
+                                        paramPlaceHolders.add("?");
+                                    });
+                        }
+                        sb.append(String.join(",", paramPlaceHolders)).append("]");
+                        return sb.toString();
+                    } else {
+                        struct.addParam(typeHandler
+                                .toJDBCType(fieldValue));
+                        return "?";
+                    }
+                })
                 .collect(Collectors.toList()));
 
         if (first) {
-            String fields = String.join(",", validatedNodes.stream()
+            String fields = String.join(", ", validatedNodes.stream()
                     .map(ColumnMeta::getName)
                     .collect(Collectors.toList()));
-            struct.setSql(String.format("(%s) VALUES (%s)", fields, values));
+            struct.setSql(String.format(" (%s) VALUES (%s)", fields, values));
         } else {
-            struct.setSql(String.format(",(%s)", values));
+            struct.setSql(String.format(", (%s)", values));
         }
-
-        struct.addParams(validatedNodes.stream()
-                .map(r -> r.getTypeHandler()
-                        .toJDBCType(bean.getFieldValue(r.getField()
-                                .getName())))
-                .collect(Collectors.toList()));
 
         return struct;
     }

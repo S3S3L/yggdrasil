@@ -40,7 +40,7 @@ import redis.clients.jedis.params.SetParams;
 public class JedisUtils implements InitializableRedis<JedisConfiguration> {
 
     private JedisPool jedisPool;
-    private StructuralHelper jsonHelper = JacksonUtils.defaultHelper;
+    private StructuralHelper jsonHelper = JacksonUtils.JSON;
 
     public static JedisUtils create(JedisConfiguration config) {
         JedisUtils operation = new JedisUtils();

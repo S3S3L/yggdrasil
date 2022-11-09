@@ -42,7 +42,7 @@ import redis.clients.jedis.params.SetParams;
 public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jedis>> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private StructuralHelper jsonHelper = JacksonUtils.defaultHelper;
+    private StructuralHelper jsonHelper = JacksonUtils.JSON;
     private JedisCluster cluster;
 
     public static RedisClusterHelper create(Set<HAPNode> clusterNodes, GenericObjectPoolConfig<Jedis> poolConfig) {

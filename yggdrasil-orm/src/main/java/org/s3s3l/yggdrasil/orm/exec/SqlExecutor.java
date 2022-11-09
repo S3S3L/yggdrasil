@@ -19,11 +19,11 @@ public interface SqlExecutor {
 
     void setDataSource(DataSource datasource);
 
-    <T> int insert(List<T> model, Class<T> modelClass);
+    <S> int insert(List<S> sources, Class<S> sourceType);
 
-    <T> int delete(T model, Class<T> modelClass);
+    <C> int delete(C condition);
 
-    <T> int update(T model, Class<T> modelClass);
+    <S, C> int update(S source, C condition);
 
-    <T> List<T> select(T model, Class<T> modelClass);
+    <C, R> List<R> select(C condition, Class<R> resultType);
 }

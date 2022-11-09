@@ -54,7 +54,7 @@ public class ApolloAutoConfigure implements EnvironmentPostProcessor, Ordered {
         this.configuration = Binder.get(environment)
                 .bind(ApolloConfiguration.PREFIX, ApolloConfiguration.class)
                 .orElse(new ApolloConfiguration());
-        String confStr = JacksonUtils.defaultHelper.toStructuralString(this.configuration);
+        String confStr = JacksonUtils.JSON.toStructuralString(this.configuration);
         logger.info("Apollo configuration loaded. {}", confStr);
     }
 

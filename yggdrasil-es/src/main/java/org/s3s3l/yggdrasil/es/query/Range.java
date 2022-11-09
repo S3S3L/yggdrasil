@@ -27,7 +27,7 @@ public class Range implements QueryBlock {
 
     @Override
     public String toQueryString() {
-        return String.format("{\"range\": %s}", JacksonUtils.nonNull.toStructuralString(fields));
+        return String.format("{\"range\": %s}", JacksonUtils.NONNULL_JSON.toStructuralString(fields));
     }
 
     @Getter

@@ -21,12 +21,9 @@ public class ConditionContext {
     private List<ConditionMeta> updateConditions = new LinkedList<>();
     @Builder.Default
     private List<ConditionMeta> deleteConditions = new LinkedList<>();
-    @Builder.Default
-    private GroupByMeta groupBy = new GroupByMeta();
+    private GroupByMeta groupBy;
     @Builder.Default
     private List<OrderByMeta> orderBy = new LinkedList<>();
-    @Builder.Default
-    private OffsetMeta offset = new OffsetMeta();
-    @Builder.Default
-    private LimitMeta limit = new LimitMeta();
+    private OffsetMeta offset;
+    private LimitMeta limit;
 }

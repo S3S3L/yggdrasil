@@ -1,6 +1,5 @@
 package org.s3s3l.yggdrasil.orm.bind.set;
 
-import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
@@ -8,6 +7,9 @@ import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -20,17 +22,11 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class SetNode implements DataBindNode {
 
     private ColumnMeta meta;
-
-    public SetNode() {
-
-    }
-
-    public SetNode(ColumnStruct column) {
-        this.meta = column.getMeta();
-    }
 
     @Override
     public SqlStruct toSqlStruct(ReflectionBean bean) {

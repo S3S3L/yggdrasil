@@ -71,7 +71,7 @@ public abstract class ReflectionUtils {
                     }
                     try {
                         ref.setFieldValue(field.getName(),
-                                JacksonUtils.defaultHelper.toObject(json, new TypeReference<Object>() {
+                                JacksonUtils.JSON.toObject(json, new TypeReference<Object>() {
                                     @Override
                                     public Type getType() {
                                         return field.getGenericType();
@@ -117,7 +117,7 @@ public abstract class ReflectionUtils {
                         return;
                     }
                     try {
-                        ref.setFieldValue(field.getName(), JacksonUtils.defaultHelper.toStructuralString(obj));
+                        ref.setFieldValue(field.getName(), JacksonUtils.JSON.toStructuralString(obj));
                     } catch (IllegalArgumentException e) {
                         log.warn("set field value fail.", e);
                         return;

@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import com.google.common.base.VerifyException;
 
 import org.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
@@ -22,6 +18,7 @@ import org.s3s3l.yggdrasil.orm.bind.annotation.Offset;
 import org.s3s3l.yggdrasil.orm.bind.annotation.OrderBy;
 import org.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
 import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
+import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
 import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
 import org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
@@ -30,6 +27,8 @@ import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import org.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner;
 import org.s3s3l.yggdrasil.utils.reflect.scan.Scanner;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
+
+import com.google.common.base.VerifyException;
 
 import lombok.Getter;
 
@@ -40,9 +39,7 @@ public class MetaManager {
     private final ValidatorFactory validatorFactory;
     @Getter
     private final TypeHandlerManager typeHandlerManager;
-    private final Lock refreshLock = new ReentrantLock();
 
-    private Set<Class<?>> types = new HashSet<>();
     private Map<Class<?>, Map<String, String>> aliasMap = new ConcurrentHashMap<>();
     private Map<Class<?>, TableMeta> tables = new ConcurrentHashMap<>();
     private Map<Class<?>, ConditionContext> condition = new ConcurrentHashMap<>();
@@ -58,43 +55,53 @@ public class MetaManager {
         refresh();
     }
 
-    public void refresh() {
-        refreshLock.lock();
-        try {
-            Set<Class<?>> types = scanner.scan(packages);
-            types.parallelStream()
-                    .filter(type -> ReflectionUtils.isAnnotationedWith(type, TableDefine.class))
-                    .forEach(type -> resolveTableDefine(ReflectionUtils.getAnnotation(type, TableDefine.class), type));
-            types.parallelStream()
-                    .filter(type -> ReflectionUtils.isAnnotationedWith(type, SqlModel.class))
-                    .forEach(type -> resolveSqlModel(ReflectionUtils.getAnnotation(type, SqlModel.class), type));
-        } finally {
-            refreshLock.unlock();
-        }
-    }
-
     public boolean isResolved(Class<?> type) {
-        return this.types.contains(type);
+        return this.tables.containsKey(type);
     }
 
-    private void resolveTableDefine(TableDefine tableDefine, Class<?> type) {
+    public TableMeta resolve(Class<?> type) {
+        return tables.computeIfAbsent(type, key -> {
+            if (ReflectionUtils.isAnnotationedWith(type, TableDefine.class)) {
+                return resolveTableDefine(ReflectionUtils.getAnnotation(type, TableDefine.class), type);
+            } else if (ReflectionUtils.isAnnotationedWith(type, SqlModel.class)) {
+                return resolveSqlModel(ReflectionUtils.getAnnotation(type, SqlModel.class), type);
+            }
+            throw new DataBindExpressException(
+                    "No 'TableDefine' or 'SqlModel' annotation found for type: " + type.getName());
+        });
+
+    }
+
+    private synchronized void refresh() {
+        Set<Class<?>> types = scanner.scan(packages);
+        types.stream().filter(type -> ReflectionUtils.isAnnotationedWith(type,
+                TableDefine.class)
+                || ReflectionUtils.isAnnotationedWith(type,
+                        SqlModel.class))
+                .forEach(this::resolve);
+    }
+
+    private TableMeta resolveTableDefine(TableDefine tableDefine, Class<?> type) {
         TableMeta table = TableMeta.builder()
                 .name(tableDefine.table())
                 .build();
         resolveType(type, table, true);
+
+        return table;
     }
 
-    private void resolveSqlModel(SqlModel sqlModel, Class<?> type) {
-        TableMeta table = this.tables.get(sqlModel.table());
+    private TableMeta resolveSqlModel(SqlModel sqlModel, Class<?> type) {
+        TableMeta table = resolve(sqlModel.table());
         if (table == null) {
             throw new ResourceNotFoundException("table for type '" + type.getName() + "' not found.");
         }
 
         resolveType(type, table, false);
+
+        return table;
     }
 
     private void resolveType(Class<?> type, TableMeta table, boolean newTable) {
-        this.types.add(type);
         List<ColumnMeta> columns = new LinkedList<>();
         List<ConditionMeta> selectConditions = new LinkedList<>();
         List<ConditionMeta> updateConditions = new LinkedList<>();
@@ -194,7 +201,6 @@ public class MetaManager {
         if (newTable) {
             table.setColumns(columns);
         }
-        this.tables.put(type, table);
         this.aliasMap.put(type, aliasMap);
         conditionContext.setSelectConditions(selectConditions);
         conditionContext.setUpdateConditions(updateConditions);

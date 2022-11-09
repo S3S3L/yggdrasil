@@ -32,11 +32,11 @@ public abstract class AbstractFsmSnapshot<T extends AbstractFsm> extends Version
         for (Field field : ReflectionUtils.getFields(type)) {
             String fieldName = field.getName();
             if (ByteArraySnapshot.class.isAssignableFrom(field.getType())) {
-                map.put(fieldName.getBytes(StandardCharsets.UTF_8), JacksonUtils.nonNull
+                map.put(fieldName.getBytes(StandardCharsets.UTF_8), JacksonUtils.NONNULL_JSON
                         .toStructuralBytes(((ByteArraySnapshot<?>) reflection.getFieldValue(fieldName)).toMap()));
             } else {
                 map.put(fieldName.getBytes(StandardCharsets.UTF_8),
-                        JacksonUtils.nonNull.toStructuralBytes(reflection.getFieldValue(fieldName)));
+                        JacksonUtils.NONNULL_JSON.toStructuralBytes(reflection.getFieldValue(fieldName)));
             }
         }
         return map;

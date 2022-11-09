@@ -42,7 +42,7 @@ public abstract class HttpUtils {
     private static final String ENCODING = "UTF-8";
 
     public static TreeNode doGet(String url, Map<String, Object> param) throws IOException {
-        JacksonHelper json = JacksonUtils.defaultHelper;
+        JacksonHelper json = JacksonUtils.JSON;
 
         OkHttpClient client = new OkHttpClient();
 

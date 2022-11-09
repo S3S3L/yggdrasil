@@ -32,6 +32,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.CaseFormat;
 
 /**
@@ -48,9 +51,15 @@ public class JacksonUtils implements JacksonHelper {
     private ObjectWriter writer;
     private static final String FIELD_NAME_SPLITOR = ".";
 
-    public static final JacksonHelper defaultHelper = JacksonUtils.create()
+    public static final JacksonHelper JSON = JacksonUtils.create()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    public static final JacksonHelper nonNull = JacksonUtils.create()
+    public static final JacksonHelper YAML = JacksonUtils.create(new YAMLFactory())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static final JacksonHelper XML = JacksonUtils.create(new XmlFactory())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static final JacksonHelper PROPS = JacksonUtils.create(new JavaPropsFactory())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static final JacksonHelper NONNULL_JSON = JacksonUtils.create()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .include(Include.NON_NULL);
 

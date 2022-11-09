@@ -8,15 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import com.ctrip.framework.apollo.ConfigFile;
-import com.ctrip.framework.apollo.ConfigService;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsFactory;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import org.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.Document;
 import org.s3s3l.yggdrasil.starter.apollo.ApolloConfiguration.FieldDoc;
@@ -33,6 +24,15 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.InputStreamResource;
 import org.yaml.snakeyaml.Yaml;
+
+import com.ctrip.framework.apollo.ConfigFile;
+import com.ctrip.framework.apollo.ConfigService;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * <p>
@@ -195,11 +195,11 @@ public class PropertySourceHelper {
 
     private void processFieldDoc(String docName, String key, TreeNode node) {
         String[] pres = key.split("\\.");
-        ObjectNode root = JacksonUtils.defaultHelper.createObjectNode();
+        ObjectNode root = JacksonUtils.JSON.createObjectNode();
         ObjectNode current = root;
         for (int i = 0; i < pres.length - 1; i++) {
             String pre = pres[i];
-            ObjectNode newNode = JacksonUtils.defaultHelper.createObjectNode();
+            ObjectNode newNode = JacksonUtils.JSON.createObjectNode();
             current.set(pre, newNode);
             current = newNode;
         }

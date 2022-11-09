@@ -25,7 +25,7 @@ public class Sort implements QueryBlock {
 
     @Override
     public String toQueryString() {
-        return String.format("\"sort\": %s", JacksonUtils.nonNull.toStructuralString(sorts));
+        return String.format("\"sort\": %s", JacksonUtils.NONNULL_JSON.toStructuralString(sorts));
     }
 
     @Data

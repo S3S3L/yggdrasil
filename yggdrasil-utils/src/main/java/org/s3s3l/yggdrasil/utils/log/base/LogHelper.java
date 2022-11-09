@@ -26,7 +26,7 @@ public class LogHelper implements ILogger {
     protected static final String DEFAULT_INFO_LOGGER = "info";
     protected static final String DEFAULT_WARN_LOGGER = "warn";
     protected static final String DEFAULT_ERROR_LOGGER = "error";
-    private static final StructuralHelper json = JacksonUtils.defaultHelper;
+    private static final StructuralHelper json = JacksonUtils.JSON;
     private final LogLevel logLevel;
 
     private Logger logger;

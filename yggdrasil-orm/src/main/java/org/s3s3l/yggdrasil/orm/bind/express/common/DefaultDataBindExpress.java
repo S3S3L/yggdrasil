@@ -1,16 +1,10 @@
 package org.s3s3l.yggdrasil.orm.bind.express.common;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.orm.bind.ColumnStruct;
-import org.s3s3l.yggdrasil.orm.bind.Table;
-import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
-import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
-import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
 import org.s3s3l.yggdrasil.orm.bind.condition.ConditionStruct;
 import org.s3s3l.yggdrasil.orm.bind.condition.RawConditionNode;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
@@ -20,14 +14,14 @@ import org.s3s3l.yggdrasil.orm.bind.set.SetStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
-import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
-import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
-import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
+import org.s3s3l.yggdrasil.orm.meta.GroupByMeta;
+import org.s3s3l.yggdrasil.orm.meta.LimitMeta;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
-import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
-import org.s3s3l.yggdrasil.utils.common.StringUtils;
+import org.s3s3l.yggdrasil.orm.meta.OffsetMeta;
+import org.s3s3l.yggdrasil.orm.meta.OrderByMeta;
+import org.s3s3l.yggdrasil.orm.meta.TableMeta;
+import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
-import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
 /**
@@ -42,103 +36,29 @@ import org.s3s3l.yggdrasil.utils.verify.Verify;
  * @since JDK 1.8
  */
 public class DefaultDataBindExpress implements DataBindExpress {
-    private final ValidatorFactory validatorFactory;
-    private final TypeHandlerManager typeHandlerManager;
+    private final MetaManager metaManager;
 
-    // TODO 优化成使用MetaManager
-    private ConditionStruct selectCondition = new ConditionStruct();
-    private ConditionStruct updateCondtion = new ConditionStruct();
-    private ConditionStruct deleteCondtion = new ConditionStruct();
-    private SelectStruct select = new SelectStruct();
-    private SetStruct set = new SetStruct();
-    private ValuesStruct values = new ValuesStruct();
-    private Table table = new Table();
-
-    public DefaultDataBindExpress(Class<?> modelType, MetaManager metaManager) {
-        this.validatorFactory = metaManager.getValidatorFactory();
-        this.typeHandlerManager = metaManager.getTypeHandlerManager();
-        express(modelType);
+    public DefaultDataBindExpress(MetaManager metaManager) {
+        this.metaManager = metaManager;
     }
 
     @Override
-    public String getAlias(String name) {
-        return this.select.getAlias(name);
-    }
+    public SqlStruct getInsert(List<?> sources) {
+        Verify.notEmpty(sources);
 
-    @Override
-    public synchronized DataBindExpress express(Class<?> modelType) {
-        Verify.notNull(modelType);
-        if (!modelType.isAnnotationPresent(TableDefine.class)) {
-            throw new DataBindExpressException("No 'SqlModel' annotation found.");
-        }
-
-        TableDefine sqlModel = modelType.getAnnotation(TableDefine.class);
-
-        if (StringUtils.isEmpty(sqlModel.table())) {
-            throw new DataBindExpressException("Table name can`t be empty.");
-        }
-
-        this.table.setName(sqlModel.table());
-
-        List<ColumnStruct> colums = new ArrayList<>();
-
-        for (Field field : ReflectionUtils.getFields(modelType)) {
-            if (!field.isAnnotationPresent(Column.class)) {
-                continue;
-            }
-
-            Column column = field.getAnnotation(Column.class);
-
-            ColumnStruct columnStruct = ColumnStruct.builder()
-                    .meta(ColumnMeta.builder()
-                            .field(field)
-                            .name(StringUtils.isEmpty(column.name()) ? field.getName() : column.name())
-                            .alias(field.getName())
-                            .validator(this.validatorFactory.getValidator(column.validator()))
-                            .typeHandler(typeHandlerManager.getOrNew(column.typeHandler()))
-                            .build())
-                    .build();
-
-            colums.add(columnStruct);
-            this.select.addNode(columnStruct);
-            this.values.addNode(columnStruct.getMeta());
-
-            if (!column.isPrimary()) {
-                this.set.addNode(new SetNode(columnStruct));
-            }
-
-            if (field.isAnnotationPresent(Condition.class)) {
-                Condition condition = field.getAnnotation(Condition.class);
-                RawConditionNode conditionNode = new RawConditionNode(columnStruct);
-                conditionNode.setPattern(condition.pattern());
-                if (condition.forSelect()) {
-                    this.selectCondition.addNode(conditionNode);
-                }
-                if (condition.forUpdate()) {
-                    this.updateCondtion.addNode(conditionNode);
-                }
-                if (condition.forDelete()) {
-                    this.deleteCondtion.addNode(conditionNode);
-                }
-            }
-        }
-
-        return this;
-    }
-
-    @Override
-    public SqlStruct getInsert(List<?> models) {
-        Verify.notEmpty(models);
+        Class<?> modelType = sources.get(0).getClass();
+        TableMeta table = metaManager.getTable(modelType);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
         AtomicBoolean first = new AtomicBoolean(true);
-        List<DefaultSqlStruct> valueStructs = models.stream()
-                .map(r -> this.values.toSqlStruct(new PropertyDescriptorReflectionBean(r), first.getAndSet(false)))
+        List<DefaultSqlStruct> valueStructs = sources.stream()
+                .map(r -> new ValuesStruct(table.getColumns())
+                        .toSqlStruct(new PropertyDescriptorReflectionBean(r), first.getAndSet(false)))
                 .collect(Collectors.toList());
 
         struct.setSql("INSERT INTO ");
-        struct.appendSql(this.table.getName());
+        struct.appendSql(table.getName());
         valueStructs.forEach(r -> {
             struct.appendSql(r.getSql());
             struct.addParams(r.getParams());
@@ -148,15 +68,21 @@ public class DefaultDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getDelete(Object model) {
-        Verify.notNull(model);
+    public SqlStruct getDelete(Object condition) {
+        Verify.notNull(condition);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
+        Class<?> conditionType = condition.getClass();
+        TableMeta table = metaManager.getTable(conditionType);
 
-        SqlStruct deleteStruct = this.deleteCondtion.toSqlStruct(new PropertyDescriptorReflectionBean(model));
+        SqlStruct deleteStruct = new ConditionStruct(metaManager.getDeleteCondition(
+                conditionType).stream().map(
+                        RawConditionNode::new)
+                .collect(Collectors.toList()))
+                .toSqlStruct(new PropertyDescriptorReflectionBean(condition));
 
         struct.setSql("DELETE FROM ");
-        struct.appendSql(this.table.getName());
+        struct.appendSql(table.getName());
 
         if (deleteStruct != null) {
             struct.appendSql(deleteStruct.getSql());
@@ -166,21 +92,33 @@ public class DefaultDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getUpdate(Object model) {
-        Verify.notNull(model);
+    public SqlStruct getUpdate(Object source, Object condition) {
+        Verify.notNull(source);
+        Verify.notNull(condition);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
+        Class<?> sourceType = source.getClass();
+        Class<?> conditionType = condition.getClass();
 
-        PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(model);
-        SqlStruct setStruct = this.set.toSqlStruct(ref);
-        SqlStruct conditionStruct = this.updateCondtion.toSqlStruct(ref);
+        TableMeta table = metaManager.getTable(sourceType);
+
+        PropertyDescriptorReflectionBean sourceRef = new PropertyDescriptorReflectionBean(source);
+        PropertyDescriptorReflectionBean conditionRef = new PropertyDescriptorReflectionBean(condition);
+
+        SqlStruct setStruct = new SetStruct(
+                table.getColumns().stream().map(SetNode::new).collect(Collectors.toList()))
+                .toSqlStruct(sourceRef);
+        SqlStruct conditionStruct = new ConditionStruct(metaManager.getUpdateCondition(
+                conditionType).stream().map(
+                        RawConditionNode::new)
+                .collect(Collectors.toList())).toSqlStruct(conditionRef);
 
         if (setStruct == null) {
             return null;
         }
 
         struct.setSql("UPDATE ");
-        struct.appendSql(this.table.getName())
+        struct.appendSql(table.getName())
                 .appendSql(setStruct.getSql())
                 .appendSql(conditionStruct.getSql());
         struct.addParams(setStruct.getParams())
@@ -189,14 +127,30 @@ public class DefaultDataBindExpress implements DataBindExpress {
     }
 
     @Override
-    public SqlStruct getSelect(Object model) {
-        Verify.notNull(model);
+    public SqlStruct getSelect(Object condition) {
+        Verify.notNull(condition);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
-        PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(model);
-        SqlStruct selectStruct = this.select.toSqlStruct(ref);
-        SqlStruct conditionStruct = this.selectCondition.toSqlStruct(ref);
+        Class<?> conditionType = condition.getClass();
+
+        TableMeta table = metaManager.getTable(conditionType);
+        OffsetMeta offset = metaManager.getOffset(conditionType);
+        LimitMeta limit = metaManager.getLimit(conditionType);
+        GroupByMeta groupBy = metaManager.getGroupBy(conditionType);
+        List<OrderByMeta> orderByMetas = metaManager.getOrderBy(conditionType);
+
+        PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(condition);
+        boolean hasGroupBy = groupBy != null && !CollectionUtils.isEmpty(groupBy.getColumns());
+        SqlStruct selectStruct = new SelectStruct(
+                table.getColumns().stream()
+                        .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
+                        .map(ColumnStruct::new).collect(Collectors.toList()))
+                .toSqlStruct(null);
+        SqlStruct conditionStruct = new ConditionStruct(metaManager.getSelectCondition(
+                conditionType).stream().map(
+                        RawConditionNode::new)
+                .collect(Collectors.toList())).toSqlStruct(ref);
 
         if (selectStruct == null) {
             return null;
@@ -205,10 +159,32 @@ public class DefaultDataBindExpress implements DataBindExpress {
         struct.setSql("SELECT ");
         struct.appendSql(selectStruct.getSql())
                 .appendSql(" FROM ")
-                .appendSql(this.table.getName());
+                .appendSql(table.getName());
         if (conditionStruct != null) {
             struct.appendSql(conditionStruct.getSql());
             struct.addParams(conditionStruct.getParams());
+        }
+
+        if (hasGroupBy) {
+            struct.appendSql(" GROUP BY ").appendSql(String.join(", ", groupBy.getColumns()));
+        }
+
+        if (!CollectionUtils.isEmpty(orderByMetas)) {
+            struct.appendSql(" ORDER BY ")
+                    .appendSql(String.join(", ",
+                            orderByMetas.stream()
+                                    .map(ob -> String.join(" ", ob.getName(), ob.isDesc() ? "DESC" : "AESC"))
+                                    .collect(Collectors.toList())));
+        }
+
+        if (limit != null) {
+            struct.appendSql(" LIMIT ?");
+            struct.addParam(ref.getFieldValue(limit.getField().getName()));
+        }
+
+        if (offset != null) {
+            struct.appendSql(" OFFSET ?");
+            struct.addParam(ref.getFieldValue(offset.getField().getName()));
         }
         return struct;
     }

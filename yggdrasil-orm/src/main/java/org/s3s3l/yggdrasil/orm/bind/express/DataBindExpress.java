@@ -16,15 +16,15 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
  * @since JDK 1.8
  */
 public interface DataBindExpress {
-    DataBindExpress express(Class<?> modelType);
+    // DataBindExpress express(Class<?> modelType);
 
-    String getAlias(String name);
+    // String getAlias(String name);
 
     SqlStruct getInsert(List<?> model);
 
-    SqlStruct getDelete(Object model);
+    SqlStruct getDelete(Object condition);
 
-    SqlStruct getUpdate(Object model);
+    SqlStruct getUpdate(Object source, Object condition);
 
-    SqlStruct getSelect(Object model);
+    SqlStruct getSelect(Object condition);
 }

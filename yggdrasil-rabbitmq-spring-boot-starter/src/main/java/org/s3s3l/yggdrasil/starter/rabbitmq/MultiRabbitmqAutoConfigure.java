@@ -58,7 +58,7 @@ public class MultiRabbitmqAutoConfigure implements ImportBeanDefinitionRegistrar
 
     public void multiRabbitmqAutoConfigure(MultiRabbitmqConfiguartion configuration, BeanDefinitionRegistry registry) {
         logger.trace("Starting auto-configuring multiple datasource.");
-        String configurationStr = JacksonUtils.defaultHelper.toStructuralString(configuration);
+        String configurationStr = JacksonUtils.JSON.toStructuralString(configuration);
         logger.debug("Multiple datasource configuration. '{}'", configurationStr);
 
         logger.trace("Starting registering common datasources.");

@@ -126,7 +126,7 @@ public class CSVHelper implements ResourceMapper {
             // 拼接csv的正文内容
             for(int i = 0; i < objList.size(); i++){
                 T obj = objList.get(i);
-                JsonNode rowValue = JacksonUtils.defaultHelper.valueToTree(obj);
+                JsonNode rowValue = JacksonUtils.JSON.valueToTree(obj);
                 for (Field field : fields) {
                     FieldMap fieldMap = field.getAnnotation(FieldMap.class);
                     String fieldName = field.getName();

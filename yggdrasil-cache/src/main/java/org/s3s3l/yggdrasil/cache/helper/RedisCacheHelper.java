@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class RedisCacheHelper implements CacheHelper<String> {
 
     private IRedis redis;
-    private JacksonHelper json = JacksonUtils.defaultHelper;
+    private JacksonHelper json = JacksonUtils.JSON;
 
     public RedisCacheHelper(IRedis redis) {
         Verify.notNull(redis);

@@ -5,7 +5,6 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
-import org.s3s3l.yggdrasil.utils.verify.Verify;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +32,6 @@ public class ColumnStruct implements DataBindNode {
 
     @Override
     public SqlStruct toSqlStruct(ReflectionBean bean) {
-        Verify.notNull(bean);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
@@ -42,7 +40,7 @@ public class ColumnStruct implements DataBindNode {
             return null;
         }
 
-        StringBuilder sb = new StringBuilder(" ");
+        StringBuilder sb = new StringBuilder("");
 
         if (!StringUtils.isEmpty(this.meta.getTableAlias())) {
             sb.append(this.meta.getTableAlias())
