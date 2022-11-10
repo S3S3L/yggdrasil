@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
+import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.CreateBuilder;
 import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.DeleteBuilder;
 import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.InsertBuilder;
 import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.SelectBuilder;
@@ -64,27 +65,10 @@ import net.sf.jsqlparser.util.SelectUtils;
 
 public class JSqlParserDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
-    // private Class<?> modelType;
 
     public JSqlParserDataBindExpress(MetaManager metaManager) {
         this.metaManager = metaManager;
-        // express(modelType);
     }
-
-    // @Override
-    // public DataBindExpress express(Class<?> modelType) {
-    // if (!this.metaManager.isResolved(modelType)) {
-    // throw new ResourceNotFoundException("type '" + modelType.getName() + "' have
-    // not been resolved.");
-    // }
-    // this.modelType = modelType;
-    // return this;
-    // }
-
-    // @Override
-    // public String getAlias(String name) {
-    // return this.metaManager.getAlias(modelType, name);
-    // }
 
     @Override
     public SqlStruct getInsert(List<?> models) {
@@ -251,6 +235,14 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         return sqlStruct;
     }
 
+    @Override
+    public SqlStruct getCreate(Class<?> tableType, boolean force) {
+        DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
+        TableMeta table = metaManager.getTable(tableType);
+        sqlStruct.appendSql(new CreateBuilder(table, force).build().toString());
+        return sqlStruct;
+    }
+
     private JSqlParserSqlStruct buildWhere(List<ConditionMeta> conditions, ReflectionBean rb) {
         JSqlParserSqlStruct whereStruct = new JSqlParserSqlStruct();
 
@@ -259,6 +251,9 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         }
 
         JSqlParserSqlStruct sqlStruct = toExpression(conditions.get(0), rb);
+        if (sqlStruct == null) {
+            return whereStruct;
+        }
         Expression expression = sqlStruct.getExpression();
         whereStruct.addParams(sqlStruct.getParams());
 
@@ -289,24 +284,28 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
             return null;
         }
 
+        String fieldName = column.getName();
+        if (StringUtils.isEmpty(fieldName)) {
+            fieldName = field.getName();
+        }
         switch (pattern) {
             case END_WITH:
                 LikeExpression endWith = new LikeExpression();
-                endWith.setLeftExpression(new Column(column.getName()));
+                endWith.setLeftExpression(new Column(fieldName));
                 endWith.setRightExpression(new JdbcParameter());
                 struct.addParam(StringUtils.isEmpty(value) ? "%" : "%" + value.toString());
                 struct.setExpression(endWith);
                 break;
             case EQUAL:
                 EqualsTo et = new EqualsTo();
-                et.setLeftExpression(new Column(column.getName()));
+                et.setLeftExpression(new Column(fieldName));
                 et.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(et);
                 break;
             case IN:
                 InExpression in = new InExpression();
-                in.setLeftExpression(new Column(column.getName()));
+                in.setLeftExpression(new Column(fieldName));
                 List<Expression> expressions = new LinkedList<>();
                 if (fieldType.isArray()) {
                     Arrays.stream(((Object[]) value))
@@ -331,60 +330,60 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
                 break;
             case LAGER:
                 GreaterThan gt = new GreaterThan();
-                gt.setLeftExpression(new Column(column.getName()));
+                gt.setLeftExpression(new Column(fieldName));
                 gt.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(gt);
                 break;
             case LESS:
                 MinorThan mt = new MinorThan();
-                mt.setLeftExpression(new Column(column.getName()));
+                mt.setLeftExpression(new Column(fieldName));
                 mt.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(mt);
                 break;
             case LIKE:
                 LikeExpression like = new LikeExpression();
-                like.setLeftExpression(new Column(column.getName()));
+                like.setLeftExpression(new Column(fieldName));
                 like.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(like);
                 break;
             case NON_NULL:
                 IsNullExpression nonNull = new IsNullExpression();
-                nonNull.setLeftExpression(new Column(column.getName()));
+                nonNull.setLeftExpression(new Column(fieldName));
                 nonNull.setNot(true);
                 struct.setExpression(nonNull);
                 break;
             case NOT_LAGER:
                 MinorThanEquals mte = new MinorThanEquals();
-                mte.setLeftExpression(new Column(column.getName()));
+                mte.setLeftExpression(new Column(fieldName));
                 mte.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(mte);
                 break;
             case NOT_LESS:
                 GreaterThanEquals gte = new GreaterThanEquals();
-                gte.setLeftExpression(new Column(column.getName()));
+                gte.setLeftExpression(new Column(fieldName));
                 gte.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(gte);
                 break;
             case NULL:
                 IsNullExpression isNull = new IsNullExpression();
-                isNull.setLeftExpression(new Column(column.getName()));
+                isNull.setLeftExpression(new Column(fieldName));
                 struct.setExpression(isNull);
                 break;
             case START_WITH:
                 LikeExpression startWith = new LikeExpression();
-                startWith.setLeftExpression(new Column(column.getName()));
+                startWith.setLeftExpression(new Column(fieldName));
                 startWith.setRightExpression(new JdbcParameter());
                 struct.addParam(StringUtils.isEmpty(value) ? "%" : value.toString() + '%');
                 struct.setExpression(startWith);
                 break;
             case UNEQUAL:
                 NotEqualsTo net = new NotEqualsTo();
-                net.setLeftExpression(new Column(column.getName()));
+                net.setLeftExpression(new Column(fieldName));
                 net.setRightExpression(new JdbcParameter());
                 struct.addParam(value);
                 struct.setExpression(net);
@@ -435,6 +434,10 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         d.setWhere(equalsTo);
 
         System.out.println(d);
+
+        Statement create = CCJSqlParserUtil
+                .parse("create table if not exists t_test(id varchar (64) primary key, name varchar (32) NOT NULL, sex int)");
+        System.out.println(create);
     }
 
 }

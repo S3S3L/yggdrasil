@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.orm.bind.express.common;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import org.s3s3l.yggdrasil.orm.bind.set.SetStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
+import org.s3s3l.yggdrasil.orm.meta.DatabaseType;
 import org.s3s3l.yggdrasil.orm.meta.GroupByMeta;
 import org.s3s3l.yggdrasil.orm.meta.LimitMeta;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
@@ -186,6 +188,48 @@ public class DefaultDataBindExpress implements DataBindExpress {
             struct.appendSql(" OFFSET ?");
             struct.addParam(ref.getFieldValue(offset.getField().getName()));
         }
+        return struct;
+    }
+
+    @Override
+    public SqlStruct getCreate(Class<?> tableType, boolean force) {
+        Verify.notNull(tableType);
+        DefaultSqlStruct struct = new DefaultSqlStruct();
+        TableMeta table = metaManager.getTable(tableType);
+
+        struct.setSql("CREATE TABLE ");
+
+        if (!force) {
+            struct.appendSql("IF NOT EXISTS ");
+        }
+
+        struct.appendSql(table.getName() + " (");
+        struct.appendSql(
+                String.join(", ", table
+                        .getColumns().stream().map(col -> {
+                            List<String> args = new LinkedList<>();
+                            args.add(col.getName());
+                            DatabaseType dbType = col.getDbType();
+                            args.add(dbType.getType());
+                            if (!CollectionUtils.isEmpty(dbType.getArgs())) {
+                                args.add(String.format("(%s)",
+                                        String.join(", ", dbType.getArgs())));
+                            }
+
+                            StringBuilder sb = new StringBuilder(String.join(" ", args));
+
+                            if (dbType.isPrimary()) {
+                                sb.append(" PRIMARY KEY");
+                            }
+
+                            if (dbType.isNotNull()) {
+                                sb.append(" NOT NULL");
+                            }
+
+                            return sb.toString();
+                        })
+                        .collect(Collectors.toList())));
+        struct.appendSql(")");
         return struct;
     }
 }

@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -63,9 +64,8 @@ public class DefaultSqlExecutor implements SqlExecutor {
     }
 
     @Override
-    public <S> int insert(List<S> sources, Class<S> sourceType) {
+    public <S> int insert(List<S> sources) {
         Verify.notEmpty(sources);
-        Verify.notNull(sourceType);
 
         SqlStruct sqlStruct = dataBindExpress.getInsert(sources);
         String sql = sqlStruct.getSql();
@@ -139,6 +139,33 @@ public class DefaultSqlExecutor implements SqlExecutor {
         }
     }
 
+    @Override
+    public boolean create(Class<?> tableType, boolean force) {
+        Verify.notNull(tableType);
+        SqlStruct sqlStruct = dataBindExpress.getCreate(tableType, force);
+        String sql = sqlStruct.getSql();
+        log.debug("Excuting sql [{}].", sql);
+        try (Connection conn = datasource.getConnection()) {
+            try (Statement preparedStatement = conn.createStatement()) {
+                return preparedStatement.execute(sql);
+            }
+        } catch (SQLException | SecurityException e) {
+            throw new SqlExecutingException(e);
+        }
+    }
+
+    @Override
+    public boolean execute(String sql) {
+        log.debug("Excuting sql [{}].", sql);
+        try (Connection conn = datasource.getConnection()) {
+            try (Statement preparedStatement = conn.createStatement()) {
+                return preparedStatement.execute(sql);
+            }
+        } catch (SQLException | SecurityException e) {
+            throw new SqlExecutingException(e);
+        }
+    }
+
     private void setParams(SqlStruct sqlStruct, PreparedStatement preparedStatement) throws SQLException {
         Verify.notNull(sqlStruct);
         Verify.notNull(preparedStatement);
@@ -177,10 +204,8 @@ public class DefaultSqlExecutor implements SqlExecutor {
                         Type fieldType = field.getGenericType();
                         Class<?> fieldClass = field.getType();
 
-                        resultData = field.getAnnotation(Column.class)
-                                .typeHandler()
-                                .getConstructor()
-                                .newInstance()
+                        resultData = metaManager.getTypeHandlerManager().getOrNew(field.getAnnotation(Column.class)
+                                .typeHandler())
                                 .toJavaType(resultData, fieldClass, fieldType);
                     }
 

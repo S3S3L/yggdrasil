@@ -23,6 +23,7 @@ module.exports = {
     {name: 'apollo_starter'},
     {name: 'rabbitmq_starter'},
     {name: 'fsm'},
+    {name: 'orm'},
     {name: 'ddd'}
   ],
   // 可以根据匹配的类型不同, 显示不一样的scope, 动手实践下!

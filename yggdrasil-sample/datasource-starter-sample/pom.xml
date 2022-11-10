@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yggdrasil-sample-orm</artifactId>
+    <artifactId>yggdrasil-sample-datasource-starter</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -22,13 +22,13 @@
     <dependencies>
         <dependency>
             <groupId>org.s3s3l.yggdrasil</groupId>
-            <artifactId>yggdrasil-orm</artifactId>
+            <artifactId>yggdrasil-datasource-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>2.7.1</version>
-        </dependency> 
+        </dependency>
         <!-- log4j2 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

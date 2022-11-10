@@ -40,7 +40,8 @@
         <module>yggdrasil-cache-spring-boot-starter</module>
         <module>doc-maven-plugin</module>
         
-	<module>yggdrasil-sample/orm-sample</module>
+        <module>yggdrasil-sample/datasource-starter-sample</module>
+        <module>yggdrasil-sample/orm-sample</module>
     </modules>
 
     <build>

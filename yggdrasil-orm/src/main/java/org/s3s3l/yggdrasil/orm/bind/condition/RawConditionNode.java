@@ -42,11 +42,15 @@ public class RawConditionNode implements DataBindNode {
         DefaultSqlStruct struct = new DefaultSqlStruct();
         ColumnMeta columnMeta = conditionMeta.getColumn();
 
-        String fieldName = this.conditionMeta.getField()
-                .getName();
+        String fieldName = columnMeta.getName();
+
+        if (StringUtils.isEmpty(fieldName)) {
+            fieldName = this.conditionMeta.getField()
+                    .getName();
+        }
         Class<?> fieldType = this.conditionMeta.getField()
                 .getType();
-        if (StringUtils.isEmpty(columnMeta.getName()) || this.conditionMeta.getField() == null
+        if (StringUtils.isEmpty(fieldName)
                 || this.conditionMeta.getValidator() == null
                 || !bean.hasField(fieldName)) {
             return null;
@@ -66,7 +70,7 @@ public class RawConditionNode implements DataBindNode {
                     .append(".");
         }
 
-        sb.append(columnMeta.getName());
+        sb.append(fieldName);
 
         switch (conditionMeta.getPattern()) {
             case NON_NULL:

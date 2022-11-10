@@ -19,11 +19,15 @@ public interface SqlExecutor {
 
     void setDataSource(DataSource datasource);
 
-    <S> int insert(List<S> sources, Class<S> sourceType);
+    <S> int insert(List<S> sources);
 
     <C> int delete(C condition);
 
     <S, C> int update(S source, C condition);
 
     <C, R> List<R> select(C condition, Class<R> resultType);
+
+    boolean create(Class<?> tableType, boolean force);
+
+    boolean execute(String sql);
 }

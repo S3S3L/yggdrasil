@@ -31,7 +31,7 @@ public class ColumnMeta {
     /**
      * 数据库字段类型
      */
-    private String dbType;
+    private DatabaseType dbType;
     /**
      * 对应JAVA对象中的字段名
      */

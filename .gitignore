@@ -81,3 +81,9 @@ logs/
 
 # Mac file system
 .DS_Store
+
+# test storage
+db/
+
+# node
+node_modules/

@@ -69,6 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = MultiDatasourceConfiguration.PREFIX, name = "enable", havingValue = "true")
 public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String BEAN_NAME = "multiDatasourceAutoConfigure";
+    private static final String META_MANAGER_BEAN_NAME = "metaManager";
     /**
      * datasource bean名称后缀
      */
@@ -170,6 +171,10 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
 
         MybatisConfiguration mybatisConf = config.getMybatis();
         List<String> instances = config.getRequiredInstances();
+
+        // 注册MetaManager
+        registry.registerBeanDefinition(META_MANAGER_BEAN_NAME,
+                BeanUtils.buildBeanDefinition(new Object[] { config.getTableDefinePackages() }, MetaManager.class));
 
         // 构建所有需要启动的数据源实例
         log.trace("Starting registering common datasources.");
@@ -363,7 +368,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         registry.registerBeanDefinition(datasourceBeanName + EXECUTOR_TAIL,
                 BeanUtils.buildBeanDefinitionForFactoryMethod(DefaultSqlExecutor.class, BEAN_NAME,
                         "sqlExecutor",
-                        new Object[] { this.configuration.getTableDefinePackages() },
+                        null,
+                        META_MANAGER_BEAN_NAME,
                         datasourceBeanName));
         log.trace("Finished registering datasource executor definition '{}'.", datasourceBeanName);
     }
@@ -375,8 +381,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
      * @param datasource 数据源
      * @return
      */
-    public SqlExecutor sqlExecutor(String[] packages, DataSource datasource) {
-        return new DefaultSqlExecutor(datasource, new MetaManager(packages));
+    public SqlExecutor sqlExecutor(MetaManager metaManager, DataSource datasource) {
+        return new DefaultSqlExecutor(datasource, metaManager);
     }
 
     /**

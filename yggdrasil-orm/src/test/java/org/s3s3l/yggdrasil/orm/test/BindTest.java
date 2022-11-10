@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
+import org.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
 import org.s3s3l.yggdrasil.orm.bind.annotation.GroupBy;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Limit;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Offset;
@@ -34,17 +35,17 @@ public class BindTest {
     @NoArgsConstructor
     @TableDefine(table = "t_user")
     public static class User {
-        @Column(isPrimary = true)
+        @Column(dbType = @DatabaseType(type = "varchar", args = { "64" }, primary = true))
         @Condition(forDelete = true)
         private String id;
-        @Column
+        @Column(dbType = @DatabaseType(type = "varchar", args = { "32" }, notNull = true))
         private String name;
-        @Column(validator = PositiveNumberValidator.class)
+        @Column(validator = PositiveNumberValidator.class, dbType = @DatabaseType(type = "int"))
         private short sex;
-        @Column(typeHandler = ArrayTypeHandler.class)
+        @Column(typeHandler = ArrayTypeHandler.class, dbType = @DatabaseType(type = "varchar[]"))
         @Condition(forDelete = true, pattern = ComparePattern.IN)
         private String[] phones;
-        @Column(validator = PositiveNumberValidator.class)
+        @Column(validator = PositiveNumberValidator.class, dbType = @DatabaseType(type = "int"))
         private int age;
     }
 
@@ -195,5 +196,10 @@ public class BindTest {
 
         conditionUpdate.getParams()
                 .forEach(System.out::println);
+
+        System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
+        System.out.println(defaulDataBindExpress.getCreate(User.class, false).getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        System.out.println(jsqlDataBindExpress.getCreate(User.class, false).getSql());
     }
 }

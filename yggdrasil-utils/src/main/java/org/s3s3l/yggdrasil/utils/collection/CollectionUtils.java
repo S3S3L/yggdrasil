@@ -27,6 +27,18 @@ public abstract class CollectionUtils {
         return coll == null || coll.isEmpty();
     }
 
+    public static boolean isEmpty(final Object[] arr) {
+        return arr == null || arr.length <= 0;
+    }
+
+    public static boolean isNotEmpty(final Collection<?> coll) {
+        return !isEmpty(coll);
+    }
+
+    public static boolean isNotEmpty(final Object[] arr) {
+        return !isEmpty(arr);
+    }
+
     public static <T extends TreeNode<T>> List<T> flat(TreeNode<T> node) {
         List<T> children = node.getChildren();
 

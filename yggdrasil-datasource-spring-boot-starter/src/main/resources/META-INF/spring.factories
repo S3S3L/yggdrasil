@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
-org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceAutoConfigure
+org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceAutoConfigure, \
+org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration

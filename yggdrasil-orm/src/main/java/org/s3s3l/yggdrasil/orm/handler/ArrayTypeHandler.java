@@ -33,12 +33,12 @@ public class ArrayTypeHandler implements TypeHandler {
             if (param instanceof double[]) {
                 return Arrays.stream((double[]) param)
                         .boxed()
-                        .map(Double::new)
+                        .map(Double::valueOf)
                         .toArray();
             } else if (param instanceof int[]) {
                 return Arrays.stream((int[]) param)
                         .boxed()
-                        .map(Integer::new)
+                        .map(Integer::valueOf)
                         .toArray();
             }
             return param;

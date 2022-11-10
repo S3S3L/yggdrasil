@@ -29,11 +29,9 @@ public @interface Column {
 
     String name() default "";
 
-    boolean isPrimary() default false;
-
     Class<? extends Validator> validator() default DefaultValidator.class;
 
-    String dbType() default "";
+    DatabaseType dbType();
 
     Class<? extends TypeHandler> typeHandler() default DefaultTypeHandler.class;
 }

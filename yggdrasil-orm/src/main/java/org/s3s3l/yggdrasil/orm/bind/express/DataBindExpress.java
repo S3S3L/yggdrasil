@@ -16,9 +16,6 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
  * @since JDK 1.8
  */
 public interface DataBindExpress {
-    // DataBindExpress express(Class<?> modelType);
-
-    // String getAlias(String name);
 
     SqlStruct getInsert(List<?> model);
 
@@ -27,4 +24,6 @@ public interface DataBindExpress {
     SqlStruct getUpdate(Object source, Object condition);
 
     SqlStruct getSelect(Object condition);
+
+    SqlStruct getCreate(Class<?> tableType, boolean force);
 }

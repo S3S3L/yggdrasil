@@ -1,6 +1,7 @@
 package org.s3s3l.yggdrasil.orm.meta;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -122,12 +123,19 @@ public class MetaManager {
 
             if (column != null) {
                 columnName = StringUtils.isEmpty(column.name()) ? field.getName() : column.name();
+                org.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType dbType = column.dbType();
                 columnMeta = ColumnMeta.builder()
                         .field(field)
                         .name(columnName)
                         .alias(field.getName())
                         .validator(this.validatorFactory.getValidator(column.validator()))
                         .typeHandler(typeHandlerManager.getOrNew(column.typeHandler()))
+                        .dbType(DatabaseType.builder()
+                                .type(dbType.type())
+                                .args(Arrays.asList(dbType.args()))
+                                .primary(dbType.primary())
+                                .notNull(dbType.notNull())
+                                .build())
                         .build();
                 columns.add(columnMeta);
                 aliasMap.put(columnName.toUpperCase(), field.getName());
