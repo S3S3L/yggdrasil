@@ -32,6 +32,7 @@ import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.BinaryExpression;
@@ -63,6 +64,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.util.SelectUtils;
 
+@Slf4j
 public class JSqlParserDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
 
@@ -165,7 +167,9 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
             sqlStruct.addParam(fieldValue);
         }
         builder.where(whereStruct.getExpression());
-        sqlStruct.addParam(whereStruct.getParams());
+        if (CollectionUtils.isNotEmpty(whereStruct.getParams())) {
+            sqlStruct.addParams(whereStruct.getParams());
+        }
         sqlStruct.appendSql(builder.build()
                 .toString());
         return sqlStruct;
@@ -246,6 +250,7 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     private JSqlParserSqlStruct buildWhere(List<ConditionMeta> conditions, ReflectionBean rb) {
         JSqlParserSqlStruct whereStruct = new JSqlParserSqlStruct();
 
+        log.info("condition size: {}", conditions.size());
         if (CollectionUtils.isEmpty(conditions)) {
             return whereStruct;
         }

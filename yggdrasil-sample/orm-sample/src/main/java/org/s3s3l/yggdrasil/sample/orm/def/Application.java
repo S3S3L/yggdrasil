@@ -1,7 +1,6 @@
-package org.s3s3l.yggdrasil.sample.orm;
+package org.s3s3l.yggdrasil.sample.orm.def;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -15,6 +14,9 @@ import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.file.FileUtils;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Application {
     public static void main(String[] args) {
         DataSource datasource = new DataSource(
@@ -40,7 +42,23 @@ public class Application {
                         .realName("realName2")
                         .age(22)
                         .build()));
-        List<User> users = sqlExecutor.select(UserCondition.builder().id(id).build(), User.class);
-        users.forEach(System.out::println);
+        log.info(">>>>>>>>>>>>>>>>>> select one");
+        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        log.info(">>>>>>>>>>>>>>>>>> select all");
+        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+
+        // update age
+        sqlExecutor.update(User.builder().age(19).build(), UserCondition.builder().id(id).build());
+        log.info(">>>>>>>>>>>>>>>>>> select one after update");
+        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        log.info(">>>>>>>>>>>>>>>>>> select all after update");
+        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+        
+        // delete by id
+        sqlExecutor.delete(UserCondition.builder().id(id).build());
+        log.info(">>>>>>>>>>>>>>>>>> select one after delete");
+        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        log.info(">>>>>>>>>>>>>>>>>> select all after delete");
+        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
     }
 }

@@ -15,6 +15,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SqlModel(table = User.class)
 public class UserCondition {
-    @Condition
+    @Condition(forUpdate = true, forDelete = true)
     private String id;
 }
