@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
+import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
+
 /**
  * 
  * <p>
@@ -26,6 +29,10 @@ public interface SqlExecutor {
     <S, C> int update(S source, C condition);
 
     <C, R> List<R> select(C condition, Class<R> resultType);
+
+    <C extends ConditionForPagination, R> PaginResult<List<R>> selectByPagin(C condition, Class<R> resultType);
+
+    <C, R> R selectOne(C condition, Class<R> resultType);
 
     boolean create(Class<?> tableType, boolean force);
 

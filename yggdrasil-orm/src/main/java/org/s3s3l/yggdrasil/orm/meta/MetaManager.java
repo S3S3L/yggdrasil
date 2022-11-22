@@ -2,6 +2,7 @@ package org.s3s3l.yggdrasil.orm.meta;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -55,11 +56,6 @@ public class MetaManager {
         this.typeHandlerManager = typeHandlerManager;
         refresh();
     }
-
-    public boolean isResolved(Class<?> type) {
-        return this.tables.containsKey(type);
-    }
-
     public TableMeta resolve(Class<?> type) {
         return tables.computeIfAbsent(type, key -> {
             if (ReflectionUtils.isAnnotationedWith(type, TableDefine.class)) {
@@ -76,9 +72,10 @@ public class MetaManager {
     private synchronized void refresh() {
         Set<Class<?>> types = scanner.scan(packages);
         types.stream().filter(type -> ReflectionUtils.isAnnotationedWith(type,
-                TableDefine.class)
-                || ReflectionUtils.isAnnotationedWith(type,
-                        SqlModel.class))
+                TableDefine.class))
+                .forEach(this::resolve);
+        types.stream().filter(type -> ReflectionUtils.isAnnotationedWith(type,
+                SqlModel.class))
                 .forEach(this::resolve);
     }
 
@@ -92,7 +89,7 @@ public class MetaManager {
     }
 
     private TableMeta resolveSqlModel(SqlModel sqlModel, Class<?> type) {
-        TableMeta table = resolve(sqlModel.table());
+        TableMeta table = tables.get(sqlModel.table());
         if (table == null) {
             throw new ResourceNotFoundException("table for type '" + type.getName() + "' not found.");
         }
@@ -221,6 +218,14 @@ public class MetaManager {
 
     public TableMeta getTable(Class<?> type) {
         return this.tables.get(type);
+    }
+
+    public Collection<TableMeta> allTables() {
+        return this.tables.values();
+    }
+
+    public Set<Class<?>> allTableTypes() {
+        return this.tables.keySet();
     }
 
     public List<ConditionMeta> getSelectCondition(Class<?> type) {

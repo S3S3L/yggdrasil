@@ -39,6 +39,7 @@ import org.s3s3l.yggdrasil.bean.FileType;
 import org.s3s3l.yggdrasil.bean.KeyValuePair;
 import org.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
 import org.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
+import org.s3s3l.yggdrasil.bean.exception.VerifyException;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.common.Utils;
@@ -46,9 +47,6 @@ import org.s3s3l.yggdrasil.utils.security.SecurityUtils;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.VerifyException;
-import com.google.common.io.Resources;
 
 import lombok.AllArgsConstructor;
 
@@ -443,20 +441,6 @@ public abstract class FileUtils {
             pathStr = pathStr.substring(1);
         }
         return Paths.get(pathStr);
-    }
-
-    /**
-     * 
-     * 获取资源文件的绝对路径
-     * 
-     * @param path
-     *            相对路径
-     * @return 绝对路径
-     * @since JDK 1.8
-     */
-    public static String mapResource(String path) {
-        return Resources.getResource(path)
-                .getPath();
     }
 
     /**

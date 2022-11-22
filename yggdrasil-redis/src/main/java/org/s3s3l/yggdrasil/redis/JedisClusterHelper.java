@@ -86,8 +86,7 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
                 .getPool();
         poolConfig.setMaxTotal(pool.getMaxActive());
         poolConfig.setMaxIdle(pool.getMaxIdle());
-        poolConfig.setMaxWaitMillis(pool.getMaxWait()
-                .toMillis());
+        poolConfig.setMaxWait(pool.getMaxWait());
         return new JedisPool(poolConfig, redisProp.getHost(), redisProp.getPort(), (int) redisProp.getTimeout()
                 .toMillis(), redisProp.getPassword(), redisProp.getDatabase());
     }
@@ -170,7 +169,7 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
         if (!jedis.exists(key) || seconds > Integer.MAX_VALUE) {
             return false;
         }
-        jedis.expire(key, (int) seconds);
+        jedis.expire(key, seconds);
         return true;
 
     }
@@ -194,7 +193,7 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     public void set(String key, String value, long seconds) {
         Verify.notLargerThan(seconds, Integer.MAX_VALUE);
         execute(jedis -> {
-            jedis.setex(key, (int) seconds, value);
+            jedis.setex(key, seconds, value);
             return null;
         }, Action.WRITE);
 
@@ -204,7 +203,7 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     public void set(byte[] key, byte[] value, long seconds) {
         Verify.notLargerThan(seconds, Integer.MAX_VALUE);
         execute(jedis -> {
-            jedis.setex(key, (int) seconds, value);
+            jedis.setex(key, seconds, value);
             return null;
         }, Action.WRITE);
     }
@@ -449,8 +448,8 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     }
 
     @Override
-    public List<GeoRadiusResponse>
-            georadius(String key, double longitude, double latitude, double radius, GeoUnit unit) {
+    public List<GeoRadiusResponse> georadius(String key, double longitude, double latitude, double radius,
+            GeoUnit unit) {
         return execute(jedis -> jedis.georadius(key, longitude, latitude, radius, unit), Action.GEO_READ);
     }
 

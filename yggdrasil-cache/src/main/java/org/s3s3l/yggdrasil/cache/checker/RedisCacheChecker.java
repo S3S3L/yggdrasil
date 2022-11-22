@@ -26,7 +26,7 @@ public class RedisCacheChecker extends AbstractRedisCacheChecker {
 
     @Override
     protected Object updateAndGet(String key) {
-        String lua = SYCN_LAST_UPDATE.replaceAll("\\{key\\}", key);
+        String lua = SYNC_LAST_UPDATE.replaceAll("\\{key\\}", key);
         return redis.eval(lua, key);
     }
 

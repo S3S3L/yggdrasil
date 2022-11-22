@@ -65,7 +65,7 @@ public class ZstdCompressorTest {
 
     @Test
     public void zstdLevelTest() {
-        byte[] dis = zstd.compress(src, 3);
+        byte[] dis = zstd.compress(src, 5);
         Assert.assertArrayEquals(zstd.decompress(dis), src);
     }
 

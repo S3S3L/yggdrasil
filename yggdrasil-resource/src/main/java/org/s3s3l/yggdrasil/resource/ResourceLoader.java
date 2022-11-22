@@ -11,6 +11,7 @@ package org.s3s3l.yggdrasil.resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 
@@ -30,269 +31,323 @@ public interface ResourceLoader {
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(String resource, Class<T> type) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(File resource, Class<T> type) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param type
-     *            target type
+     *                  target type
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                       type
      * @param type
-     *            target type
+     *                       target type
      * @param checkFileExist
-     *            if true, will throw a FileNotFoundException when a resource
-     *            file not found; if false, will not check file and continue
-     *            loading configuration.
+     *                       if true, will throw a FileNotFoundException when a
+     *                       resource
+     *                       file not found; if false, will not check file and
+     *                       continue
+     *                       loading configuration.
      * @param resources
-     *            configuration resources
+     *                       configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, boolean checkFileExist, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param type
-     *            target type
+     *                  target type
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @param profile
-     *            configuration profile
+     *                 configuration profile
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(String resource, Class<T> type, String profile) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @param profile
-     *            configuration profile
+     *                 configuration profile
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(File resource, Class<T> type, String profile) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param type
-     *            target type
+     *                  target type
      * @param profile
-     *            configuration profile
+     *                  configuration profile
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, String profile, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                       type
      * @param type
-     *            target type
+     *                       target type
      * @param checkFileExist
-     *            if true, will throw a FileNotFoundException when a resource
-     *            file not found; if false, will not check file and continue
-     *            loading configuration.
+     *                       if true, will throw a FileNotFoundException when a
+     *                       resource
+     *                       file not found; if false, will not check file and
+     *                       continue
+     *                       loading configuration.
      * @param profile
-     *            configuration profile
+     *                       configuration profile
      * @param resources
-     *            configuration resources
+     *                       configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, boolean checkFileExist, String profile, File... resources)
             throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param type
-     *            target type
+     *                  target type
      * @param profile
-     *            configuration profile
+     *                  configuration profile
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(Class<T> type, String profile, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param object
-     *            target object
+     *                 target object
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                {@link IllegalAccessException}
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, String resource, Class<T> type) throws IOException,
@@ -304,20 +359,20 @@ public interface ResourceLoader {
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param object
-     *            target object
+     *                 target object
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                {@link IllegalAccessException}
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, File resource, Class<T> type) throws IOException,
@@ -329,101 +384,118 @@ public interface ResourceLoader {
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param object
-     *            target object
+     *                  target object
      * @param type
-     *            target type
+     *                  target type
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                       type
      * @param object
-     *            target object
+     *                       target object
      * @param type
-     *            target type
+     *                       target type
      * @param checkFileExist
-     *            if true, will throw a FileNotFoundException when a resource
-     *            file not found; if false, will not check file and continue
-     *            loading configuration.
+     *                       if true, will throw a FileNotFoundException when a
+     *                       resource
+     *                       file not found; if false, will not check file and
+     *                       continue
+     *                       loading configuration.
      * @param resources
-     *            configuration resources
+     *                       configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, boolean checkFileExist, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param object
-     *            target object
+     *                  target object
      * @param type
-     *            target type
+     *                  target type
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param object
-     *            target object
+     *                 target object
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @param profile
-     *            configuration profile
+     *                 configuration profile
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                {@link IllegalAccessException}
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, String resource, Class<T> type, String profile) throws IOException,
@@ -435,22 +507,22 @@ public interface ResourceLoader {
      * load configuration resource
      * 
      * @param <T>
-     *            type
+     *                 type
      * @param object
-     *            target object
+     *                 target object
      * @param resource
-     *            configuration resource
+     *                 configuration resource
      * @param type
-     *            target type
+     *                 target type
      * @param profile
-     *            configuration profile
+     *                 configuration profile
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                {@link IllegalAccessException}
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, File resource, Class<T> type, String profile) throws IOException,
@@ -462,84 +534,101 @@ public interface ResourceLoader {
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param object
-     *            target object
+     *                  target object
      * @param type
-     *            target type
+     *                  target type
      * @param profile
-     *            configuration profile
+     *                  configuration profile
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, String profile, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                       type
      * @param object
-     *            target object
+     *                       target object
      * @param type
-     *            target type
+     *                       target type
      * @param checkFileExist
-     *            if true, will throw a FileNotFoundException when a resource
-     *            file not found; if false, will not check file and continue
-     *            loading configuration.
+     *                       if true, will throw a FileNotFoundException when a
+     *                       resource
+     *                       file not found; if false, will not check file and
+     *                       continue
+     *                       loading configuration.
      * @param profile
-     *            configuration profile
+     *                       configuration profile
      * @param resources
-     *            configuration resources
+     *                       configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, boolean checkFileExist, String profile, File... resources)
             throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 
     /**
      * 
      * load configuration resources
      * 
      * @param <T>
-     *            type
+     *                  type
      * @param object
-     *            target object
+     *                  target object
      * @param type
-     *            target type
+     *                  target type
      * @param profile
-     *            configuration profile
+     *                  configuration profile
      * @param resources
-     *            configuration resources
+     *                  configuration resources
      * @return instance of type
      * @throws IOException
-     *             {@link IOException}
+     *                                   {@link IOException}
      * @throws InstantiationException
-     *             {@link InstantiationException}
+     *                                   {@link InstantiationException}
      * @throws IllegalAccessException
-     *             {@link IllegalAccessException}
+     *                                   {@link IllegalAccessException}
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      * @since JDK 1.8
      */
     <T> T loadConfiguration(T object, Class<T> type, String profile, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException;
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException;
 }

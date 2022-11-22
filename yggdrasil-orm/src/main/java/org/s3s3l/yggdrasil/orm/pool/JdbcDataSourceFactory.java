@@ -2,12 +2,10 @@ package org.s3s3l.yggdrasil.orm.pool;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.cfg.ConfigFeature;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -21,6 +19,9 @@ import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.cfg.ConfigFeature;
 
 /**
  * 
@@ -67,7 +68,8 @@ public class JdbcDataSourceFactory implements DataSourceFactory {
     }
 
     @Override
-    public javax.sql.DataSource getDataSource(String profileKey, String profile, String... configFiles) {
+    public javax.sql.DataSource getDataSource(String profileKey, String profile, String... configFiles)
+            throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
         Verify.notEmpty(configFiles);
         File configFile = FileUtils.getFirstExistFile(configFiles);
 

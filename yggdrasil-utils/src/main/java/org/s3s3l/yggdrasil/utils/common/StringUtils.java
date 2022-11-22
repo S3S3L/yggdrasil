@@ -30,7 +30,7 @@ public class StringUtils {
     public static final String NEW_LINE_STRING = System.getProperty("line.separator");
     public static final char UNDERLINE = '_';
     public static final Integer UUID_LENGTH = 32;
-    private static final Pattern uuidPattern = Pattern.compile("[a-zA-Z\\d]+");
+    private static final Pattern UUID_PATTERN = Pattern.compile("[a-zA-Z\\d]+");
 
     public static boolean isEmpty(String str) {
         return str == null || EMPTY_STRING.equals(str);
@@ -41,6 +41,18 @@ public class StringUtils {
             isEmpty((String) obj);
         }
         return obj == null;
+    }
+
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
+    }
+
+    public static boolean isNotEmpty(Object obj) {
+        return !isEmpty(obj);
+    }
+
+    public static boolean equals(String src, String target) {
+        return src != null && target != null && src.equals(target);
     }
 
     /**
@@ -66,7 +78,7 @@ public class StringUtils {
         if (isEmpty(uuid)) {
             return EMPTY_STRING;
         }
-        Matcher matcher = uuidPattern.matcher(uuid);
+        Matcher matcher = UUID_PATTERN.matcher(uuid);
         if (matcher.find()) {
             return matcher.toMatchResult()
                     .group();
@@ -81,9 +93,9 @@ public class StringUtils {
      * 
      * @author kehw_zwei
      * @param src
-     *                  源字符串
+     *              源字符串
      * @param regex
-     *                  正则
+     *              正则
      * @return 如果匹配true，不匹配false
      * @since JDK 1.8
      */
@@ -107,9 +119,9 @@ public class StringUtils {
      * 
      * @author kehw_zwei
      * @param src
-     *                      源字符串
+     *                  源字符串
      * @param srcFormat
-     *                      源格式
+     *                  源格式
      * @return Java字段命名格式字符串
      * @since JDK 1.8
      */
@@ -123,11 +135,11 @@ public class StringUtils {
      * 
      * @author kehw_zwei
      * @param src
-     *                         源字符串
+     *                     源字符串
      * @param srcFormat
-     *                         源格式
+     *                     源格式
      * @param targetFormat
-     *                         目标格式
+     *                     目标格式
      * @return 目标格式字符串
      * @since JDK 1.8
      */
@@ -141,7 +153,7 @@ public class StringUtils {
      * 
      * @author kehw_zwei
      * @param str
-     *                源字符串
+     *            源字符串
      * @return 首字母大写的字符串
      * @since JDK 1.8
      */
@@ -160,7 +172,7 @@ public class StringUtils {
      * 
      * @author kehw_zwei
      * @param str
-     *                源字符串
+     *            源字符串
      * @return 首字母小写的字符串
      * @since JDK 1.8
      */
@@ -181,7 +193,7 @@ public class StringUtils {
      * 
      * @author carter_wang
      * @param str
-     *                源字符串
+     *            源字符串
      * @return 大写字母转换成下划线字母的字符串 eg. myJavaClass ---> my_java_class
      */
     public static String camelToUnderline(String str) {

@@ -2,7 +2,7 @@ package org.s3s3l.yggdrasil.utils.stuctural.jackson;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.NamingBase;
 
 /**
  * <p>
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrat
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class HyphenToCamelNamingStrategy extends PropertyNamingStrategyBase {
+public class HyphenToCamelNamingStrategy extends NamingBase {
     /**
      *
      */

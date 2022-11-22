@@ -130,6 +130,15 @@ public class DefaultDataBindExpress implements DataBindExpress {
 
     @Override
     public SqlStruct getSelect(Object condition) {
+        return getSelect(condition, false);
+    }
+
+    @Override
+    public SqlStruct getSelectCount(Object condition) {
+        return getSelect(condition, true);
+    }
+
+    private SqlStruct getSelect(Object condition, boolean count) {
         Verify.notNull(condition);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
@@ -159,12 +168,16 @@ public class DefaultDataBindExpress implements DataBindExpress {
         }
 
         struct.setSql("SELECT ");
-        struct.appendSql(selectStruct.getSql())
+        struct.appendSql(count ? "COUNT(*)" : selectStruct.getSql())
                 .appendSql(" FROM ")
                 .appendSql(table.getName());
         if (conditionStruct != null) {
             struct.appendSql(conditionStruct.getSql());
             struct.addParams(conditionStruct.getParams());
+        }
+
+        if (count) {
+            return struct;
         }
 
         if (hasGroupBy) {

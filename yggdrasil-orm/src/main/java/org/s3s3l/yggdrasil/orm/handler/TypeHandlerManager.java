@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.orm.handler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,8 +23,9 @@ public class TypeHandlerManager {
 
         if (handler == null) {
             try {
-                handler = handlerType.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                handler = handlerType.getConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 throw new ResourceProcessException("handler create fail.", e);
             }
             handlers.put(handlerType, handler);

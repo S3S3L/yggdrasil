@@ -22,6 +22,8 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.exception.DataMapException;
 import org.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
+import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
+import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
@@ -137,6 +139,55 @@ public class DefaultSqlExecutor implements SqlExecutor {
         } catch (SQLException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new SqlExecutingException(e);
         }
+    }
+
+    @Override
+    public <C extends ConditionForPagination, R> PaginResult<List<R>> selectByPagin(C condition, Class<R> resultType) {
+        Verify.notNull(condition);
+        Verify.notNull(resultType);
+
+        PaginResult<List<R>> result = new PaginResult<>();
+        condition.prepare();
+
+        try (Connection conn = datasource.getConnection()) {
+            SqlStruct countSqlStruct = dataBindExpress.getSelectCount(condition);
+            String countSql = countSqlStruct.getSql();
+            log.debug("Excuting countSql [{}].", countSql);
+            try (PreparedStatement preparedStatement = conn
+                    .prepareStatement(countSql)) {
+                setParams(countSqlStruct, preparedStatement);
+
+                ResultSet rs = preparedStatement.executeQuery();
+                if (!rs.next()) {
+                    throw new SqlExecutingException("Count sql execute error.");
+                }
+
+                long count = rs.getLong(1);
+                result.setRecordsCount(count);
+                result.setPageCount(-Math.floorDiv(-count, condition.getPageSize()));
+            }
+            SqlStruct sqlStruct = dataBindExpress.getSelect(condition);
+            String sql = sqlStruct.getSql();
+            log.debug("Excuting sql [{}].", sql);
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                setParams(sqlStruct, preparedStatement);
+
+                ResultSet rs = preparedStatement.executeQuery();
+
+                List<R> resultData = mapResultTo(resultType, rs);
+
+                return PaginResult.<List<R>>builder()
+                        .data(resultData)
+                        .build();
+            }
+        } catch (SQLException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            throw new SqlExecutingException(e);
+        }
+    }
+
+    @Override
+    public <C, R> R selectOne(C condition, Class<R> resultType) {
+        return CollectionUtils.getFirst(select(condition, resultType));
     }
 
     @Override

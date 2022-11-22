@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -60,6 +60,6 @@ public class ApolloAutoConfigure implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public int getOrder() {
-        return ConfigFileApplicationListener.DEFAULT_ORDER + 1;
+        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
     }
 }

@@ -3,6 +3,7 @@ package org.s3s3l.yggdrasil.resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,7 +42,7 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
      * setting feature
      * 
      * @param features
-     *            features need to be configured
+     *                 features need to be configured
      * @since JDK 1.8
      */
     public void configure(Map<ConfigFeature, Boolean> features) {
@@ -63,9 +64,9 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
      * setting feature
      * 
      * @param feature
-     *            feature need to be configured
+     *                feature need to be configured
      * @param enable
-     *            if enable feature
+     *                if enable feature
      * @since JDK 1.8
      */
     public DefaultResourceLoader configure(ConfigFeature feature, boolean enable) {
@@ -85,39 +86,44 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(String resource, Class<T> type) throws IOException,
             InstantiationException,
-            IllegalAccessException {
-        T result = type.newInstance();
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, resource, type);
     }
 
     @Override
     public <T> T loadConfiguration(File resource, Class<T> type) throws IOException,
             InstantiationException,
-            IllegalAccessException {
-        T result = type.newInstance();
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, resource, type);
     }
 
     @Override
     public <T> T loadConfiguration(Class<T> type, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         return loadConfiguration(type, true, resources);
     }
 
     @Override
     public <T> T loadConfiguration(Class<T> type, boolean checkFileExist, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
-        T result = type.newInstance();
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, type, checkFileExist, resources);
     }
 
     @Override
     public <T> T loadConfiguration(Class<T> type, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
-        T result = type.newInstance();
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, type, resources);
     }
 
@@ -160,7 +166,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(T object, Class<T> type, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         Verify.notEmpty(resources);
@@ -171,7 +178,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     public <T> T loadConfiguration(T object, Class<T> type, boolean checkFileExist, File... resources)
             throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         Verify.notEmpty(resources);
@@ -190,7 +198,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(T object, Class<T> type, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         Verify.notEmpty(resources);
@@ -205,33 +214,36 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(String resource, Class<T> type, String profile) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.hasText(resource);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
             return loadConfiguration(resource, type);
         }
-        T result = type.newInstance();
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, resource, type, profile);
     }
 
     @Override
     public <T> T loadConfiguration(File resource, Class<T> type, String profile) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(resource);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
             return loadConfiguration(resource, type);
         }
-        T result = type.newInstance();
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, resource, type, profile);
     }
 
     @Override
     public <T> T loadConfiguration(Class<T> type, String profile, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(resources);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
@@ -244,26 +256,28 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     public <T> T loadConfiguration(Class<T> type, boolean checkFileExist, String profile, File... resources)
             throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(resources);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
             return loadConfiguration(type, checkFileExist, resources);
         }
-        T result = type.newInstance();
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, type, checkFileExist, profile, resources);
     }
 
     @Override
     public <T> T loadConfiguration(Class<T> type, String profile, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notEmpty(resources);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
             return loadConfiguration(type, resources);
         }
-        T result = type.newInstance();
+        T result = type.getConstructor().newInstance();
         return loadConfiguration(result, type, profile, resources);
     }
 
@@ -329,7 +343,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(T object, Class<T> type, String profile, File... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
@@ -342,7 +357,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     public <T> T loadConfiguration(T object, Class<T> type, boolean checkFileExist, String profile, File... resources)
             throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {
@@ -363,7 +379,8 @@ public abstract class DefaultResourceLoader implements ResourceLoader {
     @Override
     public <T> T loadConfiguration(T object, Class<T> type, String profile, String... resources) throws IOException,
             InstantiationException,
-            IllegalAccessException {
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
         Verify.notNull(object);
         Verify.notNull(type);
         if (StringUtils.isEmpty(profile)) {

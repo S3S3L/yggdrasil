@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.orm.pool;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -22,5 +23,6 @@ public interface DataSourceFactory {
 
     DataSource getDataSource(Map<String, Object> config);
 
-    DataSource getDataSource(String profileKey, String profile, String... configFiles);
+    DataSource getDataSource(String profileKey, String profile, String... configFiles)
+            throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException;
 }

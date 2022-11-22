@@ -7,7 +7,6 @@ import java.util.List;
 import org.s3s3l.yggdrasil.orm.bind.DataBindNode;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
-import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
@@ -57,16 +56,15 @@ public class ConditionStruct implements DataBindNode {
             }
 
             if (!hasCondition) {
-                struct.setSql(" WHERE");
+                struct.setSql(" WHERE ");
                 hasCondition = true;
+            } else {
+                struct.appendSql(" AND ");
             }
 
             struct.appendSql(nodeStruct.getSql());
             struct.addParams(nodeStruct.getParams());
         }
-
-        struct.setSql(struct.getSql()
-                .replaceFirst("AND", StringUtils.EMPTY_STRING));
 
         return struct;
     }

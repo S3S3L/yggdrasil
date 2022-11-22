@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @since JDK 1.8
  */
 public abstract class AbstractRedisCacheChecker implements CacheChecker {
-    protected static final String SYCN_LAST_UPDATE = "redis.replicate_commands();\n"
+    protected static final String SYNC_LAST_UPDATE = "redis.replicate_commands();\n"
             + "local times = redis.call('time');\n"
             + "local time = string.format(\"%s%s\",times[1],string.sub(times[2],0,3));\n"
             + "local oldTime = redis.call('get',\"{key}\");\n"

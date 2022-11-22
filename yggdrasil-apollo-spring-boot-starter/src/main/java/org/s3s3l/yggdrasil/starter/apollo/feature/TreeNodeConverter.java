@@ -10,6 +10,7 @@ import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -45,7 +46,7 @@ public class TreeNodeConverter implements GenericConverter {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+    public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
         Class<?> sourceClass = sourceType.getType();
         if (source == null || !TreeNode.class.isAssignableFrom(sourceClass) || !(source instanceof TreeNode)) {
             return null;

@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.starter.redis;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -59,6 +60,9 @@ public class MultiRedisAutoConfigure implements ImportBeanDefinitionRegistrar, E
             registry.registerBeanDefinition(BEAN_NAME,
                     BeanUtils.buildBeanDefinition(null, null, null, MultiRedisAutoConfigure.class));
             this.configuration = this.resolver.resolve(this.environment);
+            if (!configuration.isEnable()) {
+                return;
+            }
             multipleRedis(registry);
         } catch (Exception e) {
             throw new BeanDefinitionStoreException(e.getMessage(), e);
@@ -114,8 +118,9 @@ public class MultiRedisAutoConfigure implements ImportBeanDefinitionRegistrar, E
 
     public <T, U extends InitializableRedis<T>> IRedis redis(Class<U> type, T configuration)
             throws InstantiationException,
-            IllegalAccessException {
-        U redis = type.newInstance();
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+            SecurityException {
+        U redis = type.getConstructor().newInstance();
         redis.init(configuration);
         return redis;
     }

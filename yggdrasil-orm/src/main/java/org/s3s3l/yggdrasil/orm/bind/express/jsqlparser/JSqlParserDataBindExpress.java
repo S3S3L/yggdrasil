@@ -38,6 +38,7 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -62,6 +63,7 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.SelectUtils;
 
 @Slf4j
@@ -177,66 +179,12 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
 
     @Override
     public SqlStruct getSelect(Object condition) {
-        Class<?> conditionType = condition.getClass();
-        DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
-        ReflectionBean rb = new PropertyDescriptorReflectionBean(condition);
-        TableMeta table = metaManager.getTable(conditionType);
-        OffsetMeta offset = metaManager.getOffset(conditionType);
-        LimitMeta limit = metaManager.getLimit(conditionType);
-        GroupByMeta groupBy = metaManager.getGroupBy(conditionType);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getSelectCondition(conditionType), rb);
+        return getSelect(condition, false);
+    }
 
-        boolean hasGroupBy = groupBy != null && !CollectionUtils.isEmpty(groupBy.getColumns());
-        SelectBuilder builder = new SelectBuilder().table(new Table(table.getName()))
-                .selectItems(table.getColumns()
-                        .stream()
-                        .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
-                        .map(col -> {
-                            SelectExpressionItem selectItem = new SelectExpressionItem(new Column(col.getName()));
-                            selectItem.setAlias(new Alias(col.getAlias()));
-                            return selectItem;
-                        })
-                        .collect(Collectors.toList()))
-                .groupByExpressions(groupBy.getColumns()
-                        .stream()
-                        .map(Column::new)
-                        .collect(Collectors.toList()))
-                .orderByElements(metaManager.getOrderBy(conditionType)
-                        .stream()
-                        .map(obm -> {
-                            OrderByElement ob = new OrderByElement();
-                            ob.setExpression(new Column(obm.getName()));
-                            ob.setAsc(!obm.isDesc());
-                            return ob;
-                        })
-                        .collect(Collectors.toList()))
-                .where(whereStruct.getExpression());
-
-        if (offset != null) {
-            Object offsetCount = rb.getFieldValue(offset.getField()
-                    .getName());
-            if (offsetCount != null) {
-                Offset os = new Offset();
-                os.setOffset((long) offsetCount);
-                builder.offset(os);
-            }
-        }
-
-        if (limit != null) {
-            Object limitCount = rb.getFieldValue(limit.getField()
-                    .getName());
-            if (limitCount != null) {
-                Limit l = new Limit();
-                l.setRowCount(new LongValue((long) limitCount));
-                builder.limit(l);
-            }
-        }
-
-        sqlStruct.appendSql(builder.build()
-                .toString());
-        sqlStruct.addParams(whereStruct.getParams());
-
-        return sqlStruct;
+    @Override
+    public SqlStruct getSelectCount(Object condition) {
+        return getSelect(condition, true);
     }
 
     @Override
@@ -274,6 +222,90 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         whereStruct.setExpression(expression);
 
         return whereStruct;
+    }
+
+    private SqlStruct getSelect(Object condition, boolean count) {
+        Class<?> conditionType = condition.getClass();
+        DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
+        ReflectionBean rb = new PropertyDescriptorReflectionBean(condition);
+        TableMeta table = metaManager.getTable(conditionType);
+        OffsetMeta offset = metaManager.getOffset(conditionType);
+        LimitMeta limit = metaManager.getLimit(conditionType);
+        GroupByMeta groupBy = metaManager.getGroupBy(conditionType);
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getSelectCondition(conditionType), rb);
+
+        boolean hasGroupBy = groupBy != null && !CollectionUtils.isEmpty(groupBy.getColumns());
+        List<SelectItem> selectItems;
+        if (count) {
+            Function func = new Function();
+            func.setName("COUNT");
+            func.setAllColumns(true);
+            SelectExpressionItem selectItem = new SelectExpressionItem(func);
+            selectItems = Arrays.asList(selectItem);
+        } else {
+            selectItems = table.getColumns()
+                    .stream()
+                    .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
+                    .map(col -> {
+                        SelectExpressionItem selectItem = new SelectExpressionItem(new Column(col.getName()));
+                        selectItem.setAlias(new Alias(col.getAlias()));
+                        return selectItem;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        SelectBuilder builder = new SelectBuilder().table(new Table(table.getName()))
+                .selectItems(selectItems)
+                .where(whereStruct.getExpression());
+                
+        if (count) {
+            sqlStruct.appendSql(builder.build()
+                    .toString());
+            sqlStruct.addParams(whereStruct.getParams());
+
+            return sqlStruct;
+        }
+
+        builder
+                .groupByExpressions(groupBy.getColumns()
+                        .stream()
+                        .map(Column::new)
+                        .collect(Collectors.toList()))
+                .orderByElements(metaManager.getOrderBy(conditionType)
+                        .stream()
+                        .map(obm -> {
+                            OrderByElement ob = new OrderByElement();
+                            ob.setExpression(new Column(obm.getName()));
+                            ob.setAsc(!obm.isDesc());
+                            return ob;
+                        })
+                        .collect(Collectors.toList()));
+
+        if (offset != null) {
+            Object offsetCount = rb.getFieldValue(offset.getField()
+                    .getName());
+            if (offsetCount != null) {
+                Offset os = new Offset();
+                os.setOffset((long) offsetCount);
+                builder.offset(os);
+            }
+        }
+
+        if (limit != null) {
+            Object limitCount = rb.getFieldValue(limit.getField()
+                    .getName());
+            if (limitCount != null) {
+                Limit l = new Limit();
+                l.setRowCount(new LongValue((long) limitCount));
+                builder.limit(l);
+            }
+        }
+
+        sqlStruct.appendSql(builder.build()
+                .toString());
+        sqlStruct.addParams(whereStruct.getParams());
+
+        return sqlStruct;
     }
 
     private JSqlParserSqlStruct toExpression(ConditionMeta condition, ReflectionBean rb) {
@@ -443,6 +475,10 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         Statement create = CCJSqlParserUtil
                 .parse("create table if not exists t_test(id varchar (64) primary key, name varchar (32) NOT NULL, sex int)");
         System.out.println(create);
+
+        Statement select = CCJSqlParserUtil
+                .parse("select count(*) from t_user where start > '2022-11-01' and end < '2022-11-21'");
+        System.out.println(select);
     }
 
 }

@@ -8,8 +8,6 @@ import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
 import org.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
 import org.s3s3l.yggdrasil.orm.bind.annotation.GroupBy;
-import org.s3s3l.yggdrasil.orm.bind.annotation.Limit;
-import org.s3s3l.yggdrasil.orm.bind.annotation.Offset;
 import org.s3s3l.yggdrasil.orm.bind.annotation.OrderBy;
 import org.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
 import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
@@ -20,12 +18,14 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
 import org.s3s3l.yggdrasil.orm.handler.ArrayTypeHandler;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
+import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import org.s3s3l.yggdrasil.orm.validator.PositiveNumberValidator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 public class BindTest {
 
@@ -50,11 +50,11 @@ public class BindTest {
     }
 
     @Data
-    @Builder
+    @SuperBuilder
     @AllArgsConstructor
     @NoArgsConstructor
     @SqlModel(table = User.class)
-    public static class UserCondition {
+    public static class UserCondition extends ConditionForPagination {
         @GroupBy
         private String name;
         @Condition(column = "name", forDelete = true, forUpdate = true, pattern = ComparePattern.IN)
@@ -65,10 +65,6 @@ public class BindTest {
         private int minAge;
         @OrderBy(desc = true)
         private int sort;
-        @Offset
-        private long offset;
-        @Limit
-        private long limit;
     }
 
     public static void main(String[] args) {
@@ -136,29 +132,38 @@ public class BindTest {
         conditionDelete.getParams()
                 .forEach(System.out::println);
 
-        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
-        SqlStruct conditionSelect = jsqlDataBindExpress.getSelect(UserCondition.builder()
+        System.out.println(">>>>>>>>>>>>>>>>> select");
+        UserCondition selectCondition = UserCondition.builder()
                 .names(Arrays.asList("name5.1", "name5.2"))
                 .maxAge(18)
                 .minAge(6)
                 .offset(0)
                 .limit(10)
-                .build());
+                .build();
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        SqlStruct conditionSelect = jsqlDataBindExpress.getSelect(selectCondition);
         System.out.println(conditionSelect.getSql());
 
         conditionSelect.getParams()
                 .forEach(System.out::println);
 
         System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
-        conditionSelect = defaulDataBindExpress.getSelect(UserCondition.builder()
-                .names(Arrays.asList("name5.1", "name5.2"))
-                .maxAge(18)
-                .minAge(6)
-                .offset(0)
-                .limit(10)
-                .build());
+        conditionSelect = defaulDataBindExpress.getSelect(selectCondition);
         System.out.println(conditionSelect.getSql());
 
+        conditionSelect.getParams()
+                .forEach(System.out::println);
+
+        System.out.println(">>>>>>>>>>>>>>>>> selectCount");
+
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        conditionSelect = jsqlDataBindExpress.getSelectCount(selectCondition);
+        System.out.println(conditionSelect.getSql());
+        conditionSelect.getParams()
+                .forEach(System.out::println);
+        System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
+        conditionSelect = defaulDataBindExpress.getSelectCount(selectCondition);
+        System.out.println(conditionSelect.getSql());
         conditionSelect.getParams()
                 .forEach(System.out::println);
 

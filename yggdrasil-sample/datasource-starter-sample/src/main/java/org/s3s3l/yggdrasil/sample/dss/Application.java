@@ -3,7 +3,6 @@ package org.s3s3l.yggdrasil.sample.dss;
 import java.util.Arrays;
 
 import org.s3s3l.yggdrasil.orm.exec.SqlExecutor;
-import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
 import org.s3s3l.yggdrasil.sample.dss.dao.User;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
@@ -18,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 public class Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
-        MetaManager metaManager = ctx.getBean(MetaManager.class);
+        // MetaManager metaManager = ctx.getBean(MetaManager.class);
         SqlExecutor sqlExecutor = ctx.getBean(SqlExecutor.class);
-        sqlExecutor.create(User.class, false);
+        // sqlExecutor.create(User.class, false);
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
         sqlExecutor.insert(Arrays.asList(

@@ -1,5 +1,7 @@
 package org.s3s3l.yggdrasil.orm.validator;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.s3s3l.yggdrasil.bean.exception.BeanEstablishException;
 
 /**
@@ -18,8 +20,9 @@ public class DefaultValidatorFactory implements ValidatorFactory {
     @Override
     public <T extends Validator> T getValidator(Class<T> validatorType) {
         try {
-            return validatorType.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return validatorType.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
             throw new BeanEstablishException(e);
         }
     }

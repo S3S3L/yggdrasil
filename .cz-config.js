@@ -14,29 +14,38 @@ module.exports = {
   scopes: [
     {name: 'all'},
     {name: 'annotation'},
-    {name: 'bean'},
-    {name: 'configuration'},
-    {name: 'utils'},
-    {name: 'datasource_starter'},
-    {name: 'redis_starter'},
-    {name: 'cache_starter'},
     {name: 'apollo_starter'},
-    {name: 'rabbitmq_starter'},
+    {name: 'bean'},
+    {name: 'cache'},
+    {name: 'cache_starter'},
+    {name: 'compress'},
+    {name: 'configuration'},
+    {name: 'datasource_starter'},
+    {name: 'ddd'},
+    {name: 'doc'},
+    {name: 'doc_tempalte_assembler'},
+    {name: 'document'},
+    {name: 'es'},
     {name: 'fsm'},
+    {name: 'http'},
+    {name: 'mybatis'},
     {name: 'orm'},
-    {name: 'ddd'}
+    {name: 'presistence'},
+    {name: 'rabbitmq_starter'},
+    {name: 'redis'},
+    {name: 'redis_starter'},
+    {name: 'resource'},
+    {name: 'sample'},
+    {name: 'spring'},
+    {name: 'utils'},
+    {name: 'web'}
   ],
   // 可以根据匹配的类型不同, 显示不一样的scope, 动手实践下!
-  /*
   scopeOverrides: {
-    fix: [
-      {name: 'merge'},
-      {name: 'style'},
-      {name: 'e2eTest'},
-      {name: 'unitTest'}
+    chore: [
+      {name: 'all'}
     ]
   },
-  */
-  allowCustomScopes: true,
-  allowBreakingChanges: ['feat', 'fix']
+  allowCustomScopes: false,
+  allowBreakingChanges: ['feat', 'refactor']
 };

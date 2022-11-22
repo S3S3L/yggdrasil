@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsFactory;
@@ -55,7 +56,7 @@ public class StringToObjectConverter implements GenericConverter {
     }
 
     @Override
-    public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+    public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
         Class<?> sourceClass = sourceType.getType();
         if (source == null || !String.class.isAssignableFrom(sourceClass) || !(source instanceof String)) {
             return null;

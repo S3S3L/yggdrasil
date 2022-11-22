@@ -64,6 +64,9 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
         this.configuration = Binder.get(this.environment)
                 .bind(CacheConfiguration.PREFIX, CacheConfiguration.class)
                 .orElse(new CacheConfiguration());
+        if (!configuration.isEnable()) {
+            return;
+        }
         logger.info("Cache configuration: {}", this.configuration);
         registry.registerBeanDefinition(BEAN_NAME, BeanUtils.buildBeanDefinition(null, null, null,
                 new Object[] { this.configuration, this.environment }, CacheAutoConfigure.class));
@@ -95,7 +98,7 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
                     .remoteHolder(() -> new RedisCacheHolder(dataRedis, checker, this.configuration.getKeyPrefix()))
                     .compressProp(this.configuration.getCompress())
                     .compressor(this.configuration.getCompressorSupplier()
-                            .newInstance())
+                            .getConstructor().newInstance())
                     .localExpireAfterAccess(this.configuration.getLocalExpireAfterAccess())
                     .localExpireAfterWrite(this.configuration.getLocalExpireAfterWrite())
                     .localMaxNum(this.configuration.getLocalMaxNum())

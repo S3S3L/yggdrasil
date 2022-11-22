@@ -3,6 +3,7 @@ package org.s3s3l.yggdrasil.starter.apollo.feature;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,7 +84,7 @@ public class PropertySourceHelper {
                 processPropDocument(doc);
                 break;
             default:
-                throw new ResourceProcessException("doc for format '" +doc.getFormat() + "' is not support");
+                throw new ResourceProcessException("doc for format '" + doc.getFormat() + "' is not support");
         }
         logger.info("Finished process document '{}'", doc.getName());
     }
@@ -142,9 +143,9 @@ public class PropertySourceHelper {
      * 处理Properties格式文档
      * 
      * @param doc
-     *            文档描述
+     *                      文档描述
      * @param configContent
-     *            文档内容
+     *                      文档内容
      * @since JDK 1.8
      */
     private void processPropDocument(Document doc, String configContent) {
@@ -185,8 +186,8 @@ public class PropertySourceHelper {
         }
     }
 
-    private TreeNode
-            getContentTree(String defaultContent, String content, JacksonHelper helper, TreeNodeProcesser processer) {
+    private TreeNode getContentTree(String defaultContent, String content, JacksonHelper helper,
+            TreeNodeProcesser processer) {
         if (StringUtils.isEmpty(defaultContent)) {
             return processer.process(content, helper);
         }
@@ -292,8 +293,9 @@ public class PropertySourceHelper {
             ConfigFileChangedProcessor processor = this.processors.get(processorClazz);
             if (processor == null) {
                 try {
-                    processor = processorClazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    processor = processorClazz.getConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                     throw new DocumentProcessException(e);
                 }
                 this.processors.put(processorClazz, processor);

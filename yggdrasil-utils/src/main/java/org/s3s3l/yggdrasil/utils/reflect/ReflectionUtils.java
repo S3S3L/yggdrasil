@@ -3,13 +3,16 @@ package org.s3s3l.yggdrasil.utils.reflect;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.s3s3l.yggdrasil.annotation.FromJson;
@@ -34,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class ReflectionUtils {
+
+    public static final Map<Class<?>, Set<Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 
@@ -130,7 +135,7 @@ public abstract class ReflectionUtils {
     public static <T> T clone(T src, Class<T> type) {
         try {
             ReflectionBean srcReflection = new PropertyDescriptorReflectionBean(src);
-            T result = type.newInstance();
+            T result = type.getConstructor().newInstance();
             ReflectionBean targetReflection = new PropertyDescriptorReflectionBean(result);
             for (Field field : getFields(type)) {
                 String fieldName = field.getName();
@@ -138,7 +143,8 @@ public abstract class ReflectionUtils {
             }
 
             return result;
-        } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException e) {
+        } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException e) {
             throw new ReflectException(e);
         }
     }
@@ -148,9 +154,9 @@ public abstract class ReflectionUtils {
      * 判断类型是否有指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *            类型
+     *                        类型
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @return true：类型有指定注解；false：类型没有指定注解
      * @since JDK 1.8
      */
@@ -182,11 +188,11 @@ public abstract class ReflectionUtils {
      * 获取类型上的指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *            类型
+     *                        类型
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @param <T>
-     *            注解类型
+     *                        注解类型
      * @return 类型有指定注解：返回该注解；类型没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -212,9 +218,9 @@ public abstract class ReflectionUtils {
      * 判断方法是否有指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *            方法
+     *                        方法
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @return true：方法有指定注解；false：方法没有指定注解
      * @since JDK 1.8
      */
@@ -238,11 +244,11 @@ public abstract class ReflectionUtils {
      * 获取方法上的指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *            方法
+     *                        方法
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @param <T>
-     *            注解类型
+     *                        注解类型
      * @return 方法有指定注解：返回该注解；方法没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -264,13 +270,17 @@ public abstract class ReflectionUtils {
     }
 
     public static Set<Field> getFields(Class<?> type) {
+        return FIELD_CACHE.computeIfAbsent(type, t -> getFieldsNoCache(t));
+    }
+
+    private static Set<Field> getFieldsNoCache(Class<?> type) {
         if (type == Object.class) {
             return new HashSet<>();
         }
 
         Set<Field> result = new HashSet<>(Arrays.asList(type.getDeclaredFields()));
 
-        result.addAll(getFields(type.getSuperclass()));
+        result.addAll(getFieldsNoCache(type.getSuperclass()));
 
         return result;
     }
@@ -281,9 +291,9 @@ public abstract class ReflectionUtils {
      * 
      * @author kehw_zwei
      * @param type
-     *            泛型
+     *             泛型
      * @param i
-     *            泛型类型的位置
+     *             泛型类型的位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */
@@ -303,9 +313,9 @@ public abstract class ReflectionUtils {
      * 
      * @author kehw_zwei
      * @param parameterizedType
-     *            参数类型
+     *                          参数类型
      * @param i
-     *            泛型类型位置
+     *                          泛型类型位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */

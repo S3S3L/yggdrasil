@@ -1,6 +1,7 @@
 
 package org.s3s3l.yggdrasil.starter.redis;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +34,6 @@ public class DefaultRedisClientConfiguration {
     private boolean enable;
     private String primary;
     private Set<String> requiredInstances;
-    private Map<String, RedisClusterConfiguration> masterSlave;
-    private Map<String, HAPClusterNode<Jedis>> cluster;
+    private Map<String, RedisClusterConfiguration> masterSlave = new HashMap<>();
+    private Map<String, HAPClusterNode<Jedis>> cluster = new HashMap<>();
 }

@@ -1,10 +1,11 @@
 package org.s3s3l.yggdrasil.configuration.datasource;
 
-import lombok.Data;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import lombok.Data;
 
 /**
  * <p>
@@ -26,4 +27,6 @@ public class DatasourceConfiguration extends PoolProperties {
      * @since JDK 1.8
      */
     private static final long serialVersionUID = 6502361085513435695L;
+
+    private AutoCreateConfig autoCreate = new AutoCreateConfig();
 }
