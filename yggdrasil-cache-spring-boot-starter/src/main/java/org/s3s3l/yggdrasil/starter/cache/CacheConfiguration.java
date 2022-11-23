@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.s3s3l.yggdrasil.annotation.apollo.ApolloConfiguration;
 import org.s3s3l.yggdrasil.cache.compressor.CompressProperties;
 import org.s3s3l.yggdrasil.compress.Compressor;
+import org.s3s3l.yggdrasil.compress.DefaultZstdCompressSupliers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -32,6 +33,7 @@ public class CacheConfiguration {
     private boolean enable;
     private String dataRedis;
     private String versionRedis;
+    private boolean web = false;
 
     private int remoteExpireAfterWrite = -1;
     private int remoteExpireAfterAccess = -1;
@@ -41,6 +43,6 @@ public class CacheConfiguration {
     private String keyPrefix = "c";
     private CompressProperties compress = new CompressProperties();
 
-    private Class<Supplier<Compressor>> compressorSupplier;
+    private Class<? extends Supplier<Compressor>> compressorSupplier = DefaultZstdCompressSupliers.class;
 
 }

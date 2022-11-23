@@ -21,6 +21,8 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -40,6 +42,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String COMPLEX_CACHE_HELPER = "complexCacheHelper";
     private static final String BEAN_NAME = "cacheAutoConfigure";
+    private static final String CACHE_HANDLER_INTERCEPTOR = "cacheHandlerInterceptor";
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private CacheConfiguration configuration;
@@ -76,15 +79,39 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
                         null, this.configuration.getDataRedis(), this.configuration.getVersionRedis()));
         registry.registerBeanDefinition("complexCacheInterceptor", BeanUtils.buildBeanDefinitionForFactoryMethod(
                 Interceptor.class, BEAN_NAME, "cacheInterceptor", null, COMPLEX_CACHE_HELPER));
+        if (this.configuration.isWeb()) {
+            registry.registerBeanDefinition(CACHE_HANDLER_INTERCEPTOR, BeanUtils.buildBeanDefinitionForFactoryMethod(
+                    HandlerInterceptor.class, BEAN_NAME, "handlerInterceptor", null, COMPLEX_CACHE_HELPER));
+            registry.registerBeanDefinition("cacheInterceptorRegister", BeanUtils.buildBeanDefinitionForFactoryMethod(
+                    WebMvcConfigurer.class, BEAN_NAME, "cacheInterceptorRegister", null, CACHE_HANDLER_INTERCEPTOR));
+        }
     }
 
     public Interceptor cacheInterceptor(ComplexCacheHelper<byte[], byte[]> helper) {
-        logger.info("Cache compress configuration: {}", this.configuration.getCompress());
         try {
             return new ComplexCacheInterceptor(helper,
                     new JacksonCacheKeyGenerator(JacksonUtils.create(new YAMLFactory())
                             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                             .include(Include.NON_NULL)));
+        } catch (Exception e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    public HandlerInterceptor handlerInterceptor(ComplexCacheHelper<byte[], byte[]> helper) {
+        try {
+            return new CacheHandlerInterceptor(helper,
+                    new JacksonCacheKeyGenerator(JacksonUtils.create(new YAMLFactory())
+                            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                            .include(Include.NON_NULL)));
+        } catch (Exception e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    public WebMvcConfigurer cacheInterceptorRegister(HandlerInterceptor... interceptors) {
+        try {
+            return new CacheInterceptorRegister(interceptors);
         } catch (Exception e) {
             throw new ConfigurationException(e);
         }
