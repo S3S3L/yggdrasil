@@ -201,3 +201,35 @@ userProxy.list(UserCondition.builder().ids(new String[] { id, id2 }).build()).fo
 log.info(">>>>>>>>>>>>>>>>>> proxy, get one by id");
 System.out.println(userProxy.get(UserCondition.builder().id(id2).build()));
 ```
+
+## 事务
+
+``` java
+log.info(">>>>>>>>>>>>>>>>>> transactional, commit");
+sqlExecutor.transactional();
+String id3 = StringUtils.getUUIDNoLine();
+sqlExecutor.insert(Arrays.asList(
+        User.builder()
+                .id(id3)
+                .username("username3")
+                .password("pwd3")
+                .realName("realName3")
+                .age(18)
+                .build()));
+sqlExecutor.transactionalCommit();
+System.out.println(userProxy.get(UserCondition.builder().id(id3).build()));
+
+log.info(">>>>>>>>>>>>>>>>>> transactional, rollback");
+sqlExecutor.transactional();
+String id4 = StringUtils.getUUIDNoLine();
+sqlExecutor.insert(Arrays.asList(
+        User.builder()
+                .id(id4)
+                .username("username4")
+                .password("pwd4")
+                .realName("realName4")
+                .age(18)
+                .build()));
+sqlExecutor.rollback();
+System.out.println(userProxy.get(UserCondition.builder().id(id4).build()));
+```

@@ -44,7 +44,6 @@ import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.s3s3l.yggdrasil.utils.verify.CommonVerifier;
 import org.s3s3l.yggdrasil.utils.verify.Verifier;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
-import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.base.VerifyException;
 
@@ -54,7 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MetaManager {
     private final Verifier verifier = new CommonVerifier();
-    private final Yaml yaml = new Yaml();
 
     private final String[] tableDefinePackages;
     private final String[] proxyDefinePackages;
@@ -147,9 +145,6 @@ public class MetaManager {
             for (File configFile : FileUtils.tree(location,
                     file -> file.isFile() && (file.getName().endsWith(".yml") || file.getName().endsWith(".yaml")))) {
                 String absolutePath = configFile.getAbsolutePath();
-                // ProxyConfig proxyConfig =
-                // yaml.loadAs(FileUtils.getFirstExistResource(absolutePath),
-                // ProxyConfig.class);
                 ProxyConfig proxyConfig = JacksonUtils.YAML.toObject(configFile, ProxyConfig.class);
 
                 log.trace("Loaded proxy config from {}. config: {}", absolutePath, proxyConfig);

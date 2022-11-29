@@ -2,6 +2,7 @@ package org.s3s3l.yggdrasil.orm.exec;
 
 import java.util.List;
 
+import org.s3s3l.yggdrasil.orm.ds.Transactable;
 import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
 
@@ -16,7 +17,7 @@ import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
  * @version 1.0.0
  * @since JDK 1.8
  */
-public interface SqlExecutor {
+public interface SqlExecutor extends Transactable {
 
     <S> int insert(List<S> sources);
 

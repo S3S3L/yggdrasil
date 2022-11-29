@@ -114,7 +114,9 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
             Type genericReturnType)
             throws SQLException, InvocationTargetException, NoSuchMethodException, SecurityException {
         if (returnType.isPrimitive()) {
-            rs.next();
+            if (!rs.next()) {
+                throw new SqlExecutingException("There is not any result. But required one.");
+            }
             return rs.getObject(1);
         }
 

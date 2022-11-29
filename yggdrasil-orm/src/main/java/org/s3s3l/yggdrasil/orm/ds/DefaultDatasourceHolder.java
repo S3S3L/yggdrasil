@@ -13,7 +13,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 public class DefaultDatasourceHolder implements DatasourceHolder {
-    private final ConnManager connFactory;
+    private final ConnManager connManager;
+    private final ThreadLocal<Connection> currentConn = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> isTransactional = new ThreadLocal<>();
 
     private DataSource datasource;
 
@@ -24,12 +26,43 @@ public class DefaultDatasourceHolder implements DatasourceHolder {
 
     @Override
     public <T> T useConn(ConnFunc<T> func) throws SQLException {
-        Connection conn = connFactory.getConn(datasource);
+        boolean isTrans = Boolean.TRUE.equals(isTransactional.get()) && currentConn.get() != null;
+        Connection conn = isTrans ? currentConn.get() : connManager.getConn(datasource);
         try {
             return func.execute(conn);
         } finally {
-            connFactory.relaseConn(conn, datasource);
+            if (!isTrans) {
+                connManager.relaseConn(conn, datasource);
+            }
         }
     }
-    
+
+    @Override
+    public void transactional() throws SQLException {
+        Connection conn = connManager.getConn(datasource);
+        conn.setAutoCommit(false);
+        currentConn.set(conn);
+        isTransactional.set(true);
+    }
+
+    @Override
+    public void transactionalCommit() throws SQLException {
+        Connection conn = currentConn.get();
+        conn.commit();
+        conn.setAutoCommit(true);
+        conn.close();
+        currentConn.remove();
+        isTransactional.set(false);
+    }
+
+    @Override
+    public void rollback() throws SQLException {
+        Connection conn = currentConn.get();
+        conn.rollback();
+        conn.setAutoCommit(true);
+        conn.close();
+        currentConn.remove();
+        isTransactional.set(false);
+    }
+
 }

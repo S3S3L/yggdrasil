@@ -1,5 +1,6 @@
 package org.s3s3l.yggdrasil.sample.orm.def;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Application {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         DataSource datasource = new DataSource(
                 JacksonUtils.YAML.toObject(FileUtils.getFirstExistResource("datasource.yaml"), PoolProperties.class));
         MetaManager metaManager = new MetaManager(MetaManagerConfig.builder()
@@ -41,6 +42,7 @@ public class Application {
                 .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
                         .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
                 .build();
+        sqlExecutor.execute("DROP TABLE IF EXISTS t_user");
         sqlExecutor.create(User.class, false);
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
@@ -88,5 +90,33 @@ public class Application {
 
         log.info(">>>>>>>>>>>>>>>>>> proxy, get one by id");
         System.out.println(userProxy.get(UserCondition.builder().id(id2).build()));
+
+        log.info(">>>>>>>>>>>>>>>>>> transactional, commit");
+        sqlExecutor.transactional();
+        String id3 = StringUtils.getUUIDNoLine();
+        sqlExecutor.insert(Arrays.asList(
+                User.builder()
+                        .id(id3)
+                        .username("username3")
+                        .password("pwd3")
+                        .realName("realName3")
+                        .age(18)
+                        .build()));
+        sqlExecutor.transactionalCommit();
+        System.out.println(userProxy.get(UserCondition.builder().id(id3).build()));
+
+        log.info(">>>>>>>>>>>>>>>>>> transactional, rollback");
+        sqlExecutor.transactional();
+        String id4 = StringUtils.getUUIDNoLine();
+        sqlExecutor.insert(Arrays.asList(
+                User.builder()
+                        .id(id4)
+                        .username("username4")
+                        .password("pwd4")
+                        .realName("realName4")
+                        .age(18)
+                        .build()));
+        sqlExecutor.rollback();
+        System.out.println(userProxy.get(UserCondition.builder().id(id4).build()));
     }
 }

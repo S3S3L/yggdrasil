@@ -245,4 +245,19 @@ public class DefaultSqlExecutor implements SqlExecutor {
                         .build());
     }
 
+    @Override
+    public void transactional() throws SQLException {
+        datasourceHolder.transactional();
+    }
+
+    @Override
+    public void transactionalCommit() throws SQLException {
+        datasourceHolder.transactionalCommit();
+    }
+
+    @Override
+    public void rollback() throws SQLException {
+        datasourceHolder.rollback();
+    }
+
 }
