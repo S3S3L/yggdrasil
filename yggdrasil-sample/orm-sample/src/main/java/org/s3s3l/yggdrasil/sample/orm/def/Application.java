@@ -60,7 +60,7 @@ public class Application {
                         .age(22)
                         .build()));
         log.info(">>>>>>>>>>>>>>>>>> select one");
-        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        System.out.println(sqlExecutor.selectOne(UserCondition.builder().id(id).build(), User.class));
         log.info(">>>>>>>>>>>>>>>>>> select all");
         sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
 
