@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,6 +21,7 @@ import org.s3s3l.yggdrasil.orm.ds.DatasourceHolder;
 import org.s3s3l.yggdrasil.orm.exception.ProxyExecutingException;
 import org.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
 import org.s3s3l.yggdrasil.orm.handler.StatementHelper;
+import org.s3s3l.yggdrasil.orm.proxy.meta.ParamMeta;
 import org.s3s3l.yggdrasil.orm.proxy.meta.ProxyMeta;
 import org.s3s3l.yggdrasil.orm.proxy.meta.ProxyMethodMeta;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
@@ -35,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @SuperBuilder
 @AllArgsConstructor
 public class ExecutorProxyInvocationHandler implements InvocationHandler {
-    private final Pattern placeHolderRegex = Pattern.compile("#\\{[a-zA-Z\\d\\.\\[\\]]+\\}");
+    private final Pattern placeHolderRegex = Pattern.compile("#[a-zA-Z\\d\\.\\[\\]]+#");
 
     private final ProxyMeta proxyMeta;
     private final FreeMarkerHelper freeMarkerHelper;
@@ -55,20 +57,34 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
             paramMap.put(param.getName(), args[index++]);
         }
 
+        if (!CollectionUtils.isEmpty(methodMeta.getParams())) {
+            for (ParamMeta paramMeta : methodMeta.getParams()) {
+                paramMap.put(paramMeta.getName(), args[paramMeta.getIndex()]);
+            }
+        }
+
         String sqlTemplate = freeMarkerHelper.format(
                 String.join("#", method.getDeclaringClass().getName(), method.getName()),
                 methodMeta.getSql(), paramMap);
         Matcher matcher = placeHolderRegex.matcher(sqlTemplate);
 
+        List<Object> params = new LinkedList<>();
+
+        while (matcher.find()) {
+            params.add(resolvePlaceHolder(matcher.group(), paramMap));
+        }
+
         String finalSql = matcher.replaceAll("?");
 
-        log.info("execute sql: {}", finalSql);
+        log.debug("Execute sql: \n{}", finalSql);
         return datasourceHolder.useConn(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(finalSql)) {
-                int phIndex = 0;
 
-                while (matcher.find()) {
-                    statement.setObject(phIndex, resolvePlaceHolder(matcher.group(), paramMap));
+                for (int i = 0; i < params.size(); i++) {
+                    Object param = params.get(i);
+                    int paramIndex = i + 1;
+                    statement.setObject(paramIndex, param);
+                    log.debug("Param{}: {}", paramIndex, param);
                 }
 
                 ResultSet rs = statement.executeQuery();
@@ -81,7 +97,7 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
     }
 
     private Object resolvePlaceHolder(String placeHolder, Map<String, Object> paramMap) {
-        String ph = placeHolder.substring(0, placeHolder.length() - 2);
+        String ph = placeHolder.substring(1, placeHolder.length() - 1);
         List<PlaceHolderMeta> resolvedPlaceHolder = ReflectionUtils.resolvePlaceHolder(ph);
         Object res = null;
         for (int i = 0; i < resolvedPlaceHolder.size(); i++) {

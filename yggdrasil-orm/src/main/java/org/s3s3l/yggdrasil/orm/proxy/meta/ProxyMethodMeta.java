@@ -1,6 +1,7 @@
 package org.s3s3l.yggdrasil.orm.proxy.meta;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,5 +14,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ProxyMethodMeta {
     private Method method;
+    private List<ParamMeta> params;
     private String sql;
 }

@@ -12,11 +12,11 @@ methods:
         username,
         password
       from t_user
-        where id in (${arg0.ids?join(", ")})
+        where id in (${condition.ids?join(", ")})
   - method: get
     sql: >
       select 
         username,
         password
       from t_user
-        where id = ${arg0.id}
+        where id = #condition.id#

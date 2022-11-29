@@ -87,7 +87,6 @@ SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
             // .dataBindExpress(jsqlDataBindExpress)
             .metaManager(metaManager)
             // freemarker用于复杂sql的模板引擎
-            // TODO: SqlObjectWrapper 用于防止字符串的sql注入
             .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
                     .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
             .build();
@@ -155,9 +154,9 @@ public interface UserProxy {
     
     long userCount(UserCondition condition);
 
-    List<User> list(UserCondition condition);
+    List<User> list(@Param("condition") UserCondition condition);
 
-    User get(UserCondition condition);
+    User get(@Param("condition") UserCondition condition);
 }
 ```
 
@@ -176,14 +175,15 @@ methods:
         username,
         password
       from t_user
-        where id in (${arg0.ids?join(", ")})
+        where id in (${condition.ids?join(", ")})
+  # 使用 #变量# 来防止sql注入
   - method: get
     sql: >
       select 
         username,
         password
       from t_user
-        where id = ${arg0.id}
+        where id = #condition.id#
 ```
 
 ### Proxy使用

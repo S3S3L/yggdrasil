@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.s3s3l.yggdrasil.orm.bind.annotation.GroupBy;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Limit;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Offset;
 import org.s3s3l.yggdrasil.orm.bind.annotation.OrderBy;
+import org.s3s3l.yggdrasil.orm.bind.annotation.Param;
 import org.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
 import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
 import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
@@ -30,6 +32,7 @@ import org.s3s3l.yggdrasil.orm.exception.MetaManagerGenerateException;
 import org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager;
 import org.s3s3l.yggdrasil.orm.proxy.config.ProxyConfig;
 import org.s3s3l.yggdrasil.orm.proxy.config.ProxyMethod;
+import org.s3s3l.yggdrasil.orm.proxy.meta.ParamMeta;
 import org.s3s3l.yggdrasil.orm.proxy.meta.ProxyMeta;
 import org.s3s3l.yggdrasil.orm.proxy.meta.ProxyMethodMeta;
 import org.s3s3l.yggdrasil.orm.validator.ValidatorFactory;
@@ -107,12 +110,31 @@ public class MetaManager {
             proxyMeta.setIface(type);
             proxyMeta.setMethods(
                     Arrays.stream(type.getMethods())
-                            .collect(Collectors.toMap(Method::getName, method -> ProxyMethodMeta.builder()
-                                    .method(method)
-                                    .build(), (a, b) -> {
-                                        throw new MetaManagerGenerateException(
-                                                "Duplicate method name: " + a.getMethod().getName());
-                                    })));
+                            .collect(Collectors.toMap(Method::getName, method -> {
+                                List<ParamMeta> params = new LinkedList<>();
+                                Parameter[] parameters = method.getParameters();
+                                for (int paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
+                                    Parameter parameter = parameters[paramIndex];
+                                    if (!parameter.isAnnotationPresent(Param.class)) {
+                                        continue;
+                                    }
+
+                                    Param param = parameter.getAnnotation(Param.class);
+
+                                    params.add(ParamMeta.builder()
+                                            .index(paramIndex)
+                                            .name(param.value())
+                                            .build());
+                                }
+                                ProxyMethodMeta methodMeta = ProxyMethodMeta.builder()
+                                        .method(method)
+                                        .params(params)
+                                        .build();
+                                return methodMeta;
+                            }, (a, b) -> {
+                                throw new MetaManagerGenerateException(
+                                        "Duplicate method name: " + a.getMethod().getName());
+                            })));
 
             return proxyMeta;
         });
@@ -125,9 +147,11 @@ public class MetaManager {
             for (File configFile : FileUtils.tree(location,
                     file -> file.isFile() && (file.getName().endsWith(".yml") || file.getName().endsWith(".yaml")))) {
                 String absolutePath = configFile.getAbsolutePath();
-                // ProxyConfig proxyConfig = yaml.loadAs(FileUtils.getFirstExistResource(absolutePath), ProxyConfig.class);
+                // ProxyConfig proxyConfig =
+                // yaml.loadAs(FileUtils.getFirstExistResource(absolutePath),
+                // ProxyConfig.class);
                 ProxyConfig proxyConfig = JacksonUtils.YAML.toObject(configFile, ProxyConfig.class);
-                
+
                 log.trace("Loaded proxy config from {}. config: {}", absolutePath, proxyConfig);
 
                 verifier.verify(proxyConfig, ProxyConfig.class);
