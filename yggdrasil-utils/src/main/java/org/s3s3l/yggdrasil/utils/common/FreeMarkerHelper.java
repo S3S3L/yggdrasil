@@ -3,6 +3,7 @@ package org.s3s3l.yggdrasil.utils.common;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
@@ -26,6 +27,11 @@ public class FreeMarkerHelper {
         templateConfig.setWrapUncheckedExceptions(true);
         templateConfig.setFallbackOnNullLoopVariable(false);
         templateConfig.setTemplateLoader(templateLoader);
+    }
+
+    public FreeMarkerHelper config(Consumer<Configuration> consumer) {
+        consumer.accept(templateConfig);
+        return this;
     }
 
     public String format(String templateName, String format, Object data) {

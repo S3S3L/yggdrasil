@@ -17,4 +17,5 @@ import lombok.experimental.SuperBuilder;
 public class UserCondition {
     @Condition(forUpdate = true, forDelete = true)
     private String id;
+    private String[] ids;
 }

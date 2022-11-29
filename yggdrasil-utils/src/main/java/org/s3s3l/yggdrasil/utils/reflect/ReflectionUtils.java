@@ -9,7 +9,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +40,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class ReflectionUtils {
+    private static final char FIELD_SPLIT_TOKEN = '.';
+    private static final char ARRAY_START_TOKEN = '[';
+    private static final char ARRAY_END_TOKEN = ']';
 
     public static final Map<Class<?>, Set<Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
@@ -339,5 +345,73 @@ public abstract class ReflectionUtils {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    public static List<PlaceHolderMeta> resolvePlaceHolder(String placeHolder) {
+        List<PlaceHolderMeta> metas = new LinkedList<>();
+        PlaceHolderMeta meta = new PlaceHolderMeta();
+        StringBuilder field = new StringBuilder();
+        StringBuilder arrIndex = new StringBuilder();
+        boolean isArray = false;
+        for (int i = 0; i < placeHolder.length(); i++) {
+            char token = placeHolder.charAt(i);
+            switch (token) {
+                case FIELD_SPLIT_TOKEN:
+                    meta.setFieldName(field.toString());
+                    metas.add(meta);
+                    meta = new PlaceHolderMeta();
+                    field = new StringBuilder();
+                    break;
+                case ARRAY_START_TOKEN:
+                    isArray = true;
+                    break;
+                case ARRAY_END_TOKEN:
+                    meta.setIndex(Integer.parseInt(arrIndex.toString()));
+                    meta.setArray(isArray);
+                    arrIndex = new StringBuilder();
+                    isArray = false;
+                    break;
+                default:
+                    if (isArray) {
+                        arrIndex.append(token);
+                    } else {
+                        field.append(token);
+                    }
+                    break;
+            }
+        }
+        meta.setFieldName(field.toString());
+        metas.add(meta);
+
+        return metas;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static Object checkAndGetObject(PlaceHolderMeta meta, Object value) {
+        if (!meta.isArray()) {
+            return value;
+        }
+
+        Class<?> type = value.getClass();
+
+        if (type.isArray()) {
+            return ((Object[]) value)[meta.getIndex()];
+        } else if (value instanceof Collection) {
+            return ((Collection) value).toArray()[meta.getIndex()];
+        }
+
+        throw new ReflectException("relace holder not found. " + meta);
+    }
+
+    public static Object getObject(PlaceHolderMeta meta, Map<String, Object> src) {
+        Object value = src.get(meta.getFieldName());
+        return checkAndGetObject(meta, value);
+    }
+
+    public static Object getObject(PlaceHolderMeta meta, Object src) {
+        ReflectionBean rf = new PropertyDescriptorReflectionBean(src);
+
+        Object value = rf.getFieldValue(meta.getFieldName());
+        return checkAndGetObject(meta, value);
     }
 }

@@ -1,35 +1,29 @@
 package org.s3s3l.yggdrasil.orm.exec;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
-import java.sql.Connection;
+import java.lang.reflect.Proxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
-import org.s3s3l.yggdrasil.orm.bind.express.jsqlparser.JSqlParserDataBindExpress;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
-import org.s3s3l.yggdrasil.orm.exception.DataMapException;
+import org.s3s3l.yggdrasil.orm.ds.DatasourceHolder;
+import org.s3s3l.yggdrasil.orm.exception.ProxyGenerateException;
 import org.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
+import org.s3s3l.yggdrasil.orm.handler.StatementHelper;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
+import org.s3s3l.yggdrasil.orm.proxy.ExecutorProxyInvocationHandler;
+import org.s3s3l.yggdrasil.orm.proxy.meta.ProxyMeta;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
-import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
-import org.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
+import org.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,23 +40,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultSqlExecutor implements SqlExecutor {
 
+    private final StatementHelper statementHelper;
     private final MetaManager metaManager;
     private final DataBindExpress dataBindExpress;
-    private DataSource datasource;
+    private final FreeMarkerHelper freeMarkerHelper;
+    private final DatasourceHolder datasourceHolder;
 
-    public DefaultSqlExecutor(DataSource datasource, MetaManager metaManager) {
-        this(datasource, new JSqlParserDataBindExpress(metaManager), metaManager);
-    }
-
-    public DefaultSqlExecutor(DataSource datasource, DataBindExpress dataBindExpress, MetaManager metaManager) {
-        this.datasource = datasource;
+    @Builder
+    public DefaultSqlExecutor(MetaManager metaManager, DataBindExpress dataBindExpress,
+            FreeMarkerHelper freeMarkerHelper, DatasourceHolder datasourceHolder) {
+        this.statementHelper = new StatementHelper(metaManager);
         this.metaManager = metaManager;
         this.dataBindExpress = dataBindExpress;
-    }
-
-    @Override
-    public void setDataSource(DataSource datasource) {
-        this.datasource = datasource;
+        this.freeMarkerHelper = freeMarkerHelper;
+        this.datasourceHolder = datasourceHolder;
     }
 
     @Override
@@ -72,12 +63,14 @@ public class DefaultSqlExecutor implements SqlExecutor {
         SqlStruct sqlStruct = dataBindExpress.getInsert(sources);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                setParams(sqlStruct, preparedStatement);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    statementHelper.setParams(sqlStruct.getParams(), preparedStatement);
 
-                return preparedStatement.executeUpdate();
-            }
+                    return preparedStatement.executeUpdate();
+                }
+            });
         } catch (SQLException e) {
             throw new SqlExecutingException(e);
         }
@@ -90,12 +83,14 @@ public class DefaultSqlExecutor implements SqlExecutor {
         SqlStruct sqlStruct = dataBindExpress.getDelete(condition);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                setParams(sqlStruct, preparedStatement);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    statementHelper.setParams(sqlStruct.getParams(), preparedStatement);
 
-                return preparedStatement.executeUpdate();
-            }
+                    return preparedStatement.executeUpdate();
+                }
+            });
         } catch (SQLException e) {
             throw new SqlExecutingException(e);
         }
@@ -109,12 +104,14 @@ public class DefaultSqlExecutor implements SqlExecutor {
         SqlStruct sqlStruct = dataBindExpress.getUpdate(source, condition);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                setParams(sqlStruct, preparedStatement);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    statementHelper.setParams(sqlStruct.getParams(), preparedStatement);
 
-                return preparedStatement.executeUpdate();
-            }
+                    return preparedStatement.executeUpdate();
+                }
+            });
         } catch (SQLException e) {
             throw new SqlExecutingException(e);
         }
@@ -128,15 +125,19 @@ public class DefaultSqlExecutor implements SqlExecutor {
         SqlStruct sqlStruct = dataBindExpress.getSelect(condition);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                setParams(sqlStruct, preparedStatement);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    statementHelper.setParams(sqlStruct.getParams(), preparedStatement);
 
-                ResultSet rs = preparedStatement.executeQuery();
+                    ResultSet rs = preparedStatement.executeQuery();
 
-                return mapResultTo(resultType, rs);
-            }
-        } catch (SQLException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                    return statementHelper.mapResultTo(resultType, rs);
+                } catch (InvocationTargetException | NoSuchMethodException e) {
+                    throw new SqlExecutingException(e);
+                }
+            });
+        } catch (SQLException | SecurityException e) {
             throw new SqlExecutingException(e);
         }
     }
@@ -149,38 +150,42 @@ public class DefaultSqlExecutor implements SqlExecutor {
         PaginResult<List<R>> result = new PaginResult<>();
         condition.prepare();
 
-        try (Connection conn = datasource.getConnection()) {
-            SqlStruct countSqlStruct = dataBindExpress.getSelectCount(condition);
-            String countSql = countSqlStruct.getSql();
-            log.debug("Excuting countSql [{}].", countSql);
-            try (PreparedStatement preparedStatement = conn
-                    .prepareStatement(countSql)) {
-                setParams(countSqlStruct, preparedStatement);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                SqlStruct countSqlStruct = dataBindExpress.getSelectCount(condition);
+                String countSql = countSqlStruct.getSql();
+                log.debug("Excuting countSql [{}].", countSql);
+                try (PreparedStatement preparedStatement = conn
+                        .prepareStatement(countSql)) {
+                    statementHelper.setParams(countSqlStruct.getParams(), preparedStatement);
 
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                    throw new SqlExecutingException("Count sql execute error.");
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (!rs.next()) {
+                        throw new SqlExecutingException("Count sql execute error.");
+                    }
+
+                    long count = rs.getLong(1);
+                    result.setRecordsCount(count);
+                    result.setPageCount(-Math.floorDiv(-count, condition.getPageSize()));
                 }
+                SqlStruct sqlStruct = dataBindExpress.getSelect(condition);
+                String sql = sqlStruct.getSql();
+                log.debug("Excuting sql [{}].", sql);
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    statementHelper.setParams(sqlStruct.getParams(), preparedStatement);
 
-                long count = rs.getLong(1);
-                result.setRecordsCount(count);
-                result.setPageCount(-Math.floorDiv(-count, condition.getPageSize()));
-            }
-            SqlStruct sqlStruct = dataBindExpress.getSelect(condition);
-            String sql = sqlStruct.getSql();
-            log.debug("Excuting sql [{}].", sql);
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                setParams(sqlStruct, preparedStatement);
+                    ResultSet rs = preparedStatement.executeQuery();
 
-                ResultSet rs = preparedStatement.executeQuery();
+                    List<R> resultData = statementHelper.mapResultTo(resultType, rs);
 
-                List<R> resultData = mapResultTo(resultType, rs);
-
-                return PaginResult.<List<R>>builder()
-                        .data(resultData)
-                        .build();
-            }
-        } catch (SQLException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                    return PaginResult.<List<R>>builder()
+                            .data(resultData)
+                            .build();
+                } catch (InvocationTargetException | NoSuchMethodException e) {
+                    throw new SqlExecutingException(e);
+                }
+            });
+        } catch (SQLException | SecurityException e) {
             throw new SqlExecutingException(e);
         }
     }
@@ -196,10 +201,12 @@ public class DefaultSqlExecutor implements SqlExecutor {
         SqlStruct sqlStruct = dataBindExpress.getCreate(tableType, force);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (Statement preparedStatement = conn.createStatement()) {
-                return preparedStatement.execute(sql);
-            }
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (Statement preparedStatement = conn.createStatement()) {
+                    return preparedStatement.execute(sql);
+                }
+            });
         } catch (SQLException | SecurityException e) {
             throw new SqlExecutingException(e);
         }
@@ -208,68 +215,34 @@ public class DefaultSqlExecutor implements SqlExecutor {
     @Override
     public boolean execute(String sql) {
         log.debug("Excuting sql [{}].", sql);
-        try (Connection conn = datasource.getConnection()) {
-            try (Statement preparedStatement = conn.createStatement()) {
-                return preparedStatement.execute(sql);
-            }
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (Statement preparedStatement = conn.createStatement()) {
+                    return preparedStatement.execute(sql);
+                }
+            });
         } catch (SQLException | SecurityException e) {
             throw new SqlExecutingException(e);
         }
     }
 
-    private void setParams(SqlStruct sqlStruct, PreparedStatement preparedStatement) throws SQLException {
-        Verify.notNull(sqlStruct);
-        Verify.notNull(preparedStatement);
-        for (int i = 1; i <= sqlStruct.getParams()
-                .size(); i++) {
-            Object param = sqlStruct.getParams()
-                    .get(i - 1);
-            log.debug("param{}: {}", i, param);
-            preparedStatement.setObject(i, param);
+    @SuppressWarnings("unchecked")
+    @Override
+    public <P> P getProxy(Class<P> proxyInterfaceType) {
+        Verify.notNull(proxyInterfaceType);
+
+        ProxyMeta proxyMeta = metaManager.getProxyMeta(proxyInterfaceType);
+        if (proxyMeta == null) {
+            throw new ProxyGenerateException("Proxy meta not found. " + proxyInterfaceType.getName());
         }
-    }
-
-    private <T> List<T> mapResultTo(Class<T> resultType, ResultSet rs)
-            throws SQLException, InvocationTargetException, NoSuchMethodException, SecurityException {
-        Verify.notNull(resultType);
-        Verify.notNull(rs);
-
-        List<T> resultList = new ArrayList<>();
-        ResultSetMetaData metaData = rs.getMetaData();
-        Set<Field> fields = ReflectionUtils.getFields(resultType);
-
-        try {
-            while (rs.next()) {
-                T result = resultType.getConstructor().newInstance();
-                ReflectionBean reflection = new PropertyDescriptorReflectionBean(result);
-
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    String columnLabel = metaData.getColumnLabel(i);
-                    String fieldName = metaManager.getAlias(resultType, metaData.getColumnName(i));
-
-                    Field field = CollectionUtils.getFirst(fields, r -> r.getName()
-                            .equalsIgnoreCase(fieldName));
-                    Object resultData = rs.getObject(columnLabel);
-
-                    if (field.isAnnotationPresent(Column.class)) {
-                        Type fieldType = field.getGenericType();
-                        Class<?> fieldClass = field.getType();
-
-                        resultData = metaManager.getTypeHandlerManager().getOrNew(field.getAnnotation(Column.class)
-                                .typeHandler())
-                                .toJavaType(resultData, fieldClass, fieldType);
-                    }
-
-                    reflection.setFieldValue(field.getName(), resultData);
-                }
-
-                resultList.add(result);
-            }
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-            throw new DataMapException(e);
-        }
-
-        return resultList;
+        return (P) Proxy.newProxyInstance(proxyMeta.getIface().getClassLoader(),
+                new Class<?>[] { proxyMeta.getIface() },
+                ExecutorProxyInvocationHandler.builder()
+                        .proxyMeta(proxyMeta)
+                        .freeMarkerHelper(freeMarkerHelper)
+                        .datasourceHolder(datasourceHolder)
+                        .statementHelper(statementHelper)
+                        .build());
     }
 
 }

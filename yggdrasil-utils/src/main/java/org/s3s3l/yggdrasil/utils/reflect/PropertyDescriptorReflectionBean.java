@@ -28,19 +28,19 @@ public class PropertyDescriptorReflectionBean implements ReflectionBean {
     }
 
     private void refresh() {
-        Map<String, PropertyDescriptor> propMeta = TYPE_PROP_META.get(type);
-        if (propMeta == null) {
+
+        propMap = TYPE_PROP_META.computeIfAbsent(type, t -> {
+            Map<String, PropertyDescriptor> propMeta = new ConcurrentHashMap<>();
             try {
-                propMeta = new ConcurrentHashMap<>();
                 for (Field field : ReflectionUtils.getFields(type)) {
                     propMeta.put(field.getName(), new PropertyDescriptor(field.getName(), type));
                 }
-                TYPE_PROP_META.put(type, propMeta);
             } catch (IntrospectionException e) {
                 throw new ReflectException(e);
             }
-        }
-        propMap = propMeta;
+
+            return propMeta;
+        });
     }
 
     @Override

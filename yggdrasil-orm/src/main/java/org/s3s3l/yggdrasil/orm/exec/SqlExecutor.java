@@ -2,8 +2,6 @@ package org.s3s3l.yggdrasil.orm.exec;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
 
@@ -20,8 +18,6 @@ import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
  */
 public interface SqlExecutor {
 
-    void setDataSource(DataSource datasource);
-
     <S> int insert(List<S> sources);
 
     <C> int delete(C condition);
@@ -37,4 +33,6 @@ public interface SqlExecutor {
     boolean create(Class<?> tableType, boolean force);
 
     boolean execute(String sql);
+
+    <P> P getProxy(Class<P> proxyInterfaceType);
 }

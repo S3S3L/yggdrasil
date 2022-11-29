@@ -18,16 +18,21 @@ import org.s3s3l.yggdrasil.configuration.datasource.AutoCreateConfig;
 import org.s3s3l.yggdrasil.configuration.datasource.DatasourceConfiguration;
 import org.s3s3l.yggdrasil.configuration.datasource.SwitchableDatasourceConfiguration;
 import org.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
+import org.s3s3l.yggdrasil.orm.bind.express.common.DefaultDataBindExpress;
+import org.s3s3l.yggdrasil.orm.ds.DefaultDatasourceHolder;
 import org.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import org.s3s3l.yggdrasil.orm.exec.SqlExecutor;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
+import org.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import org.s3s3l.yggdrasil.spring.BeanUtils;
 import org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.AutoSwitchDatasourceConfiguration;
 import org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.DatasourceName;
 import org.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.ShardingDatasourceConfiguration;
 import org.s3s3l.yggdrasil.starter.datasource.feature.AutoSwitchDatasource;
+import org.s3s3l.yggdrasil.starter.datasource.feature.SpringConnManager;
 import org.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import org.s3s3l.yggdrasil.utils.collection.MapBuilder;
+import org.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionsHelper;
 import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
@@ -179,7 +184,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
 
         // 注册MetaManager
         registry.registerBeanDefinition(META_MANAGER_BEAN_NAME,
-                BeanUtils.buildBeanDefinition(new Object[] { config.getTableDefinePackages() }, MetaManager.class));
+                BeanUtils.buildBeanDefinition(new Object[] { MetaManagerConfig.builder()
+                        .tableDefinePackages(config.getTableDefinePackages()).build() }, MetaManager.class));
 
         // 构建所有需要启动的数据源实例
         log.trace("Starting registering common datasources.");
@@ -352,10 +358,26 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         // 注册数据源
         registerDatasource(registry, datasourceBeanName, dataSource, autoCreateConfig);
 
+        registerTransactionManager(registry, datasourceName, datasourceBeanName);
+
         if (mybatisConf != null) {
             // 注册mybatis相关组件
             registerMybatisBean(mybatisConf, datasourceBeanName, registry, datasourceName);
         }
+    }
+
+    private void registerTransactionManager(BeanDefinitionRegistry registry, String datasourceName,
+            String datasourceBeanName) {
+        // register transaction manager
+        String transactionName = datasourceName.concat(TRANSACTION_TAIL);
+        log.trace("Starting building transaction manager definition '{}'", transactionName);
+        BeanDefinition transactionManager = BeanUtils.buildBeanDefinition(null, null,
+                new String[] { datasourceBeanName }, DataSourceTransactionManager.class);
+        log.trace("Finished building transaction manager definition '{}'", transactionName);
+
+        log.trace("Starting registering transaction manager definition '{}'", transactionName);
+        registry.registerBeanDefinition(transactionName, transactionManager);
+        log.trace("Finished registering transaction manager definition '{}'", transactionName);
     }
 
     /**
@@ -393,7 +415,13 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
      * @return
      */
     public SqlExecutor sqlExecutor(AutoCreateConfig autoCreateConfig, MetaManager metaManager, DataSource datasource) {
-        SqlExecutor sqlExecutor = new DefaultSqlExecutor(datasource, metaManager);
+        SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
+                .datasourceHolder(new DefaultDatasourceHolder(
+                        new SpringConnManager(), datasource))
+                .dataBindExpress(new DefaultDataBindExpress(metaManager))
+                .metaManager(metaManager)
+                .freeMarkerHelper(new FreeMarkerHelper())
+                .build();
 
         if (autoCreateConfig != null && autoCreateConfig.isEnable()) {
             for (Class<?> table : metaManager.allTableTypes()) {
@@ -418,16 +446,6 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             String datasourceBeanName,
             BeanDefinitionRegistry registry,
             String datasourceName) throws IOException {
-        // register transaction manager
-        String transactionName = datasourceName.concat(TRANSACTION_TAIL);
-        log.trace("Starting building transaction manager definition '{}'", transactionName);
-        BeanDefinition transactionManager = BeanUtils.buildBeanDefinition(null, null,
-                new String[] { datasourceBeanName }, DataSourceTransactionManager.class);
-        log.trace("Finished building transaction manager definition '{}'", transactionName);
-
-        log.trace("Starting registering transaction manager definition '{}'", transactionName);
-        registry.registerBeanDefinition(transactionName, transactionManager);
-        log.trace("Finished registering transaction manager definition '{}'", transactionName);
 
         // register sqlSession factory
         String sqlSessionFactoryName = datasourceName.concat(SQL_SESSION_FACTORY_TAIL);

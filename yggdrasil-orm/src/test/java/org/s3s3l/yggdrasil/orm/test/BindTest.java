@@ -18,6 +18,7 @@ import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
 import org.s3s3l.yggdrasil.orm.handler.ArrayTypeHandler;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
+import org.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import org.s3s3l.yggdrasil.orm.validator.PositiveNumberValidator;
 
@@ -69,7 +70,8 @@ public class BindTest {
 
     public static void main(String[] args) {
 
-        MetaManager metaManager = new MetaManager("org.s3s3l.yggdrasil.orm.test");
+        MetaManager metaManager = new MetaManager(MetaManagerConfig.builder().tableDefinePackages(new String[] {
+                "org.s3s3l.yggdrasil.orm.test" }).build());
         DataBindExpress jsqlDataBindExpress = new JSqlParserDataBindExpress(metaManager);
         DataBindExpress defaulDataBindExpress = new DefaultDataBindExpress(metaManager);
 

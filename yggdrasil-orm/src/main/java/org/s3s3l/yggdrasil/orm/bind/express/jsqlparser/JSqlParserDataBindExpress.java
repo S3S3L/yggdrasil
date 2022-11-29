@@ -198,7 +198,6 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     private JSqlParserSqlStruct buildWhere(List<ConditionMeta> conditions, ReflectionBean rb) {
         JSqlParserSqlStruct whereStruct = new JSqlParserSqlStruct();
 
-        log.info("condition size: {}", conditions.size());
         if (CollectionUtils.isEmpty(conditions)) {
             return whereStruct;
         }
