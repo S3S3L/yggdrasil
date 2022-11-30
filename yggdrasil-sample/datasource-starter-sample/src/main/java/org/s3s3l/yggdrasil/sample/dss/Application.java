@@ -9,6 +9,7 @@ import org.s3s3l.yggdrasil.orm.exec.SqlExecutor;
 import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
 import org.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
 import org.s3s3l.yggdrasil.sample.dss.dao.User;
+import org.s3s3l.yggdrasil.sample.dss.mapper.UserMapper;
 import org.s3s3l.yggdrasil.sample.dss.proxy.UserProxy;
 import org.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Application {
     public static void main(String[] args) throws SQLException {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
+
         SqlExecutor sqlExecutor = ctx.getBean(SqlExecutor.class);
         sqlExecutor.create(User.class, CreateConfig.builder()
                 .dropFirst(true)
@@ -125,5 +127,17 @@ public class Application {
             nextPage = pr.getPageCount() > paginCondition.getPageIndex();
             paginCondition.setPageIndex(paginCondition.getPageIndex() + 1);
         }
+
+        log.info(">>>>>>>>>>>>>>>>>> mybatis");
+
+        UserMapper userMapper = ctx.getBean(UserMapper.class);
+        log.info(">>>>>>>>>>>>>>>>>> mapper, count for in condition");
+        System.out.println(userMapper.userCount(UserCondition.builder().ids(new String[] { id, id2 }).build()));
+
+        log.info(">>>>>>>>>>>>>>>>>> mapper, list for in condition");
+        userMapper.list(UserCondition.builder().ids(new String[] { id, id2 }).build()).forEach(System.out::println);
+
+        log.info(">>>>>>>>>>>>>>>>>> mapper, get one by id");
+        System.out.println(userMapper.get(UserCondition.builder().id(id2).build()));
     }
 }

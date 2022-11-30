@@ -442,7 +442,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             String executorProxyName = datasourceBeanName + proxyType.getSimpleName() + EXECUTOR_PROXY_TAIL;
             registry.registerBeanDefinition(
                     executorProxyName,
-                    BeanUtils.buildBeanDefinitionForFactoryMethod(DefaultSqlExecutor.class,
+                    BeanUtils.buildBeanDefinitionForFactoryMethod(
+                            proxyType,
                             sqlExecutorName,
                             "getProxy",
                             new Object[] { proxyType }));
