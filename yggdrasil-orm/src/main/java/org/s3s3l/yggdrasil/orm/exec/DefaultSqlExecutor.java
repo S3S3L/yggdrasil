@@ -165,6 +165,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
                     }
 
                     long count = rs.getLong(1);
+                    log.debug("Count [{}].", count);
                     result.setRecordsCount(count);
                     result.setPageCount(-Math.floorDiv(-count, condition.getPageSize()));
                 }
@@ -178,9 +179,9 @@ public class DefaultSqlExecutor implements SqlExecutor {
 
                     List<R> resultData = statementHelper.mapResultTo(resultType, rs);
 
-                    return PaginResult.<List<R>>builder()
-                            .data(resultData)
-                            .build();
+                    result.setData(resultData);
+
+                    return result;
                 } catch (InvocationTargetException | NoSuchMethodException e) {
                     throw new SqlExecutingException(e);
                 }
@@ -196,9 +197,29 @@ public class DefaultSqlExecutor implements SqlExecutor {
     }
 
     @Override
-    public boolean create(Class<?> tableType, boolean force) {
+    public boolean create(Class<?> tableType, CreateConfig config) {
         Verify.notNull(tableType);
-        SqlStruct sqlStruct = dataBindExpress.getCreate(tableType, force);
+        if (config.isDropFirst()) {
+            drop(tableType);
+        }
+        SqlStruct sqlStruct = dataBindExpress.getCreate(tableType, config.isForce());
+        String sql = sqlStruct.getSql();
+        log.debug("Excuting sql [{}].", sql);
+        try {
+            return datasourceHolder.useConn(conn -> {
+                try (Statement preparedStatement = conn.createStatement()) {
+                    return preparedStatement.execute(sql);
+                }
+            });
+        } catch (SQLException | SecurityException e) {
+            throw new SqlExecutingException(e);
+        }
+    }
+
+    @Override
+    public boolean drop(Class<?> tableType) {
+        Verify.notNull(tableType);
+        SqlStruct sqlStruct = dataBindExpress.getDrop(tableType);
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
         try {

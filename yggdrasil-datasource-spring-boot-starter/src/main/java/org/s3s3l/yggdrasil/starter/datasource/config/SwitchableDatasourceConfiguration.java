@@ -1,4 +1,4 @@
-package org.s3s3l.yggdrasil.configuration.datasource;
+package org.s3s3l.yggdrasil.starter.datasource.config;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

@@ -1,0 +1,22 @@
+iface: org.s3s3l.yggdrasil.sample.dss.proxy.UserProxy
+methods: 
+  - method: userCount
+    sql: > 
+      select 
+        count(*)
+      from t_user
+        where id in (${arg0.ids?join(", ")})
+  - method: list
+    sql: >
+      select 
+        username,
+        password
+      from t_user
+        where id in (${condition.ids?join(", ")})
+  - method: get
+    sql: >
+      select 
+        username,
+        password
+      from t_user
+        where id = #condition.id#

@@ -97,7 +97,10 @@ SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
 ### 建表
 
 ``` java
-sqlExecutor.create(User.class, false);
+sqlExecutor.create(User.class, CreateConfig.builder()
+        .dropFirst(true)
+        .force(false)
+        .build());
 ```
 
 ### 插入数据
@@ -130,6 +133,34 @@ log.info(">>>>>>>>>>>>>>>>>> select one");
 System.out.println(sqlExecutor.selectOne(UserCondition.builder().id(id).build(), User.class));
 log.info(">>>>>>>>>>>>>>>>>> select all");
 sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+```
+
+### 分页查询
+
+``` java
+log.info(">>>>>>>>>>>>>>>>>> Pagin");
+for (int i = 10; i < 100; i++) {
+    sqlExecutor.insert(Arrays.asList(
+            User.builder()
+                    .id(StringUtils.getUUIDNoLine())
+                    .username("username" + i)
+                    .password("pwd" + i)
+                    .realName("realName" + i)
+                    .age(i)
+                    .build()));
+}
+UserCondition paginCondition = new UserCondition();
+paginCondition.setPageIndex(1);
+paginCondition.setPageSize(10);
+boolean nextPage = true;
+
+while (nextPage) {
+    PaginResult<List<User>> pr = sqlExecutor.selectByPagin(paginCondition, User.class);
+    log.info("pagecount: {}, recordscount: {}, resultRecordsCount: {}", pr.getPageCount(),
+            pr.getRecordsCount(), pr.getData().size());
+    nextPage = pr.getPageCount() > paginCondition.getPageIndex();
+    paginCondition.setPageIndex(paginCondition.getPageIndex() + 1);
+}
 ```
 
 ### 更新数据

@@ -32,7 +32,6 @@ import org.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import org.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
 
-import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.BinaryExpression;
@@ -57,6 +56,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.Offset;
 import net.sf.jsqlparser.statement.select.OrderByElement;
@@ -66,7 +66,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.SelectUtils;
 
-@Slf4j
 public class JSqlParserDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
 
@@ -192,6 +191,19 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         TableMeta table = metaManager.getTable(tableType);
         sqlStruct.appendSql(new CreateBuilder(table, force).build().toString());
+        return sqlStruct;
+    }
+
+    @Override
+    public SqlStruct getDrop(Class<?> tableType) {
+        DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
+        TableMeta table = metaManager.getTable(tableType);
+        Drop drop = new Drop();
+        drop.setIfExists(true);
+        drop.setType("TABLE");
+        drop.setName(new Table(table.getName()));
+
+        sqlStruct.appendSql(drop.toString());
         return sqlStruct;
     }
 
@@ -478,6 +490,10 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         Statement select = CCJSqlParserUtil
                 .parse("select count(*) from t_user where start > '2022-11-01' and end < '2022-11-21'");
         System.out.println(select);
+
+        Statement drop = CCJSqlParserUtil
+                .parse("DROP TABLE IF EXISTS t_user");
+        System.out.println(drop);
     }
 
 }

@@ -11,8 +11,9 @@ import java.util.Properties;
 import org.s3s3l.yggdrasil.annotation.apollo.ApolloConfiguration;
 import org.s3s3l.yggdrasil.bean.time.JsonTimestampDateTimeDeserializer;
 import org.s3s3l.yggdrasil.bean.time.JsonTimestampDateTimeSerializer;
-import org.s3s3l.yggdrasil.configuration.datasource.SwitchableDatasourceConfiguration;
 import org.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
+import org.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
+import org.s3s3l.yggdrasil.starter.datasource.config.SwitchableDatasourceConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -44,7 +45,7 @@ public class MultiDatasourceConfiguration {
     private MybatisConfiguration mybatis;
     private List<String> requiredInstances;
     private boolean enable;
-    private String[] tableDefinePackages = new String[] {};
+    private MetaManagerConfig meta = MetaManagerConfig.defaultBuilder().build();
 
     @Data
     public static class ShardingDatasourceConfiguration {

@@ -341,38 +341,59 @@ public class MetaManager {
     }
 
     public List<ConditionMeta> getSelectCondition(Class<?> type) {
-        return this.condition.get(type)
-                .getSelectConditions();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getSelectConditions();
     }
 
     public List<ConditionMeta> getUpdateCondition(Class<?> type) {
-        return this.condition.get(type)
-                .getUpdateConditions();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getUpdateConditions();
     }
 
     public List<ConditionMeta> getDeleteCondition(Class<?> type) {
-        return this.condition.get(type)
-                .getDeleteConditions();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getDeleteConditions();
     }
 
     public GroupByMeta getGroupBy(Class<?> type) {
-        return this.condition.get(type)
-                .getGroupBy();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getGroupBy();
     }
 
     public List<OrderByMeta> getOrderBy(Class<?> type) {
-        return this.condition.get(type)
-                .getOrderBy();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getOrderBy();
     }
 
     public OffsetMeta getOffset(Class<?> type) {
-        return this.condition.get(type)
-                .getOffset();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getOffset();
     }
 
     public LimitMeta getLimit(Class<?> type) {
-        return this.condition.get(type)
-                .getLimit();
+        ConditionContext conditionContext = this.condition.get(type);
+        if (conditionContext == null) {
+            return null;
+        }
+        return conditionContext.getLimit();
     }
 
     public String getAlias(Class<?> type, String columnName) {
@@ -383,5 +404,9 @@ public class MetaManager {
 
     public ProxyMeta getProxyMeta(Class<?> type) {
         return this.proxyMetas.get(type);
+    }
+
+    public Set<Class<?>> allProxies() {
+        return this.proxyMetas.keySet();
     }
 }

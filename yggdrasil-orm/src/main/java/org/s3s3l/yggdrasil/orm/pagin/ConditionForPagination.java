@@ -30,7 +30,7 @@ public class ConditionForPagination {
             pageIndex = 1;
         }
 
-        offset = pageIndex * pageSize;
+        offset = (pageIndex - 1) * pageSize;
         limit = pageSize;
     }
 }

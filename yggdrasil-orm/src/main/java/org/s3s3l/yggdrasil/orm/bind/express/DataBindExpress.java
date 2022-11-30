@@ -28,4 +28,6 @@ public interface DataBindExpress {
     SqlStruct getSelectCount(Object condition);
 
     SqlStruct getCreate(Class<?> tableType, boolean force);
+
+    SqlStruct getDrop(Class<?> tableType);
 }

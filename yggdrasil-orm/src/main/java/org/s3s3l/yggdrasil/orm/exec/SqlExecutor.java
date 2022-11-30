@@ -31,7 +31,9 @@ public interface SqlExecutor extends Transactable {
 
     <C, R> R selectOne(C condition, Class<R> resultType);
 
-    boolean create(Class<?> tableType, boolean force);
+    boolean create(Class<?> tableType, CreateConfig createConfig);
+
+    boolean drop(Class<?> tableType);
 
     boolean execute(String sql);
 

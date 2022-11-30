@@ -2,15 +2,18 @@ package org.s3s3l.yggdrasil.sample.orm.def;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.s3s3l.yggdrasil.orm.bind.express.common.DefaultDataBindExpress;
 import org.s3s3l.yggdrasil.orm.ds.DefaultDatasourceHolder;
+import org.s3s3l.yggdrasil.orm.exec.CreateConfig;
 import org.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import org.s3s3l.yggdrasil.orm.exec.SqlExecutor;
 import org.s3s3l.yggdrasil.orm.meta.MetaManager;
 import org.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
+import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
 import org.s3s3l.yggdrasil.orm.pool.ConnManager;
 import org.s3s3l.yggdrasil.orm.wrapper.SqlObjectWrapper;
 import org.s3s3l.yggdrasil.sample.orm.condition.UserCondition;
@@ -29,7 +32,7 @@ public class Application {
     public static void main(String[] args) throws SQLException {
         DataSource datasource = new DataSource(
                 JacksonUtils.YAML.toObject(FileUtils.getFirstExistResource("datasource.yaml"), PoolProperties.class));
-        MetaManager metaManager = new MetaManager(MetaManagerConfig.builder()
+        MetaManager metaManager = new MetaManager(MetaManagerConfig.defaultBuilder()
                 .tableDefinePackages(new String[] { "org.s3s3l.yggdrasil.sample.orm" })
                 .proxyDefinePackages(new String[] { "org.s3s3l.yggdrasil.sample.orm.proxy" })
                 .proxyConfigLocations(new String[] { "proxy" })
@@ -42,8 +45,10 @@ public class Application {
                 .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
                         .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
                 .build();
-        sqlExecutor.execute("DROP TABLE IF EXISTS t_user");
-        sqlExecutor.create(User.class, false);
+        sqlExecutor.create(User.class, CreateConfig.builder()
+                .dropFirst(true)
+                .force(false)
+                .build());
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
         sqlExecutor.insert(Arrays.asList(
@@ -118,5 +123,30 @@ public class Application {
                         .build()));
         sqlExecutor.rollback();
         System.out.println(userProxy.get(UserCondition.builder().id(id4).build()));
+
+        log.info(">>>>>>>>>>>>>>>>>> Pagin");
+        for (int i = 10; i < 100; i++) {
+            sqlExecutor.insert(Arrays.asList(
+                    User.builder()
+                            .id(StringUtils.getUUIDNoLine())
+                            .username("username" + i)
+                            .password("pwd" + i)
+                            .realName("realName" + i)
+                            .age(i)
+                            .build()));
+        }
+        UserCondition paginCondition = new UserCondition();
+        paginCondition.setPageIndex(1);
+        paginCondition.setPageSize(10);
+        boolean nextPage = true;
+
+        while (nextPage) {
+            PaginResult<List<User>> pr = sqlExecutor.selectByPagin(paginCondition, User.class);
+            log.info("pagecount: {}, recordscount: {}, resultRecordsCount: {}", pr.getPageCount(),
+                    pr.getRecordsCount(), pr.getData().size());
+            nextPage = pr.getPageCount() > paginCondition.getPageIndex();
+            paginCondition.setPageIndex(paginCondition.getPageIndex() + 1);
+        }
+
     }
 }

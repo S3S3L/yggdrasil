@@ -15,6 +15,7 @@ import org.s3s3l.yggdrasil.orm.bind.set.SetStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import org.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
+import org.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
 import org.s3s3l.yggdrasil.orm.meta.DatabaseType;
 import org.s3s3l.yggdrasil.orm.meta.GroupByMeta;
 import org.s3s3l.yggdrasil.orm.meta.LimitMeta;
@@ -146,6 +147,11 @@ public class DefaultDataBindExpress implements DataBindExpress {
         Class<?> conditionType = condition.getClass();
 
         TableMeta table = metaManager.getTable(conditionType);
+
+        if (table == null) {
+            throw new DataBindExpressException(String.format("type %s not resolved.", conditionType.getName()));
+        }
+
         OffsetMeta offset = metaManager.getOffset(conditionType);
         LimitMeta limit = metaManager.getLimit(conditionType);
         GroupByMeta groupBy = metaManager.getGroupBy(conditionType);
@@ -243,6 +249,18 @@ public class DefaultDataBindExpress implements DataBindExpress {
                         })
                         .collect(Collectors.toList())));
         struct.appendSql(")");
+        return struct;
+    }
+
+    @Override
+    public SqlStruct getDrop(Class<?> tableType) {
+        Verify.notNull(tableType);
+        DefaultSqlStruct struct = new DefaultSqlStruct();
+        TableMeta table = metaManager.getTable(tableType);
+
+        struct.setSql("DROP TABLE IF EXISTS ");
+        struct.appendSql(table.getName());
+
         return struct;
     }
 }

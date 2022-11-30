@@ -1,8 +1,10 @@
 yggdrasil: 
   datasource: 
     enable: true
-    tableDefinePackages: 
-    - org.s3s3l.yggdrasil.sample.dss
+    meta: 
+      tableDefinePackages: 
+      - org.s3s3l.yggdrasil.sample.dss.condition
+      - org.s3s3l.yggdrasil.sample.dss.dao
     requiredInstances: 
     - test
     dbs:
@@ -29,3 +31,8 @@ yggdrasil:
         logAbandoned: true
         minEvictableIdleTimeMillis: 60000
         removeAbandonedTimeout: 60000
+        meta: 
+          proxy-define-packages:
+          - org.s3s3l.yggdrasil.sample.dss.proxy
+          proxy-config-locations:
+          - proxy
