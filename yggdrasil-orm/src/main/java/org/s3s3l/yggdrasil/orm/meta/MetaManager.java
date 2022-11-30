@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
+import org.s3s3l.yggdrasil.bean.exception.VerifyException;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
 import org.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
@@ -44,8 +45,6 @@ import org.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.s3s3l.yggdrasil.utils.verify.CommonVerifier;
 import org.s3s3l.yggdrasil.utils.verify.Verifier;
 import org.s3s3l.yggdrasil.utils.verify.Verify;
-
-import com.google.common.base.VerifyException;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
