@@ -19,4 +19,9 @@ public class ProxyMethod {
      */
     @Examine(value = Expectation.HAS_LENGTH)
     private String sql;
+    /**
+     * sql的类型, 默认为QUERY类型
+     */
+    @Examine(value = Expectation.NOT_NULL)
+    private SqlType type = SqlType.QUERY;
 }

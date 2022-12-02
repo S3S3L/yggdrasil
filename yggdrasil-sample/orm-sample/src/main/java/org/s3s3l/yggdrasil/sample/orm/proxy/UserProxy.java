@@ -15,4 +15,6 @@ public interface UserProxy {
     List<User> list(@Param("condition") UserCondition condition);
 
     User get(@Param("condition") UserCondition condition);
+
+    int addOne(@Param("user") User user);
 }

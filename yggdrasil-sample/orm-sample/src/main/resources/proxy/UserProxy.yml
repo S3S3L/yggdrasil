@@ -20,3 +20,25 @@ methods:
         password
       from t_user
         where id = #condition.id#
+  - method: addOne
+    type: UPDATE
+    sql: >
+      insert into
+        t_user
+      (
+        id,
+        realName,
+        phone,
+        username,
+        password,
+        age
+      )
+      values
+      (
+        #user.id#,
+        #user.realName#,
+        #user.phone#,
+        #user.username#,
+        #user.password#,
+        #user.age#
+      )

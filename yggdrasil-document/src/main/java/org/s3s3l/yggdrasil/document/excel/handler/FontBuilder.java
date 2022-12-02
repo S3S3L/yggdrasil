@@ -144,15 +144,6 @@ public interface FontBuilder {
 
     /**
      * 
-     * 设置线粗
-     * 
-     * @param boldweight
-     * @since JDK 1.8
-     */
-    FontBuilder setBoldweight(short boldweight);
-
-    /**
-     * 
      * 设置是否加粗
      * 
      * @param bold

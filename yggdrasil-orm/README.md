@@ -263,4 +263,34 @@ sqlExecutor.insert(Arrays.asList(
                 .build()));
 sqlExecutor.rollback();
 System.out.println(userProxy.get(UserCondition.builder().id(id4).build()));
+
+log.info(">>>>>>>>>>>>>>>>>> transactional, proxy, commit");
+sqlExecutor.transactional();
+String id5 = StringUtils.getUUIDNoLine();
+userProxy.addOne(User.builder()
+        .id(id5)
+        .username("username5")
+        .password("pwd5")
+        .realName("realName5")
+        .age(18)
+        .build());
+sqlExecutor.transactionalCommit();
+System.out.println(userProxy.get(UserCondition.builder()
+        .id(id5)
+        .build()));
+
+log.info(">>>>>>>>>>>>>>>>>> transactional, proxy, rollback");
+sqlExecutor.transactional();
+String id6 = StringUtils.getUUIDNoLine();
+userProxy.addOne(User.builder()
+        .id(id6)
+        .username("username6")
+        .password("pwd6")
+        .realName("realName6")
+        .age(18)
+        .build());
+sqlExecutor.rollback();
+System.out.println(userProxy.get(UserCondition.builder()
+        .id(id6)
+        .build()));
 ```

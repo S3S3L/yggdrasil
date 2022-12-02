@@ -164,6 +164,7 @@ public class MetaManager {
                     log.trace("Proxy config is Loaded. iface: {}, method: {}", proxyConfig.getIface().getName(),
                             methodName);
                     proxyMethodMeta.setSql(proxyMethod.getSql());
+                    proxyMethodMeta.setType(proxyMethod.getType());
                 }
             }
             log.debug("Finished load proxy config from {}", location);

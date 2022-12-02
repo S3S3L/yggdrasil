@@ -9,12 +9,12 @@ import org.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner;
 import org.s3s3l.yggdrasil.utils.reflect.scan.Scanner;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MetaManagerConfig {
@@ -31,7 +31,7 @@ public class MetaManagerConfig {
     @Examine(value = Expectation.NOT_NULL)
     private Class<? extends Scanner> scanner;
 
-    public static MetaManagerConfigBuilder<?, ?> defaultBuilder() {
+    public static MetaManagerConfigBuilder defaultBuilder() {
         return MetaManagerConfig.builder()
                 .tableDefinePackages(new String[] {})
                 .proxyDefinePackages(new String[] {})

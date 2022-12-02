@@ -17,6 +17,7 @@
         <groupId>org.s3s3l.yggdrasil</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.6.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>

@@ -1,7 +1,11 @@
 package org.s3s3l.yggdrasil.document.excel.handler.impl;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.s3s3l.yggdrasil.document.excel.handler.CellStyleBuilder;
 
 /**
@@ -76,7 +80,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setAlignment(short align) {
+    public CellStyleBuilder setAlignment(HorizontalAlignment align) {
         cellStyle.setAlignment(align);
         return this;
     }
@@ -93,7 +97,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setVerticalAlignment(short align) {
+    public CellStyleBuilder setVerticalAlignment(VerticalAlignment align) {
         cellStyle.setVerticalAlignment(align);
         return this;
     }
@@ -116,7 +120,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setBorderLeft(short border) {
+    public CellStyleBuilder setBorderLeft(BorderStyle border) {
         cellStyle.setBorderLeft(border);
         return this;
     }
@@ -127,7 +131,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setBorderRight(short border) {
+    public CellStyleBuilder setBorderRight(BorderStyle border) {
         cellStyle.setBorderRight(border);
         return this;
     }
@@ -138,7 +142,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setBorderTop(short border) {
+    public CellStyleBuilder setBorderTop(BorderStyle border) {
         cellStyle.setBorderTop(border);
         return this;
     }
@@ -149,7 +153,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setBorderBottom(short border) {
+    public CellStyleBuilder setBorderBottom(BorderStyle border) {
         cellStyle.setBorderBottom(border);
         return this;
     }
@@ -184,7 +188,7 @@ public class POICellStyleBuilder implements CellStyleBuilder {
      */
     @Override
     @Deprecated
-    public CellStyleBuilder setFillPattern(short fp) {
+    public CellStyleBuilder setFillPattern(FillPatternType fp) {
         cellStyle.setFillPattern(fp);
         return this;
     }

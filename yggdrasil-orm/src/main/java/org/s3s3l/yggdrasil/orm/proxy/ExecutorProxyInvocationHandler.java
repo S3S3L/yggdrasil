@@ -63,9 +63,8 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
             }
         }
 
-        String sqlTemplate = freeMarkerHelper.format(
-                String.join("#", method.getDeclaringClass().getName(), method.getName()),
-                methodMeta.getSql(), paramMap);
+        String sqlTemplate = freeMarkerHelper.format(String.join("#", method.getDeclaringClass()
+                .getName(), method.getName()), methodMeta.getSql(), paramMap);
         Matcher matcher = placeHolderRegex.matcher(sqlTemplate);
 
         List<Object> params = new LinkedList<>();
@@ -87,9 +86,19 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
                     log.debug("Param{}: {}", paramIndex, param);
                 }
 
-                ResultSet rs = statement.executeQuery();
+                switch (methodMeta.getType()) {
+                    case DDL:
+                        return statement.execute();
+                    case QUERY:
+                        ResultSet rs = statement.executeQuery();
 
-                return mapResult(rs, method.getReturnType(), method.getGenericReturnType());
+                        return mapResult(rs, method.getReturnType(), method.getGenericReturnType());
+                    case UPDATE:
+                        return statement.executeUpdate();
+                    default:
+                        throw new SqlExecutingException("Unsupported sql type " + methodMeta.getType());
+                }
+
             } catch (InvocationTargetException | NoSuchMethodException e) {
                 throw new SqlExecutingException(e);
             }
@@ -110,9 +119,10 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
         return res;
     }
 
-    private Object mapResult(ResultSet rs, Class<?> returnType,
-            Type genericReturnType)
-            throws SQLException, InvocationTargetException, NoSuchMethodException, SecurityException {
+    private Object mapResult(ResultSet rs, Class<?> returnType, Type genericReturnType) throws SQLException,
+            InvocationTargetException,
+            NoSuchMethodException,
+            SecurityException {
         if (returnType.isPrimitive()) {
             if (!rs.next()) {
                 throw new SqlExecutingException("There is not any result. But required one.");
@@ -135,8 +145,7 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
                     .toArray();
         }
 
-        List<?> res = statementHelper
-                .mapResultTo(returnType, rs);
+        List<?> res = statementHelper.mapResultTo(returnType, rs);
 
         if (res.size() > 1) {
             throw new SqlExecutingException("Multi records in result. But return type is one. " + returnType.getName());

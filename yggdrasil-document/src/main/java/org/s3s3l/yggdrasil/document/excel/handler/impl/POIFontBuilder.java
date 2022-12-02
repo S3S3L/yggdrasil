@@ -105,17 +105,6 @@ public class POIFontBuilder implements FontBuilder {
         return this;
     }
 
-    /**
-     * @deprecated
-     * @see org.s3s3l.yggdrasil.utils.excel.handler.FontBuilder#setBoldweight(short)
-     */
-    @Override
-    @Deprecated
-    public FontBuilder setBoldweight(short boldweight) {
-        font.setBoldweight(boldweight);
-        return this;
-    }
-
     @Override
     public FontBuilder setBold(boolean bold) {
         font.setBold(bold);

@@ -1,8 +1,12 @@
 package org.s3s3l.yggdrasil.document.excel.handler;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 
 /**
@@ -91,7 +95,7 @@ public interface CellStyleBuilder {
      * @since JDK 1.8
      */
     @Deprecated
-    CellStyleBuilder setAlignment(short align);
+    CellStyleBuilder setAlignment(HorizontalAlignment align);
 
     /**
      * 
@@ -121,7 +125,7 @@ public interface CellStyleBuilder {
      * @since JDK 1.8
      */
     @Deprecated
-    CellStyleBuilder setVerticalAlignment(short align);
+    CellStyleBuilder setVerticalAlignment(VerticalAlignment align);
 
     /**
      * 
@@ -168,7 +172,7 @@ public interface CellStyleBuilder {
      * @return builder
      * @since JDK 1.8
      */
-    CellStyleBuilder setBorderLeft(short border);
+    CellStyleBuilder setBorderLeft(BorderStyle border);
 
     /**
      * 
@@ -193,7 +197,7 @@ public interface CellStyleBuilder {
      * @return builder
      * @since JDK 1.8
      */
-    CellStyleBuilder setBorderRight(short border);
+    CellStyleBuilder setBorderRight(BorderStyle border);
 
     /**
      * 
@@ -218,7 +222,7 @@ public interface CellStyleBuilder {
      * @return builder
      * @since JDK 1.8
      */
-    CellStyleBuilder setBorderTop(short border);
+    CellStyleBuilder setBorderTop(BorderStyle border);
 
     /**
      * 
@@ -243,7 +247,7 @@ public interface CellStyleBuilder {
      * @return builder
      * @since JDK 1.8
      */
-    CellStyleBuilder setBorderBottom(short border);
+    CellStyleBuilder setBorderBottom(BorderStyle border);
 
     /**
      * 
@@ -315,7 +319,7 @@ public interface CellStyleBuilder {
      * @return builder
      * @since JDK 1.8
      */
-    CellStyleBuilder setFillPattern(short fp);
+    CellStyleBuilder setFillPattern(FillPatternType fp);
 
     /**
      * 
