@@ -1,4 +1,4 @@
-iface: org.s3s3l.yggdrasil.sample.orm.proxy.UserProxy
+iface: io.github.s3s3l.yggdrasil.sample.orm.proxy.UserProxy
 methods: 
   - method: userCount
     sql: > 

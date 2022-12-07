@@ -3,24 +3,24 @@ yggdrasil:
     enable: true
     meta: 
       tableDefinePackages: 
-      - org.s3s3l.yggdrasil.sample.dss.condition
-      - org.s3s3l.yggdrasil.sample.dss.dao
+      - io.github.s3s3l.yggdrasil.sample.dss.condition
+      - io.github.s3s3l.yggdrasil.sample.dss.dao
       proxy-define-packages:
-      - org.s3s3l.yggdrasil.sample.dss.proxy
+      - io.github.s3s3l.yggdrasil.sample.dss.proxy
       proxy-config-locations:
       - proxy
-      validatorFactory: org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory
-      typeHandlerManager: org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager
-      scanner: org.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner
+      validatorFactory: io.github.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory
+      typeHandlerManager: io.github.s3s3l.yggdrasil.orm.handler.TypeHandlerManager
+      scanner: io.github.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner
     requiredInstances: 
     - test
     mybatis:
       check-config-location: true
       config: config/mybatis-config.xml
       mapper-locations: config/mapper/**/*.xml
-      type-aliases-package: org.s3s3l.yggdrasil.sample.dss.dao
+      type-aliases-package: io.github.s3s3l.yggdrasil.sample.dss.dao
       mapper-packages:
-        test: org.s3s3l.yggdrasil.sample.dss.mapper
+        test: io.github.s3s3l.yggdrasil.sample.dss.mapper
     dbs:
       test:
         autoCreate: 
@@ -47,6 +47,6 @@ yggdrasil:
         removeAbandonedTimeout: 60000
         meta: 
           proxy-define-packages:
-          - org.s3s3l.yggdrasil.sample.dss.proxy
+          - io.github.s3s3l.yggdrasil.sample.dss.proxy
           proxy-config-locations:
           - proxy

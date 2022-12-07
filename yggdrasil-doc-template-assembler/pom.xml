@@ -60,14 +60,14 @@
     </build>
 
     <parent>
-        <groupId>org.s3s3l.yggdrasil</groupId>
+        <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.6.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>org.s3s3l.yggdrasil</groupId>
+            <groupId>io.github.s3s3l</groupId>
             <artifactId>yggdrasil-doc</artifactId>
         </dependency>
         <!-- FreeMarker -->

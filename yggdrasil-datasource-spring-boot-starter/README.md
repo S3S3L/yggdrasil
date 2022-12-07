@@ -120,15 +120,15 @@ yggdrasil:
     enable: true
     meta: 
       tableDefinePackages: 
-      - org.s3s3l.yggdrasil.sample.dss.condition
-      - org.s3s3l.yggdrasil.sample.dss.dao
+      - io.github.s3s3l.yggdrasil.sample.dss.condition
+      - io.github.s3s3l.yggdrasil.sample.dss.dao
       proxy-define-packages:
-      - org.s3s3l.yggdrasil.sample.dss.proxy
+      - io.github.s3s3l.yggdrasil.sample.dss.proxy
       proxy-config-locations:
       - proxy
-      validatorFactory: org.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory
-      typeHandlerManager: org.s3s3l.yggdrasil.orm.handler.TypeHandlerManager
-      scanner: org.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner
+      validatorFactory: io.github.s3s3l.yggdrasil.orm.validator.DefaultValidatorFactory
+      typeHandlerManager: io.github.s3s3l.yggdrasil.orm.handler.TypeHandlerManager
+      scanner: io.github.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner
 ```
 
 #### 针对个别数据源配置
@@ -141,7 +141,7 @@ yggdrasil:
       test:
         meta: 
           proxy-define-packages:
-          - org.s3s3l.yggdrasil.sample.dss.proxy
+          - io.github.s3s3l.yggdrasil.sample.dss.proxy
           proxy-config-locations:
           - proxy
 ```
@@ -164,7 +164,7 @@ yggdrasil:
   - 以${your-db-name} + SessionTemplate作为BeanName
 - Mapper
   - 可直接以类型注入
-- org.s3s3l.yggdrasil.orm.exec.SqlExecutor
+- io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor
   - 以${your-db-name} + Executor作为BeanName
 - ExecutorProxy
   - 可直接以类型注入
@@ -179,17 +179,17 @@ yggdrasil:
     enable: true
     meta: 
       tableDefinePackages: 
-      - org.s3s3l.yggdrasil.sample.dss.condition
-      - org.s3s3l.yggdrasil.sample.dss.dao
+      - io.github.s3s3l.yggdrasil.sample.dss.condition
+      - io.github.s3s3l.yggdrasil.sample.dss.dao
     requiredInstances: 
     - test
     mybatis:
       check-config-location: true
       config: config/mybatis-config.xml
       mapper-locations: config/mapper/**/*.xml
-      type-aliases-package: org.s3s3l.yggdrasil.sample.dss.dao
+      type-aliases-package: io.github.s3s3l.yggdrasil.sample.dss.dao
       mapper-packages:
-        test: org.s3s3l.yggdrasil.sample.dss.mapper
+        test: io.github.s3s3l.yggdrasil.sample.dss.mapper
     dbs:
       test:
         autoCreate: 
@@ -216,19 +216,19 @@ yggdrasil:
         removeAbandonedTimeout: 60000
         meta: 
           proxy-define-packages:
-          - org.s3s3l.yggdrasil.sample.dss.proxy
+          - io.github.s3s3l.yggdrasil.sample.dss.proxy
           proxy-config-locations:
           - proxy
 ```
 
-> org.s3s3l.yggdrasil.sample.dss.dao.User
+> io.github.s3s3l.yggdrasil.sample.dss.dao.User
 
 ``` java
-package org.s3s3l.yggdrasil.sample.dss.dao;
+package io.github.s3s3l.yggdrasil.sample.dss.dao;
 
-import org.s3s3l.yggdrasil.orm.bind.annotation.Column;
-import org.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
-import org.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.Column;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -256,15 +256,15 @@ public class User {
 }
 ```
 
-> org.s3s3l.yggdrasil.sample.dss.condition.UserCondition
+> io.github.s3s3l.yggdrasil.sample.dss.condition.UserCondition
 
 ``` java
-package org.s3s3l.yggdrasil.sample.dss.condition;
+package io.github.s3s3l.yggdrasil.sample.dss.condition;
 
-import org.s3s3l.yggdrasil.orm.bind.annotation.Condition;
-import org.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
-import org.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
-import org.s3s3l.yggdrasil.sample.dss.dao.User;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.Condition;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
+import io.github.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
+import io.github.s3s3l.yggdrasil.sample.dss.dao.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -283,17 +283,17 @@ public class UserCondition extends ConditionForPagination {
 }
 ```
 
-> org.s3s3l.yggdrasil.sample.dss.proxy.UserProxy
+> io.github.s3s3l.yggdrasil.sample.dss.proxy.UserProxy
 
 ``` java
-package org.s3s3l.yggdrasil.sample.dss.proxy;
+package io.github.s3s3l.yggdrasil.sample.dss.proxy;
 
 import java.util.List;
 
-import org.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
-import org.s3s3l.yggdrasil.orm.bind.annotation.Param;
-import org.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
-import org.s3s3l.yggdrasil.sample.dss.dao.User;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.Param;
+import io.github.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
+import io.github.s3s3l.yggdrasil.sample.dss.dao.User;
 
 @ExecutorProxy
 public interface UserProxy {
@@ -309,7 +309,7 @@ public interface UserProxy {
 > proxy/UserProxy.yml
 
 ``` yaml
-iface: org.s3s3l.yggdrasil.sample.dss.proxy.UserProxy
+iface: io.github.s3s3l.yggdrasil.sample.dss.proxy.UserProxy
 methods: 
   - method: userCount
     sql: > 
@@ -333,16 +333,16 @@ methods:
         where id = #condition.id#
 ```
 
-> org.s3s3l.yggdrasil.sample.dss.mapper.UserMapper
+> io.github.s3s3l.yggdrasil.sample.dss.mapper.UserMapper
 
 ``` java
-package org.s3s3l.yggdrasil.sample.dss.mapper;
+package io.github.s3s3l.yggdrasil.sample.dss.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
-import org.s3s3l.yggdrasil.sample.dss.dao.User;
+import io.github.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
+import io.github.s3s3l.yggdrasil.sample.dss.dao.User;
 
 public interface UserMapper {
     long userCount(@Param("condition") UserCondition condition);
@@ -358,7 +358,7 @@ public interface UserMapper {
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.s3s3l.yggdrasil.sample.dss.mapper.UserMapper">
+<mapper namespace="io.github.s3s3l.yggdrasil.sample.dss.mapper.UserMapper">
     <select id="userCount" resultType="java.lang.Long">
       select 
         count(*)
@@ -369,7 +369,7 @@ public interface UserMapper {
         </foreach>
     </select>
 
-    <select id="list" resultType="org.s3s3l.yggdrasil.sample.dss.dao.User">
+    <select id="list" resultType="io.github.s3s3l.yggdrasil.sample.dss.dao.User">
         
       select 
         username,
@@ -381,7 +381,7 @@ public interface UserMapper {
         </foreach>
     </select>
 
-    <select id="get" resultType="org.s3s3l.yggdrasil.sample.dss.dao.User">
+    <select id="get" resultType="io.github.s3s3l.yggdrasil.sample.dss.dao.User">
       select 
         username,
         password
@@ -414,23 +414,23 @@ public interface UserMapper {
 </configuration>
 ```
 
-> org.s3s3l.yggdrasil.sample.dss.Application
+> io.github.s3s3l.yggdrasil.sample.dss.Application
 
 ``` java
-package org.s3s3l.yggdrasil.sample.dss;
+package io.github.s3s3l.yggdrasil.sample.dss;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.s3s3l.yggdrasil.orm.exec.CreateConfig;
-import org.s3s3l.yggdrasil.orm.exec.SqlExecutor;
-import org.s3s3l.yggdrasil.orm.pagin.PaginResult;
-import org.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
-import org.s3s3l.yggdrasil.sample.dss.dao.User;
-import org.s3s3l.yggdrasil.sample.dss.mapper.UserMapper;
-import org.s3s3l.yggdrasil.sample.dss.proxy.UserProxy;
-import org.s3s3l.yggdrasil.utils.common.StringUtils;
+import io.github.s3s3l.yggdrasil.orm.exec.CreateConfig;
+import io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor;
+import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
+import io.github.s3s3l.yggdrasil.sample.dss.condition.UserCondition;
+import io.github.s3s3l.yggdrasil.sample.dss.dao.User;
+import io.github.s3s3l.yggdrasil.sample.dss.mapper.UserMapper;
+import io.github.s3s3l.yggdrasil.sample.dss.proxy.UserProxy;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;

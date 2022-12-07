@@ -67,8 +67,8 @@ DataSource datasource = ...;
 // 初始化MetaManager
 // 初始化过程中会扫描响应的包来初始化数据对象定义
 MetaManager metaManager = new MetaManager(MetaManagerConfig.builder()
-                .tableDefinePackages(new String[] { "org.s3s3l.yggdrasil.sample.orm" })
-                .proxyDefinePackages(new String[] { "org.s3s3l.yggdrasil.sample.orm.proxy" })
+                .tableDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm" })
+                .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm.proxy" })
                 .proxyConfigLocations(new String[] { "proxy" })
                 .build());
 // 初始化DataBindExpress
@@ -192,7 +192,7 @@ public interface UserProxy {
 ```
 
 ``` yaml
-iface: org.s3s3l.yggdrasil.sample.orm.proxy.UserProxy
+iface: io.github.s3s3l.yggdrasil.sample.orm.proxy.UserProxy
 methods: 
   - method: userCount
     sql: > 

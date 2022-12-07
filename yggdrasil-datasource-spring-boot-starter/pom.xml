@@ -64,7 +64,7 @@
 	</build>
 
 	<parent>
-		<groupId>org.s3s3l.yggdrasil</groupId>
+		<groupId>io.github.s3s3l</groupId>
 		<artifactId>yggdrasil-parent</artifactId>
 		<version>3.6.1-SNAPSHOT</version>
 	</parent>
@@ -93,19 +93,19 @@
 		</dependency>
 		<!-- Yggdrasil -->
 		<dependency>
-			<groupId>org.s3s3l.yggdrasil</groupId>
+			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-configuration</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.s3s3l.yggdrasil</groupId>
+			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-utils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.s3s3l.yggdrasil</groupId>
+			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-orm</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.s3s3l.yggdrasil</groupId>
+			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-spring</artifactId>
 		</dependency>
 		<!-- Mybatis -->

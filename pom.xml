@@ -1,6 +1,6 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.s3s3l.yggdrasil</groupId>
+    <groupId>io.github.s3s3l</groupId>
     <artifactId>yggdrasil-parent</artifactId>
     <version>3.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -197,122 +197,122 @@
             </dependency>
             <!-- Yggdrasil -->
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-compress</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-spring</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-mybatis</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-web</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-redis</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-http</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-es</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-doc</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-doc-template-assembler</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-document</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-resource</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-orm</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-persistence</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-cache</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-bean</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-ddd</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-fsm</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-annotation</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-configuration</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-utils</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-datasource-spring-boot-starter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-redis-spring-boot-starter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-apollo-spring-boot-starter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.s3s3l.yggdrasil</groupId>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-cache-spring-boot-starter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
