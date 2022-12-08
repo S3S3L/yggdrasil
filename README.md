@@ -1,3 +1,13 @@
+![](https://img.shields.io/github/license/S3S3L/yggdrasil)
+![](https://img.shields.io/github/v/tag/S3S3L/yggdrasil?label=Last%20Version)
+![](https://img.shields.io/maven-central/v/io.github.s3s3l/yggdrasil-parent)
+![](https://img.shields.io/github/languages/top/S3S3L/yggdrasil)
+![](https://github.com/S3S3L/yggdrasil/actions/workflows/maven.yml/badge.svg)
+![](https://img.shields.io/github/issues/S3S3L/yggdrasil)
+![](https://img.shields.io/github/commit-activity/m/S3S3L/yggdrasil)
+![](https://img.shields.io/github/release-date/S3S3L/yggdrasil)
+![](https://img.shields.io/github/last-commit/S3S3L/yggdrasil)
+
 # __yggdrasil__
 > A batch of tool-kits to help coding faster &amp; easier
 
