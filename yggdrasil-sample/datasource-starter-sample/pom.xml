@@ -1,6 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yggdrasil-sample-datasource-starter</artifactId>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:S3S3L/yggdrasil.git</connection>
+        <developerConnection>scm:git:git@github.com:S3S3L/yggdrasil.git</developerConnection>
+        <url>https://github.com/S3S3L/yggdrasil</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Kehw.Zwei</name>
+            <email>kehw.zwei@gmail.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
+
     <build>
         <plugins>
             <plugin>
@@ -10,13 +34,26 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <configuration>
+                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <parent>
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
-        <version>3.6.1-SNAPSHOT</version>
+        <version>3.6.1-RELEASE</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

@@ -1,6 +1,16 @@
 # datasource-spring-boot-starter
 
-多种数据源以及orm框架自动初始化组件
+> 多种数据源以及orm框架自动初始化组件
+
+## Maven依赖
+
+``` xml
+<dependency>
+    <groupId>io.github.s3s3l</groupId>
+    <artifactId>datasource-spring-boot-starter</artifactId>
+    <version>3.6.1-RELEASE</version>
+</dependency>
+```
 
 ## 配置
 
@@ -10,12 +20,14 @@
 yggdrasil:
   datasource:
     enable: true # 组件开关
+    requiredInstances: # 指定需要初始化的实例，如果未指定，所有配置的实例都会初始化
+    - ${your_first_db}
+    - ${your_second_db}
     dbs:
       your_first_db:
         url: ${your-first-db-url}
         username: $${your-first-db-username}
         password: ${your-first-db-password}
-        cryptographic: true # 密码是否是加密字符串
         switch-conf: # 自动切换配置
             db: # 另一个db配置，配置项跟当前这个一样
             time: # 切换时间
@@ -40,7 +52,6 @@ yggdrasil:
         url: ${your-second-db-url}
         username: $${your-second-db-username}
         password: ${your-second-db-password}
-        cryptographic: true # 密码是否是加密字符串
         switch-conf: # 自动切换配置
             db: # 另一个db配置，配置项跟当前这个一样
             time: # 切换时间

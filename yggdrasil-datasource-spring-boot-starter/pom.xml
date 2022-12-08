@@ -3,7 +3,30 @@
 	<artifactId>yggdrasil-datasource-spring-boot-starter</artifactId>
 	<packaging>jar</packaging>
 
-	<name>yggdrasil-datasource-spring-boot-starter</name>
+    <name>yggdrasil-datasource-spring-boot-starter</name>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:S3S3L/yggdrasil.git</connection>
+        <developerConnection>scm:git:git@github.com:S3S3L/yggdrasil.git</developerConnection>
+        <url>https://github.com/S3S3L/yggdrasil</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Kehw.Zwei</name>
+            <email>kehw.zwei@gmail.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
 
 	<build>
 		<plugins>
@@ -66,7 +89,7 @@
 	<parent>
 		<groupId>io.github.s3s3l</groupId>
 		<artifactId>yggdrasil-parent</artifactId>
-		<version>3.6.1-SNAPSHOT</version>
+		<version>3.6.1-RELEASE</version>
 	</parent>
 
 	<properties>

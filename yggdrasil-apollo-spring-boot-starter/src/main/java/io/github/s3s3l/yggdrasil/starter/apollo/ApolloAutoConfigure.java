@@ -1,9 +1,5 @@
 package io.github.s3s3l.yggdrasil.starter.apollo;
 
-import io.github.s3s3l.yggdrasil.starter.apollo.feature.PropertySourceHelper;
-import io.github.s3s3l.yggdrasil.starter.apollo.feature.StringToObjectConverter;
-import io.github.s3s3l.yggdrasil.starter.apollo.feature.TreeNodeConverter;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +9,10 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
+
+import io.github.s3s3l.yggdrasil.starter.apollo.feature.PropertySourceHelper;
+import io.github.s3s3l.yggdrasil.starter.apollo.feature.StringToObjectConverter;
+import io.github.s3s3l.yggdrasil.starter.apollo.feature.TreeNodeConverter;
 
 /**
  * <p>
@@ -54,8 +54,7 @@ public class ApolloAutoConfigure implements EnvironmentPostProcessor, Ordered {
         this.configuration = Binder.get(environment)
                 .bind(ApolloConfiguration.PREFIX, ApolloConfiguration.class)
                 .orElse(new ApolloConfiguration());
-        String confStr = JacksonUtils.JSON.toStructuralString(this.configuration);
-        logger.info("Apollo configuration loaded. {}", confStr);
+        logger.info("Apollo configuration loaded. {}", this.configuration);
     }
 
     @Override

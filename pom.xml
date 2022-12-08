@@ -2,15 +2,31 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.s3s3l</groupId>
     <artifactId>yggdrasil-parent</artifactId>
-    <version>3.6.1-SNAPSHOT</version>
+    <version>3.6.1-RELEASE</version>
     <packaging>pom</packaging>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
     <scm>
-        <connection>scm:git:git@github.com:KehwZwei/yggdrasil.git</connection>
-        <developerConnection>scm:git:git@github.com:KehwZwei/yggdrasil.git</developerConnection>
-        <url>https://github.com/KehwZwei/yggdrasil</url>
+        <connection>scm:git:git@github.com:S3S3L/yggdrasil.git</connection>
+        <developerConnection>scm:git:git@github.com:S3S3L/yggdrasil.git</developerConnection>
+        <url>https://github.com/S3S3L/yggdrasil</url>
         <tag>HEAD</tag>
     </scm>
+
+    <developers>
+        <developer>
+            <name>Kehw.Zwei</name>
+            <email>kehw.zwei@gmail.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
 
     <modules>
         <module>yggdrasil-compress</module>
@@ -38,7 +54,7 @@
         <module>yggdrasil-apollo-spring-boot-starter</module>
         <module>yggdrasil-cache-spring-boot-starter</module>
         <module>doc-maven-plugin</module>
-        
+
         <module>yggdrasil-sample/datasource-starter-sample</module>
         <module>yggdrasil-sample/orm-sample</module>
     </modules>
@@ -129,13 +145,38 @@
                         <preparationGoals>clean install</preparationGoals>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>versions-maven-plugin</artifactId>
-                    <version>${plugin.versions.version}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${plugin.gpg.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <properties>
@@ -155,8 +196,9 @@
         <plugin.surefire.version>2.9</plugin.surefire.version>
         <plugin.findbugs.version>3.0.3</plugin.findbugs.version>
         <plugin.versions.version>2.4</plugin.versions.version>
+        <plugin.gpg.version>3.0.1</plugin.gpg.version>
 
-        <spring.boot.version>2.7.1</spring.boot.version>
+        <spring.boot.version>2.7.6</spring.boot.version>
 
         <google.guava.version>31.1-jre</google.guava.version>
         <googleauth.versioin>0.5.0</googleauth.versioin>
@@ -496,13 +538,12 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/S3S3L/yggdrasil/</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/S3S3L/yggdrasil/</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
 </project>

@@ -2,12 +2,12 @@ package io.github.s3s3l.yggdrasil.starter.apollo;
 
 import java.util.List;
 
-import io.github.s3s3l.yggdrasil.starter.apollo.feature.ConfigFileChangedProcessor;
-import io.github.s3s3l.yggdrasil.utils.file.FileFormat;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 
+import io.github.s3s3l.yggdrasil.starter.apollo.feature.ConfigFileChangedProcessor;
+import io.github.s3s3l.yggdrasil.utils.file.FileFormat;
 import lombok.Data;
 
 /**

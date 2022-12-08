@@ -19,17 +19,17 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import io.github.s3s3l.yggdrasil.document.excel.FieldMap;
 import io.github.s3s3l.yggdrasil.document.excel.WorkbookBuilder;
 import io.github.s3s3l.yggdrasil.document.excel.enumerations.WorkbookType;
@@ -530,7 +530,6 @@ public class POIUtils implements WorkbookBuilder {
             if (cell == null) {
                 continue;
             }
-            cell.setCellType(CellType.STRING);
             String stringValue = cell.getStringCellValue();
             if (StringUtils.isEmpty(stringValue)) {
                 continue;
