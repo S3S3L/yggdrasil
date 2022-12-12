@@ -35,6 +35,7 @@ module.exports = {
     {name: 'redis'},
     {name: 'redis_starter'},
     {name: 'resource'},
+    {name: 'rpc'},
     {name: 'sample'},
     {name: 'spring'},
     {name: 'utils'},

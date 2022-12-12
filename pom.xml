@@ -12,7 +12,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:git@github.com:S3S3L/yggdrasil.git</connection>
         <developerConnection>scm:git:git@github.com:S3S3L/yggdrasil.git</developerConnection>
@@ -54,6 +54,9 @@
         <module>yggdrasil-apollo-spring-boot-starter</module>
         <module>yggdrasil-cache-spring-boot-starter</module>
         <module>doc-maven-plugin</module>
+
+        <module>yggdrasil-rpc/core</module>
+        <module>yggdrasil-rpc/grpc</module>
 
         <module>yggdrasil-sample/datasource-starter-sample</module>
         <module>yggdrasil-sample/orm-sample</module>
@@ -225,6 +228,7 @@
         <kafka.version>2.4.1</kafka.version>
         <kotlin.version>1.7.22</kotlin.version>
         <ktorm.version>3.5.0</ktorm.version>
+        <grpc.version>1.51.0</grpc.version>
     </properties>
 
     <dependencyManagement>
@@ -356,6 +360,16 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-cache-spring-boot-starter</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-rpc-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-rpc-grpc</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <!-- Kotlin -->
@@ -532,6 +546,30 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.11</artifactId>
                 <version>${kafka.version}</version>
+            </dependency>
+            <!-- GRPC -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+                <version>${grpc.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <!-- necessary for Java 9+ -->
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>annotations-api</artifactId>
+                <version>6.0.53</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yggdrasil-orm</artifactId>
+    <artifactId>yggdrasil-rpc-core</artifactId>
 
     <licenses>
         <license>
@@ -106,25 +106,10 @@
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.6.1-RELEASE</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>
-        <!-- Yggdrasil -->
-        <dependency>
-            <groupId>io.github.s3s3l</groupId>
-            <artifactId>yggdrasil-utils</artifactId>
-        </dependency>
-        <!-- sqlParser -->
-        <dependency>
-            <groupId>com.github.jsqlparser</groupId>
-            <artifactId>jsqlparser</artifactId>
-        </dependency>
-        <!-- FreeMarker -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
         <!-- Log -->
         <dependency>
             <groupId>org.slf4j</groupId>
