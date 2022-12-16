@@ -122,6 +122,7 @@
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>compile</goal>
+                            <goal>compile-custom</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>src/main/java</outputDirectory>
@@ -133,6 +134,7 @@
                         <phase>generate-test-sources</phase>
                         <goals>
                             <goal>test-compile</goal>
+                            <goal>compile-custom</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>src/test/java</outputDirectory>
@@ -172,6 +174,11 @@
             <artifactId>annotations-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>3.21.11</version>
+        </dependency>
         <!-- Log -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +196,27 @@
             <artifactId>junit</artifactId>
             <optional>true</optional>
             <scope>test</scope>
+        </dependency>
+        <!-- log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jcl</artifactId>
         </dependency>
     </dependencies>
 </project>

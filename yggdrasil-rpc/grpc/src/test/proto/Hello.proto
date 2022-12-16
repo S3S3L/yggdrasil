@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.s3s3l.yggdrasil.rpc.grpc.test.hello";
+option java_outer_classname = "HelloProto";
+option objc_class_prefix = "RTG";
+
+package hello;
+
+service Hello {
+    rpc SayHello(People) returns (Message) {}
+}
+
+message People {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+message Message {
+    string from = 1;
+    string words = 2;
+}
