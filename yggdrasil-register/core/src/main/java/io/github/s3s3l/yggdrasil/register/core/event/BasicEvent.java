@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.rpc.core.event;
+package io.github.s3s3l.yggdrasil.register.core.event;
 
 import java.util.function.Supplier;
 
@@ -10,7 +10,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasicEvent implements Event<BasicEventType, byte[]> {
-    private String key;
     private BasicEventType eventType;
     private Supplier<byte[]> data;
     private Supplier<byte[]> oldData;
@@ -29,10 +28,4 @@ public class BasicEvent implements Event<BasicEventType, byte[]> {
     public byte[] oldData() {
         return oldData.get();
     }
-
-    @Override
-    public String key() {
-        return key;
-    }
-    
 }

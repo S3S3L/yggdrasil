@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.rpc.core.config.exception;
+package io.github.s3s3l.yggdrasil.register.core.config.exception;
 
 public class ConfigException extends RuntimeException {
 

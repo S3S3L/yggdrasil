@@ -58,6 +58,9 @@ public @interface Examine {
      * 
      * only effect in {@code FIELD}
      * 
+     * @see Expectation.LENGTH_LIMIT
+     * @see Expectation.FIXED_LENGTH
+     * 
      * @since JDK 1.8
      */
     long length() default 0L;
@@ -65,6 +68,8 @@ public @interface Examine {
     /**
      * 
      * only effect in {@code FIELD}
+     * 
+     * @see Expectation.TYPE
      * 
      * @since JDK 1.8
      */
@@ -91,6 +96,8 @@ public @interface Examine {
      * tells if this {@code Examine} is for {@code Object}s in
      * {@code Collection}s
      * 
+     * @see Expectation.EXAMINED
+     * 
      * @return
      * @since JDK 1.8
      */
@@ -99,12 +106,17 @@ public @interface Examine {
     /**
      * 数字大小比较的标准值
      * 
+     * @see Expectation.LARGER_THAN
+     * @see Expectation.LESS_THAN
+     * 
      * @return
      */
     int standard() default 0;
 
     /**
      * 正则匹配的正则表达式
+     * 
+     * @see Expectation.MATCH
      * 
      * @return
      */

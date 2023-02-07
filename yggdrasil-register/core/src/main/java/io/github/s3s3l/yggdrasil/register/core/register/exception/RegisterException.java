@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.rpc.core.register.exception;
+package io.github.s3s3l.yggdrasil.register.core.register.exception;
 
 public class RegisterException extends RuntimeException {
 

@@ -1,4 +1,6 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.s3s3l</groupId>
     <artifactId>yggdrasil-parent</artifactId>
@@ -54,6 +56,11 @@
         <module>yggdrasil-apollo-spring-boot-starter</module>
         <module>yggdrasil-cache-spring-boot-starter</module>
         <module>doc-maven-plugin</module>
+
+        <module>yggdrasil-register/core</module>
+        <module>yggdrasil-register/etcd</module>
+        <module>yggdrasil-register/nacos</module>
+        <module>yggdrasil-register/zookeeper</module>
 
         <module>yggdrasil-rpc/core</module>
         <module>yggdrasil-rpc/grpc</module>
@@ -229,6 +236,9 @@
         <kotlin.version>1.7.22</kotlin.version>
         <ktorm.version>3.5.0</ktorm.version>
         <grpc.version>1.51.0</grpc.version>
+        <zookeeper.version>3.8.0</zookeeper.version>
+        <curator.version>5.3.0</curator.version>
+        <nacos.version>2.2.0</nacos.version>
     </properties>
 
     <dependencyManagement>
@@ -362,6 +372,28 @@
                 <artifactId>yggdrasil-cache-spring-boot-starter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
+            <!-- yggdrasil-register -->
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-register-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-register-etcd</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-register-nacos</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-register-zookeeper</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <!-- yggdrasil-rpc -->
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-rpc-core</artifactId>
@@ -570,6 +602,29 @@
                 <artifactId>annotations-api</artifactId>
                 <version>6.0.53</version>
                 <scope>provided</scope>
+            </dependency>
+            <!-- curator framework -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <!-- zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <!-- nacos -->
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
