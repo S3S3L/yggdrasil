@@ -112,6 +112,15 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-register-core</artifactId>
+        </dependency>
+        <!-- etcd -->
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+        </dependency>
         <!-- Log -->
         <dependency>
             <groupId>org.slf4j</groupId>
