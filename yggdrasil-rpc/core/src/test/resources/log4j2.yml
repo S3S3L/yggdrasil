@@ -1,0 +1,98 @@
+Configuration:
+  status: info
+  properties:
+    property:
+    - name: logPath
+      value: logs
+    - name: pattern
+      value: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+  Appenders:
+    Console:
+      name: consoleAppender
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: ${pattern}
+    RollingFile:
+    - name: serverAppender
+      fileName: ${logPath}/server.log
+      filePattern: "${logPath}/archive/$${date:yyyy-MM-dd}/server-%i.log.gz"
+      PatternLayout:
+        pattern: ${pattern}
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 20 MB
+      DefaultRollOverStrategy:
+        max: 5
+    - name: errorAppender
+      fileName: ${logPath}/error.log
+      filePattern: "${logPath}/archive/$${date:yyyy-MM-dd}/error-%i.log.gz"
+      PatternLayout:
+        pattern: ${pattern}
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 20 MB
+      DefaultRollOverStrategy:
+        max: 5
+    - name: commonAppender
+      fileName: ${logPath}/common.log
+      filePattern: "${logPath}/archive/$${date:yyyy-MM-dd}/common-%i.log.gz"
+      PatternLayout:
+        pattern: ${pattern}
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 20 MB
+      DefaultRollOverStrategy:
+        max: 5
+    - name: requestAppender
+      fileName: ${logPath}/request.log
+      filePattern: "${logPath}/archive/$${date:yyyy-MM-dd}/request-%i.log.gz"
+      PatternLayout:
+        pattern: ${pattern}
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 20 MB
+      DefaultRollOverStrategy:
+        max: 5
+  Loggers:
+    Root:
+      level: debug
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: serverAppender
+    Logger:
+    - name: error
+      level: error
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: errorAppender
+    - name: warn
+      level: warn
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: info
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: debug
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: common
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: commonAppender
+    - name: request
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: consoleAppender
+      - ref: requestAppender

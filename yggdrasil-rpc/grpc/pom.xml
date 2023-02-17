@@ -154,6 +154,10 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-rpc-core</artifactId>
+        </dependency>
         <!-- GRPC -->
         <dependency>
             <groupId>io.grpc</groupId>

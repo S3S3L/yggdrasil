@@ -139,5 +139,10 @@
             <optional>true</optional>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
