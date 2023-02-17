@@ -10,6 +10,9 @@ import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SetOperationList;
+import net.sf.jsqlparser.statement.values.ValuesStatement;
 
 public class InsertBuilder {
 
@@ -76,7 +79,12 @@ public class InsertBuilder {
 
         insert.setTable(table);
         insert.setColumns(columns);
-        insert.setItemsList(itemsList);
+        // insert.setWithItemsList(itemsList);
+        Select select = new Select();
+        SetOperationList body = new SetOperationList();
+        body.addSelects(new ValuesStatement(itemsList));
+        select.setSelectBody(body);
+        insert.setSelect(select);
         return insert;
     }
 }

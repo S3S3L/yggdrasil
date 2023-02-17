@@ -205,7 +205,7 @@
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
+            <artifactId>kafka-clients</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

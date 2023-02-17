@@ -31,7 +31,6 @@ import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.BinaryExpression;
@@ -57,6 +56,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.drop.Drop;
+import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.Offset;
 import net.sf.jsqlparser.statement.select.OrderByElement;
@@ -77,7 +77,8 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     public SqlStruct getInsert(List<?> models) {
         Verify.notEmpty(models);
 
-        Class<?> modelType = models.get(0).getClass();
+        Class<?> modelType = models.get(0)
+                .getClass();
         TableMeta table = this.metaManager.getTable(modelType);
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         List<Column> insertColumns = new LinkedList<>();
@@ -135,8 +136,7 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         Class<?> conditionType = condition.getClass();
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         TableMeta table = this.metaManager.getTable(conditionType);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getDeleteCondition(
-                conditionType),
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getDeleteCondition(conditionType),
                 new PropertyDescriptorReflectionBean(condition));
         sqlStruct.appendSql(new DeleteBuilder().table(new Table(table.getName()))
                 .where(whereStruct.getExpression())
@@ -153,15 +153,15 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         TableMeta table = this.metaManager.getTable(sourceType);
         ReflectionBean rb = new PropertyDescriptorReflectionBean(source);
-        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getUpdateCondition(
-                conditionType),
+        JSqlParserSqlStruct whereStruct = buildWhere(this.metaManager.getUpdateCondition(conditionType),
                 new PropertyDescriptorReflectionBean(condition));
         UpdateBuilder builder = new UpdateBuilder().table(new Table(table.getName()));
         for (ColumnMeta columnMeta : table.getColumns()) {
             String fieldName = columnMeta.getField()
                     .getName();
             Object fieldValue = rb.getFieldValue(fieldName);
-            if (!rb.hasField(fieldName) || !columnMeta.getValidator().isValid(fieldValue)) {
+            if (!rb.hasField(fieldName) || !columnMeta.getValidator()
+                    .isValid(fieldValue)) {
                 continue;
             }
             builder.addSet(new Column(columnMeta.getName()), new JdbcParameter());
@@ -190,7 +190,8 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
     public SqlStruct getCreate(Class<?> tableType, boolean force) {
         DefaultSqlStruct sqlStruct = new DefaultSqlStruct();
         TableMeta table = metaManager.getTable(tableType);
-        sqlStruct.appendSql(new CreateBuilder(table, force).build().toString());
+        sqlStruct.appendSql(new CreateBuilder(table, force).build()
+                .toString());
         return sqlStruct;
     }
 
@@ -250,13 +251,16 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         if (count) {
             Function func = new Function();
             func.setName("COUNT");
-            func.setAllColumns(true);
+            ExpressionList expressionList = new ExpressionList();
+            expressionList.addExpressions(new AllColumns());
+            func.setParameters(expressionList);
             SelectExpressionItem selectItem = new SelectExpressionItem(func);
             selectItems = Arrays.asList(selectItem);
         } else {
             selectItems = table.getColumns()
                     .stream()
-                    .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
+                    .filter(col -> !hasGroupBy || groupBy.getColumns()
+                            .contains(col.getName()))
                     .map(col -> {
                         SelectExpressionItem selectItem = new SelectExpressionItem(new Column(col.getName()));
                         selectItem.setAlias(new Alias(col.getAlias()));
@@ -268,7 +272,7 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
         SelectBuilder builder = new SelectBuilder().table(new Table(table.getName()))
                 .selectItems(selectItems)
                 .where(whereStruct.getExpression());
-                
+
         if (count) {
             sqlStruct.appendSql(builder.build()
                     .toString());
@@ -277,11 +281,10 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
             return sqlStruct;
         }
 
-        builder
-                .groupByExpressions(groupBy.getColumns()
-                        .stream()
-                        .map(Column::new)
-                        .collect(Collectors.toList()))
+        builder.groupByExpressions(groupBy.getColumns()
+                .stream()
+                .map(Column::new)
+                .collect(Collectors.toList()))
                 .orderByElements(metaManager.getOrderBy(conditionType)
                         .stream()
                         .map(obm -> {
@@ -297,7 +300,7 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
                     .getName());
             if (offsetCount != null) {
                 Offset os = new Offset();
-                os.setOffset((long) offsetCount);
+                os.setOffset(new LongValue((long) offsetCount));
                 builder.offset(os);
             }
         }
@@ -483,16 +486,15 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
 
         System.out.println(d);
 
-        Statement create = CCJSqlParserUtil
-                .parse("create table if not exists t_test(id varchar (64) primary key, name varchar (32) NOT NULL, sex int)");
+        Statement create = CCJSqlParserUtil.parse(
+                "create table if not exists t_test(id varchar (64) primary key, name varchar (32) NOT NULL, sex int)");
         System.out.println(create);
 
         Statement select = CCJSqlParserUtil
                 .parse("select count(*) from t_user where start > '2022-11-01' and end < '2022-11-21'");
         System.out.println(select);
 
-        Statement drop = CCJSqlParserUtil
-                .parse("DROP TABLE IF EXISTS t_user");
+        Statement drop = CCJSqlParserUtil.parse("DROP TABLE IF EXISTS t_user");
         System.out.println(drop);
     }
 

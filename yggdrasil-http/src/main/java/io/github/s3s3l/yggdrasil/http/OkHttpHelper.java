@@ -2,28 +2,29 @@ package io.github.s3s3l.yggdrasil.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Proxy;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.entity.ContentType;
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squareup.okhttp.Authenticator;
-import com.squareup.okhttp.Credentials;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Request.Builder;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
+
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import okhttp3.Authenticator;
+import okhttp3.Credentials;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Request.Builder;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.Route;
 
 /**
  * <p>
@@ -42,35 +43,35 @@ public class OkHttpHelper implements HttpHelper {
     private OkHttpClient client;
 
     public OkHttpHelper(OkHttpClient client) {
+
         this.client = client;
     }
 
     @Override
     public HttpHelper basicAuthenticate(String username, String password) {
-        client.setAuthenticator(new Authenticator() {
-            @Override
-            public Request authenticate(Proxy proxy, Response response) throws IOException {
-                String credential = Credentials.basic(username, password);
-                return response.request()
-                        .newBuilder()
-                        .header("Authorization", credential)
-                        .build();
-            }
+        client = client.newBuilder()
 
-            @Override
-            public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
-                return null;
-            }
-        });
+                .authenticator(new Authenticator() {
+
+                    @Override
+                    public Request authenticate(Route route, Response response) throws IOException {
+                        String credential = Credentials.basic(username, password);
+                        return response.request()
+                                .newBuilder()
+                                .header("Authorization", credential)
+                                .build();
+                    }
+
+                })
+                .build();
         return this;
     }
 
-    /**
-     * @see io.github.s3s3l.yggdrasil.utils.http.HttpHelper#followRedirects(boolean)
-     */
     @Override
     public HttpHelper followRedirects(boolean followRedirects) {
-        client.setFollowRedirects(followRedirects);
+        client = client.newBuilder()
+                .followRedirects(followRedirects)
+                .build();
         return this;
     }
 
@@ -175,11 +176,11 @@ public class OkHttpHelper implements HttpHelper {
                 break;
             case POST:
                 builder.url(url)
-                        .post(RequestBody.create(MediaType.parse(mediaType), content));
+                        .post(RequestBody.create(content, MediaType.parse(mediaType)));
                 break;
             case PUT:
                 builder.url(url)
-                        .put(RequestBody.create(MediaType.parse(mediaType), content));
+                        .put(RequestBody.create(content, MediaType.parse(mediaType)));
                 break;
             default:
                 throw new HttpException(400, "Invalid method");

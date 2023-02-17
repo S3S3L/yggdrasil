@@ -72,8 +72,10 @@ public class CliHelper {
         CliResponse res = new CliResponse();
         try {
             StringBuilder resp = new StringBuilder();
-            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), msg -> resp.append(msg)
-                    .append("\n"));
+            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), msg -> {
+                resp.append(msg)
+                        .append("\n");
+            });
             FutureTask<Void> future = new FutureTask<>(streamGobbler, null);
             executor.execute(future);
 

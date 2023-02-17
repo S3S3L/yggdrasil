@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import io.github.s3s3l.yggdrasil.orm.meta.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.meta.TableMeta;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-
 import lombok.AllArgsConstructor;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
@@ -42,7 +41,7 @@ public class CreateBuilder {
                 columnSpecStrings.add("NULL");
             }
             columnDefinition.setColDataType(type);
-            columnDefinition.setColumnSpecStrings(columnSpecStrings);
+            columnDefinition.setColumnSpecs(columnSpecStrings);
             return columnDefinition;
         }).collect(Collectors.toList()));
         return createTable;

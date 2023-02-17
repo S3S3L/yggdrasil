@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.schema.Column;
@@ -90,7 +89,7 @@ public class SelectBuilder {
         OrderByElement ob = new OrderByElement();
         ob.setExpression(new Column("age"));
         Offset offset = new Offset();
-        offset.setOffset(10);
+        offset.setOffset(new LongValue(10L));
         Limit limit = new Limit();
         limit.setRowCount(new LongValue(5));
 

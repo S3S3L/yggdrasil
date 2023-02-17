@@ -84,6 +84,7 @@ logs/
 
 # test storage
 db/
+default.etcd
 
 # node
 node_modules/

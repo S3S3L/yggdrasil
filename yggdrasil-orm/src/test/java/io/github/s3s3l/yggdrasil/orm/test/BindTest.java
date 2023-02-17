@@ -21,7 +21,6 @@ import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import io.github.s3s3l.yggdrasil.orm.validator.PositiveNumberValidator;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -70,7 +69,7 @@ public class BindTest {
 
     public static void main(String[] args) {
 
-        MetaManager metaManager = new MetaManager(MetaManagerConfig.builder().tableDefinePackages(new String[] {
+        MetaManager metaManager = new MetaManager(MetaManagerConfig.defaultBuilder().tableDefinePackages(new String[] {
                 "io.github.s3s3l.yggdrasil.orm.test" }).build());
         DataBindExpress jsqlDataBindExpress = new JSqlParserDataBindExpress(metaManager);
         DataBindExpress defaulDataBindExpress = new DefaultDataBindExpress(metaManager);

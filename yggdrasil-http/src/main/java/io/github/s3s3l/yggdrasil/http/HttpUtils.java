@@ -13,21 +13,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.entity.ContentType;
-import io.github.s3s3l.yggdrasil.bean.exception.HttpRequestException;
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+
+import io.github.s3s3l.yggdrasil.bean.exception.HttpRequestException;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
+import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * ClassName:HttpUtils <br>
@@ -79,8 +80,8 @@ public abstract class HttpUtils {
         OkHttpClient client = new OkHttpClient();
 
         MediaType requestMediaType = MediaType.parse(mediaType);
-        RequestBody requestBody = RequestBody.create(requestMediaType,
-                body == null ? StringUtils.EMPTY_STRING : json.toStructuralString(body));
+        RequestBody requestBody = RequestBody
+                .create(body == null ? StringUtils.EMPTY_STRING : json.toStructuralString(body), requestMediaType);
         Request request = new Request.Builder().url(url)
                 .post(requestBody)
                 .addHeader("content-type", contentType.getMimeType())
