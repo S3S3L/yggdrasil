@@ -11,8 +11,10 @@ import javax.crypto.NoSuchPaddingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.github.s3s3l.yggdrasil.utils.security.impl.AES256Encipher;
 import io.github.s3s3l.yggdrasil.utils.security.impl.AESEncipher;
 import io.github.s3s3l.yggdrasil.utils.security.impl.BaseEncipher;
+import io.github.s3s3l.yggdrasil.utils.security.impl.DESEncipher;
 
 /**
  * <p>
@@ -27,7 +29,7 @@ import io.github.s3s3l.yggdrasil.utils.security.impl.BaseEncipher;
 public class EncipherTest {
 
     @Test
-    public void baseTest() throws InvalidKeyException,
+    public void aesTest() throws InvalidKeyException,
             NoSuchAlgorithmException,
             NoSuchPaddingException,
             UnsupportedEncodingException,
@@ -41,5 +43,39 @@ public class EncipherTest {
                 .getEncoded();
 
         Assertions.assertEquals(src, new AESEncipher(keyBytes).decrypt(encryptStr));
+    }
+
+    @Test
+    public void aes256Test() throws InvalidKeyException,
+            NoSuchAlgorithmException,
+            NoSuchPaddingException,
+            UnsupportedEncodingException,
+            IllegalBlockSizeException,
+            BadPaddingException {
+        String src = "hello world";
+        BaseEncipher encipher = new AES256Encipher();
+        String encryptStr = encipher.encrypt(src);
+
+        byte[] keyBytes = encipher.getSecretKey()
+                .getEncoded();
+
+        Assertions.assertEquals(src, new AES256Encipher(keyBytes).decrypt(encryptStr));
+    }
+
+    @Test
+    public void desTest() throws InvalidKeyException,
+            NoSuchAlgorithmException,
+            NoSuchPaddingException,
+            UnsupportedEncodingException,
+            IllegalBlockSizeException,
+            BadPaddingException {
+        String src = "hello world";
+        BaseEncipher encipher = new DESEncipher();
+        String encryptStr = encipher.encrypt(src);
+
+        byte[] keyBytes = encipher.getSecretKey()
+                .getEncoded();
+
+        Assertions.assertEquals(src, new DESEncipher(keyBytes).decrypt(encryptStr));
     }
 }

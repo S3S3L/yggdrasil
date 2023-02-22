@@ -27,13 +27,25 @@ public abstract class BaseEncipher implements Encipher {
 
     protected SecretKey secretKey = null;
     protected Cipher cipher;
-    protected Integer keySize;
     protected String key;
 
     public BaseEncipher(final String ALGORITHM) {
         try {
             if (secretKey == null || secretKey.isDestroyed()) {
                 KeyGenerator keygen = KeyGenerator.getInstance(ALGORITHM);
+                secretKey = keygen.generateKey();
+            }
+            cipher = Cipher.getInstance(ALGORITHM);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public BaseEncipher(final String ALGORITHM, final int keySize) {
+        try {
+            if (secretKey == null || secretKey.isDestroyed()) {
+                KeyGenerator keygen = KeyGenerator.getInstance(ALGORITHM);
+                keygen.init(keySize);
                 secretKey = keygen.generateKey();
             }
             cipher = Cipher.getInstance(ALGORITHM);
@@ -52,14 +64,6 @@ public abstract class BaseEncipher implements Encipher {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    public Integer getKeySize() {
-        return keySize;
-    }
-
-    public void setKeySize(Integer keySize) {
-        this.keySize = keySize;
     }
 
     public SecretKey getSecretKey() {
