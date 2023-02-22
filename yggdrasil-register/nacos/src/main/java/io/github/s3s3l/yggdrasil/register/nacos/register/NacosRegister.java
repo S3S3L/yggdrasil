@@ -7,6 +7,8 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.listener.EventListener;
 import com.alibaba.nacos.api.naming.listener.NamingEvent;
+import com.alibaba.nacos.api.naming.pojo.builder.InstanceBuilder;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.s3s3l.yggdrasil.register.core.event.BasicEvent;
 import io.github.s3s3l.yggdrasil.register.core.event.BasicEventType;
@@ -17,6 +19,7 @@ import io.github.s3s3l.yggdrasil.register.core.register.Register;
 import io.github.s3s3l.yggdrasil.register.core.register.RegisterType;
 import io.github.s3s3l.yggdrasil.register.core.register.exception.ListenerRegisterException;
 import io.github.s3s3l.yggdrasil.register.core.register.exception.RegisterException;
+import io.github.s3s3l.yggdrasil.register.nacos.event.NacosEventData;
 import io.github.s3s3l.yggdrasil.register.nacos.listener.NacosListenerMeta;
 import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
 
@@ -44,7 +47,7 @@ public class NacosRegister implements Register<Node, byte[], BasicEventType, Bas
                 NamingEvent namingEvent = (NamingEvent) event;
                 listener.onEvent(BasicEvent.builder()
                         .eventType(BasicEventType.CHANGE)
-                        .data(() -> structuralHelper.toStructuralBytes(namingEvent))
+                        .data(() -> structuralHelper.toStructuralBytes(NacosEventData.fromNamingEvent(namingEvent)))
                         .build());
             };
             namingService.subscribe(node.getName(), node.getGroup(), eventListener);
@@ -78,7 +81,15 @@ public class NacosRegister implements Register<Node, byte[], BasicEventType, Bas
     @Override
     public boolean register(Node node, byte[] nodeInfo) {
         try {
-            namingService.registerInstance(node.getName(), node.getGroup(), node.getHost(), node.getPort());
+            namingService.registerInstance(node.getName(), node.getGroup(), InstanceBuilder.newBuilder()
+                    .setServiceName(node.getName())
+                    .setIp(node.getHost())
+                    .setPort(node.getPort())
+                    .setMetadata(structuralHelper.toObject(nodeInfo, new TypeReference<Map<String, String>>() {
+                    }))
+                    .build());
+            // namingService.registerInstance(node.getName(), node.getGroup(),
+            // node.getHost(), node.getPort());
         } catch (NacosException e) {
             throw new RegisterException(e);
         }

@@ -4,8 +4,10 @@ import java.util.function.Supplier;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+@ToString
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor

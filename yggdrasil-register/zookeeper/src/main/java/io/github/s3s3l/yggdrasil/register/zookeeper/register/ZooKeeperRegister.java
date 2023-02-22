@@ -56,7 +56,7 @@ public class ZooKeeperRegister implements Register<Node, byte[], BasicEventType,
                         .build()))
                 .forDeletes(data -> listener.onEvent(BasicEvent.builder()
                         .eventType(BasicEventType.DELETE)
-                        .data(() -> data.getData())
+                        .oldData(() -> data.getData())
                         .build()))
                 .build();
 
