@@ -108,7 +108,7 @@
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.6.1-RELEASE</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <optional>true</optional>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
