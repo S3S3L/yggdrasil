@@ -2,10 +2,10 @@ package io.github.s3s3l.yggdrasil.reigister.etcd.test;
 
 import java.nio.charset.StandardCharsets;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.etcd.jetcd.Client;
@@ -31,9 +31,8 @@ public class EtcdRegisterTest {
             .host("host1")
             .build();
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws InterruptedException {
-        cluster.restart();
         Client client = Client.builder()
                 .endpoints(cluster.clientEndpoints())
                 .build();
@@ -41,7 +40,7 @@ public class EtcdRegisterTest {
 
     }
 
-    @After
+    @AfterEach
     public void clean(){
         event = null;
     }

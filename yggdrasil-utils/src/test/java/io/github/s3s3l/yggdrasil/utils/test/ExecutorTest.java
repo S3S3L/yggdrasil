@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Lists;
+
 import io.github.s3s3l.yggdrasil.bean.combine.CombinableInteger;
 import io.github.s3s3l.yggdrasil.bean.combine.CombinableInteger.IntegerCombineType;
 import io.github.s3s3l.yggdrasil.utils.concurrent.CommonTaskExecutor;
 import io.github.s3s3l.yggdrasil.utils.concurrent.TaskExecutor;
-
-import com.google.common.collect.Lists;
 
 /**
  * <p>
@@ -28,7 +29,7 @@ public class ExecutorTest {
     private TaskExecutor executor = CommonTaskExecutor.create(() -> Executors.newFixedThreadPool(10));
     private List<Integer> conditions;
 
-    @Before
+    @BeforeEach
     public void setConditions() {
         conditions = new ArrayList<>();
         for (int i = 0; i < 1000000; i++) {
@@ -39,9 +40,9 @@ public class ExecutorTest {
     @Test
     public void callableExecute() {
         List<Integer> result = executor.execute(param -> param, Lists.partition(conditions, 1000));
-        Assert.assertEquals(result.size(), conditions.size());
+        Assertions.assertEquals(result.size(), conditions.size());
         int count = executor.execute(param -> param.size(), Lists.partition(conditions, 1000),
                 new CombinableInteger(0, IntegerCombineType.ADD));
-        Assert.assertEquals(conditions.size(), count);
+        Assertions.assertEquals(conditions.size(), count);
     }
 }

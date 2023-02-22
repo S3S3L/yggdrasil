@@ -8,8 +8,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.utils.security.impl.AESEncipher;
 import io.github.s3s3l.yggdrasil.utils.security.impl.BaseEncipher;
 
@@ -39,6 +40,6 @@ public class EncipherTest {
         byte[] keyBytes = encipher.getSecretKey()
                 .getEncoded();
 
-        Assert.assertEquals(src, new AESEncipher(keyBytes).decrypt(encryptStr));
+        Assertions.assertEquals(src, new AESEncipher(keyBytes).decrypt(encryptStr));
     }
 }

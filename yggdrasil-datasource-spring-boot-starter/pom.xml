@@ -100,110 +100,110 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Yggdrasil -->
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-configuration</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-utils</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-orm</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-spring</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Mybatis -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
-		</dependency>
+        </dependency>
 		<!-- JDBC -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Sharding JDBC -->
 		<dependency>
 			<groupId>io.shardingsphere</groupId>
 			<artifactId>sharding-jdbc-core</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Reflect -->
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
-		</dependency>
+        </dependency>
 		<!-- slf4j -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-		</dependency>
+        </dependency>
 
 		<!-- Compile -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>compile</scope>
-		</dependency>
+        </dependency>
 
 		<!-- Test -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- log4j2 -->
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- log4j2 -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<scope>test</scope>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<scope>test</scope>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        </dependency>
+    </dependencies>
 </project>

@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.compress.CompressException;
 import io.github.s3s3l.yggdrasil.compress.DecompressException;
 import io.github.s3s3l.yggdrasil.compress.GzipCompressor;
@@ -32,12 +33,12 @@ public class GzipCompressorTest {
     private final String compressTargetFile = "compress/gzip/gzip.compress";
     private final String decompressTargetFile = "compress/gzip/gzip.decompress";
 
-    @Before
+    @BeforeEach
     public void prepare() {
         gzip = new GzipCompressor();
     }
 
-    @After
+    @AfterEach
     public void clean() throws IOException {
         File compressTarget = FileUtils.getFirstExistFile(compressTargetFile);
         if (compressTarget != null) {
@@ -49,7 +50,7 @@ public class GzipCompressorTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void finalClent() throws IOException {
         File workFolder = FileUtils.getFirstExistFile("compress");
         if (workFolder != null && workFolder.exists()) {
@@ -60,17 +61,17 @@ public class GzipCompressorTest {
     @Test
     public void gzipTest() {
         byte[] dis = gzip.compress(src);
-        Assert.assertArrayEquals(gzip.decompress(dis), src);
+        Assertions.assertArrayEquals(gzip.decompress(dis), src);
     }
 
-    @Test(expected = CompressException.class)
+    @Test
     public void gzipCompressExceptionTest() {
-        gzip.compress(null);
+        Assertions.assertThrows(CompressException.class, () -> gzip.compress(null));
     }
 
-    @Test(expected = DecompressException.class)
+    @Test
     public void gzipDecompressExceptionTest() {
-        gzip.decompress(null);
+        Assertions.assertThrows(DecompressException.class, () -> gzip.decompress(null));
     }
 
     @Test
@@ -78,7 +79,7 @@ public class GzipCompressorTest {
         gzip.compress(FileUtils.getFirstExistFile(sourceFile), new File(compressTargetFile));
         gzip.decompress(new File(compressTargetFile), new File(decompressTargetFile));
 
-        Assert.assertEquals(FileUtils.readToEnd(FileUtils.getFirstExistResource(sourceFile)),
+        Assertions.assertEquals(FileUtils.readToEnd(FileUtils.getFirstExistResource(sourceFile)),
                 FileUtils.readToEnd(FileUtils.getFirstExistResource(decompressTargetFile)));
     }
 }

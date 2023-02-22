@@ -2,7 +2,8 @@ package io.github.s3s3l.yggdrasil.utils.test;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 
 /**

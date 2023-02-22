@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.compress.CompressException;
 import io.github.s3s3l.yggdrasil.compress.DecompressException;
 import io.github.s3s3l.yggdrasil.compress.ZstdCompressor;
@@ -32,12 +33,12 @@ public class ZstdCompressorTest {
     private final String compressTargetFile = "compress/zstd/sztd.compress";
     private final String decompressTargetFile = "compress/zstd/sztd.decompress";
 
-    @Before
+    @BeforeEach
     public void prepare() {
         zstd = new ZstdCompressor();
     }
 
-    @After
+    @AfterEach
     public void clean() throws IOException {
         File compressTarget = FileUtils.getFirstExistFile(compressTargetFile);
         if (compressTarget != null) {
@@ -49,24 +50,24 @@ public class ZstdCompressorTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void finalClent() throws IOException {
         File workFolder = FileUtils.getFirstExistFile("compress");
         if (workFolder != null && workFolder.exists()) {
             FileUtils.delete(workFolder);
         }
     }
-    
+
     @Test
     public void zstdTest() {
         byte[] dis = zstd.compress(src);
-        Assert.assertArrayEquals(zstd.decompress(dis), src);
+        Assertions.assertArrayEquals(zstd.decompress(dis), src);
     }
 
     @Test
     public void zstdLevelTest() {
         byte[] dis = zstd.compress(src, 5);
-        Assert.assertArrayEquals(zstd.decompress(dis), src);
+        Assertions.assertArrayEquals(zstd.decompress(dis), src);
     }
 
     @Test
@@ -74,22 +75,22 @@ public class ZstdCompressorTest {
         zstd.compress(FileUtils.getFirstExistFile(sourceFile), new File(compressTargetFile));
         zstd.decompress(new File(compressTargetFile), new File(decompressTargetFile));
 
-        Assert.assertEquals(FileUtils.readToEnd(FileUtils.getFirstExistResource(sourceFile)),
+        Assertions.assertEquals(FileUtils.readToEnd(FileUtils.getFirstExistResource(sourceFile)),
                 FileUtils.readToEnd(FileUtils.getFirstExistResource(decompressTargetFile)));
     }
 
-    @Test(expected = CompressException.class)
+    @Test
     public void zstdCompressExceptionTest() {
-        zstd.compress(null);
+        Assertions.assertThrows(CompressException.class, () -> zstd.compress(null));
     }
 
-    @Test(expected = CompressException.class)
+    @Test
     public void zstdLevelCompressExceptionTest() {
-        zstd.compress(null, 1);
+        Assertions.assertThrows(CompressException.class, () -> zstd.compress(null, 1));
     }
 
-    @Test(expected = DecompressException.class)
+    @Test
     public void zstdDecompressExceptionTest() {
-        zstd.decompress(null);
+        Assertions.assertThrows(DecompressException.class, () -> zstd.decompress(null));
     }
 }

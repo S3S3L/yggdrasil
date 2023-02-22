@@ -56,6 +56,7 @@
         <module>yggdrasil-apollo-spring-boot-starter</module>
         <module>yggdrasil-cache-spring-boot-starter</module>
         <module>doc-maven-plugin</module>
+        <module>yggdrasil-annotation</module>
 
         <module>yggdrasil-register/core</module>
         <module>yggdrasil-register/etcd</module>
@@ -234,7 +235,7 @@
         <javax.mail.version>1.6.2</javax.mail.version>
         <javax.servlet.version>2.5</javax.servlet.version>
         <kafka.version>3.4.0</kafka.version>
-        <kotlin.version>1.8.10</kotlin.version>
+        <kotlin.version>1.8.20-Beta</kotlin.version>
         <ktorm.version>3.6.0</ktorm.version>
         <grpc.version>1.53.0</grpc.version>
         <zookeeper.version>3.8.1</zookeeper.version>
@@ -243,6 +244,7 @@
         <etcd.version>0.7.5</etcd.version>
 
         <testcontainers.version>1.17.6</testcontainers.version>
+        <junit.version>5.9.2</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -252,6 +254,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Junit -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

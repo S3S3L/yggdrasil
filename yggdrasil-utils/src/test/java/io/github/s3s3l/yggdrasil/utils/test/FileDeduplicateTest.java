@@ -11,10 +11,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 
 /**
@@ -33,7 +34,7 @@ public class FileDeduplicateTest {
     private static final long SOURCE_FILE_LINE_NUM = 100000L;
     private static final int numRange = 100;
 
-    @Before
+    @BeforeEach
     public void prepare() throws IOException {
         Random r = new Random();
         File sourceFile = new File(SOURCE_DUPLICATE_FILE);
@@ -51,7 +52,7 @@ public class FileDeduplicateTest {
         }
     }
 
-    @After
+    @AfterEach
     public void clean() throws IOException {
         File sourceFile = new File(WORK_SPACE);
         FileUtils.delete(sourceFile);
@@ -61,7 +62,7 @@ public class FileDeduplicateTest {
     public void deduplicateSyncTest() throws IOException {
         File out = new File(WORK_SPACE.concat("/deduplicate.out"));
         FileUtils.deduplication(new File(SOURCE_DUPLICATE_FILE), out, WORK_SPACE, 16, 10240, 128, 10000, null);
-        Assert.assertTrue(Files.lines(out.toPath())
+        Assertions.assertTrue(Files.lines(out.toPath())
                 .count() <= numRange);
     }
 
@@ -70,7 +71,7 @@ public class FileDeduplicateTest {
         File out = new File(WORK_SPACE.concat("/deduplicate.out"));
         FileUtils.deduplication(new File(SOURCE_DUPLICATE_FILE), out, WORK_SPACE, 16, 10240, 128, 10000,
                 new ThreadPoolExecutor(16, 32, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(1024)));
-        Assert.assertTrue(Files.lines(out.toPath())
+        Assertions.assertTrue(Files.lines(out.toPath())
                 .count() <= numRange);
     }
 }

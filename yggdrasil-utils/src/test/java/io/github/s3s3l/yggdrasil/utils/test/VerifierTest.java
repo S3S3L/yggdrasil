@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.bean.exception.VerifyException;
 import io.github.s3s3l.yggdrasil.bean.verify.Examine;
 import io.github.s3s3l.yggdrasil.bean.verify.Expectation;
@@ -32,13 +34,13 @@ public class VerifierTest {
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitStringNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitString(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
@@ -52,23 +54,23 @@ public class VerifierTest {
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitStringLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitString("123");
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitCollectionNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitCollection(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
@@ -82,23 +84,23 @@ public class VerifierTest {
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitCollectionLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitCollection(Arrays.asList(1, 2, 3));
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitArrayNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitArray(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
@@ -112,252 +114,252 @@ public class VerifierTest {
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void lengthLimitArrayLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setLengthLimitArray(new Integer[] { 1, 2, 3 });
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthStringNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthString(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthStringSmall() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthString("1");
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthStringLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthString("123");
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthCollectionNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthCollection(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthCollectionSmall() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthCollection(Arrays.asList(1));
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthCollectionLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthCollection(Arrays.asList(1, 2, 3));
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthArrayNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthArray(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthArraySamll() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthArray(new Integer[] { 1 });
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void fixedLengthArrayLarge() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setFixedLengthArray(new Integer[] { 1, 2, 3 });
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void notEmptyCollectionNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNotEmptyCollection(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void notEmptyCollection() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNotEmptyCollection(new ArrayList<>());
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void notEmptyArrayNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNotEmptyArray(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void notEmptyArray() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNotEmptyArray(new Integer[] {});
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void emptyCollectionNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setEmptyCollection(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void emptyCollection() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setEmptyCollection(Arrays.asList(1));
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void emptyArrayNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setEmptyArray(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void emptyArray() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setEmptyArray(new Integer[] { 1 });
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void hasLengthNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setHasLength(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void hasLength() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setHasLength(StringUtils.EMPTY_STRING);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void nullObject() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNullObject(new Object());
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void notNullObject() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setNotNullObject(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void typeNull() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setType(null);
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void type() {
         CommonVerifier verifier = new CommonVerifier();
 
         ConditionModel condition = new ConditionModel();
         condition.setType(Integer.valueOf(1));
-        verifier.verify(condition, ConditionModel.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, ConditionModel.class));
 
     }
 
-    @Test(expected = VerifyException.class)
+    @Test
     public void interfaceCheck() {
         CommonVerifier verifier = new CommonVerifier();
 
         InterfaceCheck condition = new InterfaceCheck();
-        verifier.verify(condition, InterfaceCheck.class);
+        Assertions.assertThrows(VerifyException.class, () -> verifier.verify(condition, InterfaceCheck.class));
 
     }
 

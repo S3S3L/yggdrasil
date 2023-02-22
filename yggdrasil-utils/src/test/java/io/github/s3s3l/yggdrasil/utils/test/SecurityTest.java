@@ -1,7 +1,8 @@
 package io.github.s3s3l.yggdrasil.utils.test;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.github.s3s3l.yggdrasil.utils.security.SecurityUtils;
 
 /**
@@ -18,44 +19,44 @@ public class SecurityTest {
 
     @Test
     public void weekPasswordTest() {
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123+456Aa"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("a123+456A"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123a+456A"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("A123a+456"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123Aa+456"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("+123456Aa"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa+"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa["));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa]"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa{"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa}"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa;"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa:"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa\""));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa'"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa,"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa<"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa."));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa>"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa/"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa?"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa!"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa@"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa#"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa$"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa%"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa^"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa&"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa*"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa("));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa)"));
-        Assert.assertFalse(SecurityUtils.isWeakPassword("123456Aa-"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123+456Aa"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("a123+456A"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123a+456A"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("A123a+456"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123Aa+456"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("+123456Aa"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa+"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa["));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa]"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa{"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa}"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa;"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa:"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa\""));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa'"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa,"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa<"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa."));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa>"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa/"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa?"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa!"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa@"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa#"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa$"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa%"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa^"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa&"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa*"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa("));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa)"));
+        Assertions.assertFalse(SecurityUtils.isWeakPassword("123456Aa-"));
 
-        Assert.assertTrue(SecurityUtils.isWeakPassword(""));
-        Assert.assertTrue(SecurityUtils.isWeakPassword("123456Aa"));
-        Assert.assertTrue(SecurityUtils.isWeakPassword("123456A-"));
-        Assert.assertTrue(SecurityUtils.isWeakPassword("123456a-"));
-        Assert.assertTrue(SecurityUtils.isWeakPassword("1234Aa-"));
-        Assert.assertTrue(SecurityUtils.isWeakPassword("Abcdefa-"));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword(""));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword("123456Aa"));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword("123456A-"));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword("123456a-"));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword("1234Aa-"));
+        Assertions.assertTrue(SecurityUtils.isWeakPassword("Abcdefa-"));
     }
 }

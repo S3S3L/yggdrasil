@@ -94,38 +94,37 @@
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-utils</artifactId>
-		</dependency>
+        </dependency>
 		<!-- zstd -->
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
 			<classifier>linux_amd64</classifier>
 			<optional>true</optional>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
 			<classifier>darwin_x86_64</classifier>
 			<optional>true</optional>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
 			<classifier>win_amd64</classifier>
 			<optional>true</optional>
-		</dependency>
+        </dependency>
 		<!-- Compile -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>compile</scope>
-		</dependency>
+        </dependency>
 		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<optional>true</optional>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

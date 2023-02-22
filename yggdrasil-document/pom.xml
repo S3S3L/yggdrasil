@@ -94,33 +94,32 @@
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
 			<artifactId>yggdrasil-utils</artifactId>
-		</dependency>
+        </dependency>
 		<!-- CSV -->
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-		</dependency>
+        </dependency>
 		<!-- POI -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-		</dependency>
+        </dependency>
 		<!-- Compile -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>compile</scope>
-		</dependency>
+        </dependency>
 		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<optional>true</optional>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

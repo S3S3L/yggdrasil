@@ -1,7 +1,7 @@
 package io.github.s3s3l.yggdrasil.rpc.core.test;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.github.s3s3l.yggdrasil.rpc.core.server.ServerConfig;
 import io.github.s3s3l.yggdrasil.rpc.core.server.ServerStatus;
@@ -17,19 +17,19 @@ public class ServerTest {
     @Test
     public void initTest() {
         server.init();
-        Assert.assertEquals(ServerStatus.INITIALIZED, server.status());
+        Assertions.assertEquals(ServerStatus.INITIALIZED, server.status());
     }
 
     @Test
     public void startTest() {
         server.init();
         server.start();
-        Assert.assertEquals(ServerStatus.RUNNING, server.status());
+        Assertions.assertEquals(ServerStatus.RUNNING, server.status());
     }
 
-    @Test(expected = ServerException.class)
+    @Test
     public void startFailTest() {
-        server.start();
+        Assertions.assertThrows(ServerException.class, () -> server.start());
     }
 
     @Test
@@ -37,12 +37,12 @@ public class ServerTest {
         server.init();
         server.start();
         server.stop();
-        Assert.assertEquals(ServerStatus.STOPED, server.status());
+        Assertions.assertEquals(ServerStatus.STOPED, server.status());
     }
 
-    @Test(expected = ServerException.class)
+    @Test
     public void stopFailTest() {
-        server.stop();
+        Assertions.assertThrows(ServerException.class, () -> server.stop());
     }
 
     @Test
@@ -51,11 +51,11 @@ public class ServerTest {
         server.start();
         server.stop();
         server.destroy();
-        Assert.assertEquals(ServerStatus.DESTROYED, server.status());
+        Assertions.assertEquals(ServerStatus.DESTROYED, server.status());
     }
 
-    @Test(expected = ServerException.class)
+    @Test
     public void destroyFailTest() {
-        server.destroy();
+        Assertions.assertThrows(ServerException.class, () -> server.destroy());
     }
 }

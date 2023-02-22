@@ -219,6 +219,11 @@
             <artifactId>freemarker</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.drewnoakes</groupId>
+            <artifactId>metadata-extractor</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Compile -->
         <dependency>
@@ -228,16 +233,9 @@
         </dependency>
         <!-- Test -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <optional>true</optional>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.drewnoakes</groupId>
-            <artifactId>metadata-extractor</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
