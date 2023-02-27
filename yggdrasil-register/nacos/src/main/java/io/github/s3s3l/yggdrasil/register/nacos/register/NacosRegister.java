@@ -88,8 +88,6 @@ public class NacosRegister implements Register<Node, byte[], BasicEventType, Bas
                     .setMetadata(structuralHelper.toObject(nodeInfo, new TypeReference<Map<String, String>>() {
                     }))
                     .build());
-            // namingService.registerInstance(node.getName(), node.getGroup(),
-            // node.getHost(), node.getPort());
         } catch (NacosException e) {
             throw new RegisterException(e);
         }

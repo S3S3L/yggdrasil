@@ -107,7 +107,7 @@
     <parent>
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
-        <version>3.6.1-RELEASE</version>
+        <version>3.7.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -153,13 +153,8 @@
         </dependency>
         <!-- Test -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
