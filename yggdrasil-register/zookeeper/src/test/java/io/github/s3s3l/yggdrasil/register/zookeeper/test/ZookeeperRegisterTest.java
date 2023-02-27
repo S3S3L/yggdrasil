@@ -26,7 +26,6 @@ public class ZookeeperRegisterTest {
 
     @RegisterExtension
     public ZooKeeperExtension zookeeper = new ZooKeeperExtension(ZooKeeperExtensionConfig.builder()
-            // .tarLocation("local_zk_tar_location")
             .build());
     public static BasicEvent event = null;
 
