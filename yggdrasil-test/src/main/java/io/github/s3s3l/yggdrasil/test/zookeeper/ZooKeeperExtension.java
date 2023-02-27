@@ -12,7 +12,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import io.github.s3s3l.yggdrasil.test.base.ServiceExtension;
-import io.github.s3s3l.yggdrasil.test.exception.ConfigException;
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 
 public class ZooKeeperExtension implements BeforeEachCallback, AfterEachCallback, AfterAllCallback, ServiceExtension {
@@ -22,9 +21,6 @@ public class ZooKeeperExtension implements BeforeEachCallback, AfterEachCallback
 
     @SuppressWarnings("resource")
     public ZooKeeperExtension(ZooKeeperExtensionConfig config) {
-        if (StringUtils.isEmpty(config.getTarLocation())) {
-            throw new ConfigException("tar location not set.");
-        }
         ImageFromDockerfile dockerfile = new ImageFromDockerfile();
 
         if (StringUtils.isNotEmpty(config.getTarLocation())) {
@@ -35,7 +31,7 @@ public class ZooKeeperExtension implements BeforeEachCallback, AfterEachCallback
             dockerfile.withFileFromClasspath("Dockerfile", "zk/Dockerfile_remote_tar");
         }
         zookeeper = new GenericContainer<>(dockerfile).withExposedPorts(PORT)
-                .waitingFor(Wait.forLogMessage(".*PrepRequestProcessor .* started.*", 1));
+                .waitingFor(Wait.forLogMessage(config.getStartedRegex(), 1));
     }
 
     @Override
