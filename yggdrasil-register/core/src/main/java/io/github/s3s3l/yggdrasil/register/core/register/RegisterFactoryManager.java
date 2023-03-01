@@ -1,6 +1,7 @@
 package io.github.s3s3l.yggdrasil.register.core.register;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class RegisterFactoryManager {
         scanner.scan(packages)
                 .stream()
                 .filter(RegisterFactory.class::isAssignableFrom)
+                .filter(type -> !type.isInterface() && !type.isEnum() && !Modifier.isAbstract(type.getModifiers()))
                 .forEach(r -> {
                     try {
                         RegisterFactory rf = (RegisterFactory) r.getConstructor()

@@ -21,13 +21,13 @@ import io.github.s3s3l.yggdrasil.register.core.register.exception.ListenerRegist
 import io.github.s3s3l.yggdrasil.register.core.register.exception.RegisterException;
 import io.github.s3s3l.yggdrasil.register.zookeeper.listener.ZkListenerMeta;
 
-public class ZooKeeperRegister implements Register<Node, byte[], BasicEventType, BasicEvent> {
+public class ZookeeperRegister implements Register<Node, byte[], BasicEventType, BasicEvent> {
     private final Map<ListenType, Map<String, CuratorCache>> cacheMap = new ConcurrentHashMap<>();
     private final Map<Listener<byte[], BasicEventType, BasicEvent>, ZkListenerMeta> listenerCache = new ConcurrentHashMap<>();
     private final CuratorFramework client;
     private final KeyGenerator keyGenerator;
 
-    public ZooKeeperRegister(CuratorFramework client, KeyGenerator keyGenerator) {
+    public ZookeeperRegister(CuratorFramework client, KeyGenerator keyGenerator) {
         this.client = client;
         this.keyGenerator = keyGenerator;
     }
@@ -139,7 +139,7 @@ public class ZooKeeperRegister implements Register<Node, byte[], BasicEventType,
 
     @Override
     public RegisterType type() {
-        return RegisterType.ZK;
+        return RegisterType.ZOOKEEPER;
     }
 
 }
