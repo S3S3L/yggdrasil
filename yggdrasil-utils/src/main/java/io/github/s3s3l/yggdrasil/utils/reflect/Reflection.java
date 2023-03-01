@@ -2,11 +2,14 @@ package io.github.s3s3l.yggdrasil.utils.reflect;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
+
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
@@ -45,19 +48,28 @@ public class Reflection<T> implements ReflectionBean {
         return tmp;
     }
 
+    @Override
+    public Collection<String> getFields() {
+        return Arrays.stream(obj.getClass()
+                .getDeclaredFields())
+                .map(Field::getName)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public boolean hasField(String fieldName) {
 
         if (StringUtils.isEmpty(fieldName)) {
             return false;
         }
 
-        return Arrays.asList(obj.getClass()
+        return Arrays.stream(obj.getClass()
                 .getDeclaredFields())
-                .stream()
                 .anyMatch(r -> r.getName()
                         .equals(fieldName));
     }
 
+    @Override
     public Object getFieldValue(String fieldName) {
         Object result = null;
         Field field = getField(fieldName);
@@ -72,6 +84,7 @@ public class Reflection<T> implements ReflectionBean {
         return result;
     }
 
+    @Override
     public void setFieldValue(String fieldName, Object fieldValue) {
         Field field = getField(fieldName);
         if (field != null) {
@@ -108,6 +121,7 @@ public class Reflection<T> implements ReflectionBean {
         }
     }
 
+    @Override
     public void fill(Properties prop) {
         Verify.notNull(prop);
         for (Entry<Object, Object> entry : prop.entrySet()) {
@@ -119,6 +133,7 @@ public class Reflection<T> implements ReflectionBean {
         }
     }
 
+    @Override
     public void fill(Map<String, Object> map) {
         Verify.notNull(map);
         for (Entry<String, Object> entry : map.entrySet()) {

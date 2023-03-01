@@ -18,14 +18,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.github.s3s3l.yggdrasil.annotation.FromJson;
 import io.github.s3s3l.yggdrasil.annotation.FromObject;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -45,6 +45,30 @@ public abstract class ReflectionUtils {
     private static final char ARRAY_END_TOKEN = ']';
 
     public static final Map<Class<?>, Set<Field>> FIELD_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 从{@code src}<b>浅拷贝</b>属性到{@code target} <br>
+     * {@code src}中需要有对应的{@code getter}方法，{@code target}中需要有对应的{@code setter}方法
+     *
+     * @param src
+     *            原对象
+     * @param target
+     *            目标对象
+     */
+    public static void copyProperties(Object src, Object target) {
+        try {
+            ReflectionBean srcReflection = new PropertyDescriptorReflectionBean(src);
+            ReflectionBean targetReflection = new PropertyDescriptorReflectionBean(target);
+            for (String fieldName : srcReflection.getFields()) {
+                if (!targetReflection.hasField(fieldName)) {
+                    continue;
+                }
+                targetReflection.setFieldValue(fieldName, srcReflection.getFieldValue(fieldName));
+            }
+        } catch (SecurityException | IllegalArgumentException e) {
+            throw new ReflectException(e);
+        }
+    }
 
     /**
      * 

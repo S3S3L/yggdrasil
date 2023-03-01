@@ -4,6 +4,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -20,27 +21,39 @@ public class PropertyDescriptorReflectionBean implements ReflectionBean {
     private final Class<?> type;
     private Map<String, PropertyDescriptor> propMap = new ConcurrentHashMap<>();
 
+    public static void warmup(Class<?>... types) {
+        for (Class<?> type : types) {
+            resolveType(type);
+        }
+    }
+
     public PropertyDescriptorReflectionBean(Object target) {
         Verify.notNull(target);
         this.target = target;
         this.type = target.getClass();
-        refresh();
+        propMap = resolveType(type);
     }
 
-    private void refresh() {
-
-        propMap = TYPE_PROP_META.computeIfAbsent(type, t -> {
+    private static Map<String, PropertyDescriptor> resolveType(Class<?> type) {
+        return TYPE_PROP_META.computeIfAbsent(type, t -> {
             Map<String, PropertyDescriptor> propMeta = new ConcurrentHashMap<>();
-            try {
-                for (Field field : ReflectionUtils.getFields(type)) {
+            for (Field field : ReflectionUtils.getFields(type)) {
+                try {
                     propMeta.put(field.getName(), new PropertyDescriptor(field.getName(), type));
+                } catch (IntrospectionException e) {
+                    continue;
+                } catch (Exception e) {
+                    throw new ReflectException(e);
                 }
-            } catch (IntrospectionException e) {
-                throw new ReflectException(e);
             }
 
             return propMeta;
         });
+    }
+
+    @Override
+    public Collection<String> getFields() {
+        return propMap.keySet();
     }
 
     @Override

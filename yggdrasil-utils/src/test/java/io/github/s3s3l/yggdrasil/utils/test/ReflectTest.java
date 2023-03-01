@@ -6,15 +6,16 @@ import java.time.temporal.ChronoUnit;
 import io.github.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.Reflection;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @SuppressWarnings("deprecation")
 public class ReflectTest {
 
     @Data
+    @SuperBuilder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Man {

@@ -39,6 +39,7 @@ module.exports = {
     { name: 'rpc' },
     { name: 'sample' },
     { name: 'spring' },
+    { name: 'test' },
     { name: 'utils' },
     { name: 'web' }
   ],

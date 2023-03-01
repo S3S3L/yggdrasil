@@ -127,8 +127,8 @@
         </dependency>
         <!-- Test -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

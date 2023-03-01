@@ -1,5 +1,6 @@
 package io.github.s3s3l.yggdrasil.utils.reflect;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
@@ -12,6 +13,8 @@ import java.util.Properties;
  * @since JDK 1.8
  */
 public interface ReflectionBean {
+
+    Collection<String> getFields();
 
     boolean hasField(String fieldName);
 
