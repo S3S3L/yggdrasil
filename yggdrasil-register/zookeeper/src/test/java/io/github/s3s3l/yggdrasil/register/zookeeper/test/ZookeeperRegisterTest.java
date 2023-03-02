@@ -26,7 +26,6 @@ public class ZookeeperRegisterTest {
 
     @RegisterExtension
     public ZooKeeperExtension zookeeper = new ZooKeeperExtension(ZooKeeperExtensionConfig.builder()
-            .tarLocation("/home/kehewei/pkg/docker/zk/apache-zookeeper-3.7.1-bin.tar.gz")
             .build());
     public static BasicEvent event = null;
 
