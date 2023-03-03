@@ -21,6 +21,7 @@ import io.github.s3s3l.yggdrasil.register.core.register.Register;
 import io.github.s3s3l.yggdrasil.register.core.register.RegisterFactoryManager;
 import io.github.s3s3l.yggdrasil.test.zookeeper.ZooKeeperExtension;
 import io.github.s3s3l.yggdrasil.test.zookeeper.ZooKeeperExtensionConfig;
+import lombok.AllArgsConstructor;
 
 public class ZookeeperRegisterTest {
 
@@ -33,14 +34,16 @@ public class ZookeeperRegisterTest {
 
     private static RegisterFactoryManager registerFactoryManager = new RegisterFactoryManager();
 
-    private CountDownLatch countDownLatch = null;
-    private Listener<byte[], BasicEventType, BasicEvent> listener = new Listener<>() {
+    @AllArgsConstructor
+    public static class TestListener implements Listener<byte[], BasicEventType, BasicEvent> {
+        private CountDownLatch countDownLatch;
+
         @Override
         public void onEvent(BasicEvent event) {
             ZookeeperRegisterTest.event = event;
             countDownLatch.countDown();
         }
-    };
+    }
 
     @BeforeAll
     public static void beforeAll() {
@@ -54,19 +57,19 @@ public class ZookeeperRegisterTest {
 
     @AfterEach
     public void clean() {
-        register.removeListener(listener);
         event = null;
     }
 
     @Test
     public void registerTest() throws InterruptedException {
-        countDownLatch = new CountDownLatch(2);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
 
         Node node = Node.builder()
                 .group("registerTest")
                 .host("host1")
                 .build();
 
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         String data = "registerTestData";
@@ -78,17 +81,19 @@ public class ZookeeperRegisterTest {
 
         Assertions.assertEquals(data, new String(ZookeeperRegisterTest.event.data(), StandardCharsets.UTF_8));
         Assertions.assertEquals(BasicEventType.CREATE, ZookeeperRegisterTest.event.eventType());
+        register.removeListener(listener);
     }
 
     @Test
     public void updateTest() throws InterruptedException {
-        countDownLatch = new CountDownLatch(3);
+        CountDownLatch countDownLatch = new CountDownLatch(3);
 
         Node node = Node.builder()
                 .group("updateTest")
                 .host("host1")
                 .build();
 
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         String data = "updateTestData";
@@ -103,17 +108,19 @@ public class ZookeeperRegisterTest {
         Assertions.assertEquals(data, new String(ZookeeperRegisterTest.event.oldData(), StandardCharsets.UTF_8));
         Assertions.assertEquals(newData, new String(ZookeeperRegisterTest.event.data(), StandardCharsets.UTF_8));
         Assertions.assertEquals(BasicEventType.CHANGE, ZookeeperRegisterTest.event.eventType());
+        register.removeListener(listener);
     }
 
     @Test
     public void removeTest() throws InterruptedException {
-        countDownLatch = new CountDownLatch(3);
+        CountDownLatch countDownLatch = new CountDownLatch(3);
 
         Node node = Node.builder()
                 .group("removeTest")
                 .host("host1")
                 .build();
 
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         String data = "removeTestData";
@@ -126,5 +133,6 @@ public class ZookeeperRegisterTest {
 
         Assertions.assertEquals(data, new String(ZookeeperRegisterTest.event.oldData(), StandardCharsets.UTF_8));
         Assertions.assertEquals(BasicEventType.DELETE, ZookeeperRegisterTest.event.eventType());
+        register.removeListener(listener);
     }
 }

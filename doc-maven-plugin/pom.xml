@@ -112,7 +112,7 @@
     <parent>
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
-        <version>3.7.0-SNAPSHOT</version>
+        <version>3.7.0-RELEASE-jdk8</version>
     </parent>
 
     <dependencies>

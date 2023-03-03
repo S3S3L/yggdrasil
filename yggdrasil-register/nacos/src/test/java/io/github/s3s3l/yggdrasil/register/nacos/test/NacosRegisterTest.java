@@ -27,6 +27,7 @@ import io.github.s3s3l.yggdrasil.register.nacos.register.NacosRegister;
 import io.github.s3s3l.yggdrasil.test.nacos.NacosExtension;
 import io.github.s3s3l.yggdrasil.test.nacos.NacosExtensionConfig;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import lombok.AllArgsConstructor;
 
 public class NacosRegisterTest {
 
@@ -37,14 +38,17 @@ public class NacosRegisterTest {
     public static BasicEvent event = null;
 
     private static Register<Node, byte[], BasicEventType, BasicEvent> register;
-    private CountDownLatch countDownLatch = null;
-    private Listener<byte[], BasicEventType, BasicEvent> listener = new Listener<>() {
+
+    @AllArgsConstructor
+    public static class TestListener implements Listener<byte[], BasicEventType, BasicEvent> {
+        private CountDownLatch countDownLatch;
+
         @Override
         public void onEvent(BasicEvent event) {
             NacosRegisterTest.event = event;
             countDownLatch.countDown();
         }
-    };
+    }
 
     @BeforeEach
     public void init() throws NacosException, InterruptedException {
@@ -54,7 +58,6 @@ public class NacosRegisterTest {
 
     @AfterEach
     public void clean() {
-        register.removeListener(listener);
         event = null;
     }
 
@@ -66,7 +69,8 @@ public class NacosRegisterTest {
                 .host("host1")
                 .port(8888)
                 .build();
-        countDownLatch = new CountDownLatch(2);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         Map<String, String> data = new HashMap<>();
@@ -85,6 +89,8 @@ public class NacosRegisterTest {
         Assertions.assertEquals(1, eventData.getInstances()
                 .size());
         Assertions.assertEquals(BasicEventType.CHANGE, NacosRegisterTest.event.eventType());
+        
+        register.removeListener(listener);
     }
 
     @Test
@@ -95,7 +101,8 @@ public class NacosRegisterTest {
                 .host("host1")
                 .port(8888)
                 .build();
-        countDownLatch = new CountDownLatch(2);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         Map<String, String> data = new HashMap<>();
@@ -118,6 +125,8 @@ public class NacosRegisterTest {
         Assertions.assertEquals(1, eventData.getInstances()
                 .size());
         Assertions.assertEquals(BasicEventType.CHANGE, NacosRegisterTest.event.eventType());
+
+        register.removeListener(listener);
     }
 
     @Test
@@ -128,7 +137,8 @@ public class NacosRegisterTest {
                 .host("host1")
                 .port(8888)
                 .build();
-        countDownLatch = new CountDownLatch(3);
+        CountDownLatch countDownLatch = new CountDownLatch(3);
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener(countDownLatch);
         register.addListener(node, listener, ListenType.TREE);
 
         Map<String, String> data = new HashMap<>();
@@ -145,5 +155,7 @@ public class NacosRegisterTest {
         Assertions.assertEquals(0, eventData.getInstances()
                 .size());
         Assertions.assertEquals(BasicEventType.CHANGE, NacosRegisterTest.event.eventType());
+
+        register.removeListener(listener);
     }
 }

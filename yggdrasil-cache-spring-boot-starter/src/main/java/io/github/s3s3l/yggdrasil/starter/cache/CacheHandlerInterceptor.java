@@ -6,17 +6,17 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.lang.Nullable;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+
 import io.github.s3s3l.yggdrasil.annotation.Cache;
 import io.github.s3s3l.yggdrasil.annotation.CacheExpire;
 import io.github.s3s3l.yggdrasil.cache.helper.ComplexCacheHelper;
 import io.github.s3s3l.yggdrasil.cache.key.CacheKeyGenerator;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
-import org.springframework.lang.Nullable;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.util.ContentCachingResponseWrapper;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -59,7 +59,7 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
                 .path(request.getRequestURI())
                 .params(request.getParameterMap())
                 .method(request.getMethod())
-                .body(request.getInputStream().readAllBytes())
+                .body(request.getInputStream())
                 .build());
         log.trace("fetching cache. cacheKey: {}", cacheKey);
         // 获取缓存数据

@@ -31,6 +31,13 @@ public class EtcdRegisterTest {
             .host("host1")
             .build();
 
+    public static class TestListener implements Listener<byte[], BasicEventType, BasicEvent> {
+        @Override
+        public void onEvent(BasicEvent event) {
+            EtcdRegisterTest.event = event;
+        }
+    }
+
     @BeforeAll
     public static void init() throws InterruptedException {
         Client client = Client.builder()
@@ -41,18 +48,13 @@ public class EtcdRegisterTest {
     }
 
     @AfterEach
-    public void clean(){
+    public void clean() {
         event = null;
     }
 
     @Test
     public void registerTest() throws InterruptedException {
-        Listener<byte[], BasicEventType, BasicEvent> listener = new Listener<>() {
-            @Override
-            public void onEvent(BasicEvent event) {
-                EtcdRegisterTest.event = event;
-            }
-        };
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener();
         register.addListener(node, listener, null);
         String data = "registerTestData";
         register.register(node, data.getBytes(StandardCharsets.UTF_8));
@@ -66,13 +68,8 @@ public class EtcdRegisterTest {
 
     @Test
     public void updateTest() throws InterruptedException {
-        
-        Listener<byte[], BasicEventType, BasicEvent> listener = new Listener<>() {
-            @Override
-            public void onEvent(BasicEvent event) {
-                EtcdRegisterTest.event = event;
-            }
-        };
+
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener();
         register.addListener(node, listener, null);
         String data = "registerTestData";
         register.register(node, data.getBytes(StandardCharsets.UTF_8));
@@ -90,12 +87,7 @@ public class EtcdRegisterTest {
     @Test
     public void removeTest() throws InterruptedException {
 
-        Listener<byte[], BasicEventType, BasicEvent> listener = new Listener<>() {
-            @Override
-            public void onEvent(BasicEvent event) {
-                EtcdRegisterTest.event = event;
-            }
-        };
+        Listener<byte[], BasicEventType, BasicEvent> listener = new TestListener();
         register.addListener(node, listener, null);
         String data = "registerTestDat3";
         register.register(node, data.getBytes(StandardCharsets.UTF_8));
