@@ -4,10 +4,10 @@ import java.util.SortedSet;
 
 import io.github.s3s3l.yggdrasil.doc.bean.BaseField;
 import io.github.s3s3l.yggdrasil.doc.enumerations.Protocol;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ApiDocNode extends DocNode {
 
     /**

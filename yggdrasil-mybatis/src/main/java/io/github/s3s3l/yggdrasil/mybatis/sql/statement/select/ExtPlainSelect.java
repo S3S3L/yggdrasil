@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import io.github.s3s3l.yggdrasil.mybatis.sql.enumerations.DatabaseType;
-
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
 import net.sf.jsqlparser.statement.select.Distinct;
@@ -66,7 +65,7 @@ public class ExtPlainSelect extends PlainSelect {
         Expression where = this.getWhere();
         OracleHierarchicalExpression oracleHierarchical = this.getOracleHierarchical();
         List<Expression> groupByColumnReferences = this.getGroupBy()
-                .getGroupByExpressions();
+                .getGroupByExpressionList().getExpressions();
         Expression having = this.getHaving();
         ExtLimit limit = new ExtLimit(this.getLimit(), databaseType);
         List<OrderByElement> orderByElements = this.getOrderByElements();

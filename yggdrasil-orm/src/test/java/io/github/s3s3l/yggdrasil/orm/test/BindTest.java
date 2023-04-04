@@ -24,6 +24,7 @@ import io.github.s3s3l.yggdrasil.orm.validator.PositiveNumberValidator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -53,6 +54,7 @@ public class BindTest {
     @SuperBuilder
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode(callSuper = true)
     @SqlModel(table = User.class)
     public static class UserCondition extends ConditionForPagination {
         @GroupBy

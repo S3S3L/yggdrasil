@@ -24,27 +24,22 @@ public interface IRedis {
 
     void set(String key, String value, long seconds);
 
-    @Deprecated
     void set(byte[] key, byte[] value);
 
-    @Deprecated
     void set(byte[] key, byte[] value, long seconds);
 
     String set(final String key, final String value, final SetParams params);
 
     boolean del(String key);
 
-    @Deprecated
     boolean del(byte[] key);
 
     boolean expire(String key, long seconds);
 
-    @Deprecated
     boolean expire(byte[] key, long seconds);
 
     String get(String key);
 
-    @Deprecated
     byte[] getBytes(byte[] key);
 
     List<String> lRange(String key, long start, long stop);
@@ -84,19 +79,16 @@ public interface IRedis {
 
     void hset(String key, String hash, String value);
 
-    @Deprecated
     void hset(String key, String hash, byte[] value);
 
     void hset(String key, String hash, List<String> value);
 
-    @Deprecated
     void hset(byte[] key, byte[] hash, byte[] value);
 
     Set<String> hkeys(String key);
 
     String hget(String key, String hash);
 
-    @Deprecated
     byte[] hget(byte[] key, byte[] hash);
 
     List<String> hgetList(String key, String hash);
@@ -140,7 +132,6 @@ public interface IRedis {
 
     long hdel(String key, String... field);
 
-    @Deprecated
     long hdel(byte[] key, byte[]... field);
 
     String lpop(String key);
@@ -167,7 +158,6 @@ public interface IRedis {
 
     Double zscoreBymember(String key, String member);
 
-    @Deprecated
     boolean sismember(byte[] key, byte[] member);
 
     boolean sismember(String key, String member);

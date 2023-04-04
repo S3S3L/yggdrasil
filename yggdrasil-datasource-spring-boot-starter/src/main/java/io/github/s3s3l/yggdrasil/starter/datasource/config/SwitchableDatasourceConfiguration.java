@@ -3,13 +3,13 @@ package io.github.s3s3l.yggdrasil.starter.datasource.config;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import io.github.s3s3l.yggdrasil.bean.time.JsonTimestampDateTimeDeserializer;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.github.s3s3l.yggdrasil.bean.time.JsonTimestampDateTimeDeserializer;
 import io.github.s3s3l.yggdrasil.bean.time.JsonTimestampDateTimeSerializer;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -22,6 +22,7 @@ import lombok.Data;
  * @since JDK 1.8
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SwitchableDatasourceConfiguration extends DatasourceConfiguration {
 
     /**

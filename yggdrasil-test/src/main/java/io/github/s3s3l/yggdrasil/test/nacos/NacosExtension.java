@@ -12,9 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NacosExtension implements BeforeEachCallback, AfterEachCallback, AfterAllCallback, ServiceExtension {
+    private static final String IMAGE_NAME = "nacos/nacos-server:v2.2.0";
     @SuppressWarnings("deprecation")
-    private FixedHostPortGenericContainer<?> nacos = new FixedHostPortGenericContainer<>("nacos/nacos-server")
-            .withEnv("MODE", "standalone");
+    private FixedHostPortGenericContainer<?> nacos = new FixedHostPortGenericContainer<>(IMAGE_NAME).withEnv("MODE",
+            "standalone");
     private final NacosExtensionConfig config;
 
     public NacosExtension(NacosExtensionConfig config) {

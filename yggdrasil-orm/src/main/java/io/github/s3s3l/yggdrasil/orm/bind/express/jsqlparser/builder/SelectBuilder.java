@@ -7,6 +7,7 @@ import java.util.List;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.AllColumns;
@@ -70,7 +71,7 @@ public class SelectBuilder {
         selectBody.setWhere(where);
         if (!CollectionUtils.isEmpty(groupByExpressions)) {
             GroupByElement groupBy = new GroupByElement();
-            groupBy.setGroupByExpressions(groupByExpressions);
+            groupBy.setGroupByExpressionList(new ExpressionList(groupByExpressions));
             selectBody.setGroupByElement(groupBy);
         }
         if (!CollectionUtils.isEmpty(orderByElements)) {

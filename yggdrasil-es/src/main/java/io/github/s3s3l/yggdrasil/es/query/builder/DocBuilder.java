@@ -15,12 +15,12 @@ import io.github.s3s3l.yggdrasil.es.query.Esdsl;
  */
 // TODO 未完成
 public class DocBuilder implements DocBeanBuilder, DocFieldBuilder {
-    private EsdslBuilder preBuilder;
-    private Doc doc;
+    // private EsdslBuilder preBuilder;
+    // private Doc doc;
 
     public DocBuilder(EsdslBuilder builder, Doc doc) {
-        this.doc = doc;
-        this.preBuilder = builder;
+        // this.doc = doc;
+        // this.preBuilder = builder;
     }
 
     @Override

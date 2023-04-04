@@ -31,44 +31,38 @@
     </developers>
 
     <modules>
+        <module>doc-maven-plugin</module>
+
+        <module>yggdrasil-annotation</module>
+        <module>yggdrasil-bean</module>
+        <module>yggdrasil-cache</module>
+        <module>yggdrasil-configuration</module>
         <module>yggdrasil-compress</module>
-        <module>yggdrasil-spring</module>
-        <module>yggdrasil-mybatis</module>
-        <module>yggdrasil-web</module>
-        <module>yggdrasil-redis</module>
-        <module>yggdrasil-http</module>
-        <module>yggdrasil-es</module>
-        <module>yggdrasil-document</module>
+        <module>yggdrasil-ddd</module>
         <module>yggdrasil-doc</module>
         <module>yggdrasil-doc-template-assembler</module>
-        <module>yggdrasil-resource</module>
+        <module>yggdrasil-document</module>
+        <module>yggdrasil-es</module>
+        <module>yggdrasil-fsm</module>
+        <module>yggdrasil-http</module>
+        <module>yggdrasil-mybatis</module>
         <module>yggdrasil-orm</module>
         <module>yggdrasil-persistence</module>
-        <module>yggdrasil-cache</module>
+        <module>yggdrasil-redis</module>
+        <module>yggdrasil-resource</module>
+        <module>yggdrasil-spring</module>
+        <module>yggdrasil-test</module>
         <module>yggdrasil-utils</module>
-        <module>yggdrasil-bean</module>
-        <module>yggdrasil-ddd</module>
-        <module>yggdrasil-fsm</module>
-        <module>yggdrasil-annotation</module>
-        <module>yggdrasil-configuration</module>
-        <module>yggdrasil-datasource-spring-boot-starter</module>
-        <module>yggdrasil-redis-spring-boot-starter</module>
+        <module>yggdrasil-web</module>
+
         <module>yggdrasil-apollo-spring-boot-starter</module>
         <module>yggdrasil-cache-spring-boot-starter</module>
-        <module>doc-maven-plugin</module>
-        <module>yggdrasil-test</module>
+        <module>yggdrasil-datasource-spring-boot-starter</module>
+        <module>yggdrasil-redis-spring-boot-starter</module>
 
-        <module>yggdrasil-register/core</module>
-        <module>yggdrasil-register/etcd</module>
-        <module>yggdrasil-register/nacos</module>
-        <module>yggdrasil-register/zookeeper</module>
-
-        <module>yggdrasil-rpc/core</module>
-        <module>yggdrasil-rpc/grpc</module>
-
-        <module>yggdrasil-sample/datasource-starter-sample</module>
-        <module>yggdrasil-sample/orm-sample</module>
-        <module>yggdrasil-sample/register-sample</module>
+        <module>yggdrasil-register</module>
+        <module>yggdrasil-rpc</module>
+        <module>yggdrasil-sample</module>
     </modules>
 
     <build>
@@ -254,6 +248,24 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <junit.version>5.9.2</junit.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <env>local</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>github</id>
+            <properties>
+                <env>github</env>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>

@@ -13,6 +13,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Pool;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+
 import io.github.s3s3l.yggdrasil.configuration.redis.RedisClusterConfiguration;
 import io.github.s3s3l.yggdrasil.redis.base.IRedis;
 import io.github.s3s3l.yggdrasil.redis.base.InitializableRedis;
@@ -23,13 +30,6 @@ import io.github.s3s3l.yggdrasil.utils.log.base.LogHelper;
 import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-import org.slf4j.Logger;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Pool;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-
 import redis.clients.jedis.GeoCoordinate;
 import redis.clients.jedis.GeoRadiusResponse;
 import redis.clients.jedis.GeoUnit;

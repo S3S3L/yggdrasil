@@ -1,12 +1,13 @@
 package io.github.s3s3l.yggdrasil.starter.datasource.config;
 
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -19,6 +20,7 @@ import lombok.Data;
  * @since JDK 1.8
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ConditionalOnClass(PoolProperties.class)
 @Configuration("datasourceConfiguration")
 @ConfigurationProperties(prefix = "datasource")

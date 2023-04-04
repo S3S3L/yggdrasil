@@ -38,7 +38,7 @@ public class ReflectTest {
         int times = 10000000;
 
         LocalDateTime start;
-        ReflectionBean rb = null;
+        ReflectionBean rb = Reflection.create(man);
 
         // Reflection
         System.out.println("Reflection");

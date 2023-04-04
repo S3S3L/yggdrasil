@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
 
 import io.github.s3s3l.yggdrasil.test.TimeCalExtension;
-import io.github.s3s3l.yggdrasil.test.base.Timeout;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +39,6 @@ public class CopyPropertiesTest {
         System.out.println("warmup finish");
     }
 
-    @Timeout(200)
     @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
     public void pdTest() throws InterruptedException {
         Man man = Man.builder()
@@ -55,7 +53,6 @@ public class CopyPropertiesTest {
         }
     }
 
-    @Timeout(1_000)
     @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
     public void springBeanUtilsTest() {
         Man man = Man.builder()

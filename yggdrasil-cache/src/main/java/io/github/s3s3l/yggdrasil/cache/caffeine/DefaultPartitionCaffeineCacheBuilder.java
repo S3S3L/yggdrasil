@@ -2,12 +2,12 @@ package io.github.s3s3l.yggdrasil.cache.caffeine;
 
 import java.util.concurrent.TimeUnit;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import io.github.s3s3l.yggdrasil.cache.key.ScopeKeyGenerator;
 import io.github.s3s3l.yggdrasil.redis.base.IRedis;
 import io.github.s3s3l.yggdrasil.utils.common.ObjectSerializer;
-
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * <p>
@@ -25,7 +25,7 @@ public class DefaultPartitionCaffeineCacheBuilder implements PartitionCaffeineCa
     public DefaultPartitionCaffeineCacheBuilder(IRedis redis) {
         this.redis = redis;
     }
-
+    
     @Override
     public LoadingCache<byte[], Object> getCache(String scope) {
         return Caffeine.newBuilder()

@@ -1,5 +1,6 @@
 package io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.update.UpdateSet;
 
 public class UpdateBuilder {
 
@@ -34,8 +36,10 @@ public class UpdateBuilder {
     public Update build() {
         Update update = new Update();
         update.setTable(table);
-        update.setColumns(columns);
-        update.setExpressions(expressions);
+        UpdateSet updateSet = new UpdateSet();
+        updateSet.setColumns(new ArrayList<>(columns));
+        updateSet.setExpressions(new ArrayList<>(expressions));
+        update.addUpdateSet(updateSet);
         update.setWhere(where);
         return update;
     }

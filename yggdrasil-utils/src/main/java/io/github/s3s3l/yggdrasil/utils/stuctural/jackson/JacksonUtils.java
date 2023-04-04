@@ -10,8 +10,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -37,6 +35,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.CaseFormat;
 
 import io.github.s3s3l.yggdrasil.bean.exception.JsonException;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 
 /**
  * ClassName:JacksonUtils <br>

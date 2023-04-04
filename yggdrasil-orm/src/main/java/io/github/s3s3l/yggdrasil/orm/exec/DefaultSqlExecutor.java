@@ -2,7 +2,6 @@ package io.github.s3s3l.yggdrasil.orm.exec;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +22,6 @@ import io.github.s3s3l.yggdrasil.orm.proxy.meta.ProxyMeta;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,15 +53,6 @@ public class DefaultSqlExecutor implements SqlExecutor {
         this.dataBindExpress = dataBindExpress;
         this.freeMarkerHelper = freeMarkerHelper;
         this.datasourceHolder = datasourceHolder;
-
-        try {
-            datasourceHolder.useConn(conn -> {
-                DatabaseMetaData metaData = conn.getMetaData();
-                return null;
-            });
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
