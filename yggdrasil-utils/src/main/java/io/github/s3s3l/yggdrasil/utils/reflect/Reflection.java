@@ -17,15 +17,13 @@ import io.github.s3s3l.yggdrasil.utils.verify.Verify;
 /**
  * ClassName:ReflectUtils <br>
  * Date: 2016年2月25日 下午6:47:44 <br>
+ * 各方面性能上{@code PropertyDescriptorReflectionBean}占优，请用{@code PropertyDescriptorReflectionBean}来替代使用。
  * 
  * @author kehw_zwei
  * @version 1.0.0
  * @since JDK 1.8
- * @deprecated 各方面性能上
- *             {@code PropertyDescriptorReflectionBean}占优，请用{@code PropertyDescriptorReflectionBean}来替代使用。
  * @see PropertyDescriptorReflectionBean
  */
-@Deprecated
 public class Reflection<T> implements ReflectionBean {
 
     private T obj;

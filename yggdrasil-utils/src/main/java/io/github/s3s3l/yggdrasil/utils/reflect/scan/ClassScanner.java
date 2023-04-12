@@ -14,12 +14,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.s3s3l.yggdrasil.bean.FileType;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClassScanner implements Scanner {
     private static final Logger logger = LoggerFactory.getLogger(ClassScanner.class);
@@ -95,8 +96,8 @@ public class ClassScanner implements Scanner {
 
                 try {
                     clzSet.add(cl.loadClass(String.join(".", pkg, className)));
-                } catch (ClassNotFoundException e) {
-                    logger.warn("fail to load class", e);
+                } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                    logger.debug("fail to load class", e);
                 }
             } else if (file.isDirectory()) {
                 clzSet.addAll(findAllClassInFolder(cl, file, String.join(".", pkg, file.getName())));
@@ -161,8 +162,8 @@ public class ClassScanner implements Scanner {
                     clzSet.add(cl.loadClass(entry.getName()
                             .replace(".class", "")
                             .replace(File.separatorChar, '.')));
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                    logger.debug("fail to load class", e);
                 }
             }
         }

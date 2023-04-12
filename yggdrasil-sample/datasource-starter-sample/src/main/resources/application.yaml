@@ -1,3 +1,6 @@
+spring: 
+  main: 
+    allow-circular-references: true
 yggdrasil: 
   datasource: 
     enable: true

@@ -28,7 +28,6 @@ import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import io.github.s3s3l.yggdrasil.utils.reflect.PlaceHolderMeta;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -133,7 +132,7 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
         if (Collection.class.isAssignableFrom(returnType)) {
             if (List.class.isAssignableFrom(returnType) && genericReturnType instanceof ParameterizedType) {
                 return statementHelper
-                        .mapResultTo(ReflectionUtils.getGenericClass((ParameterizedType) genericReturnType, 0), rs);
+                        .mapResultTo(ReflectionUtils.getGenericClasses((ParameterizedType) genericReturnType)[0], rs);
             }
 
             throw new SqlExecutingException("Return type not supported. " + returnType.getName());
@@ -141,7 +140,7 @@ public class ExecutorProxyInvocationHandler implements InvocationHandler {
 
         if (returnType.isArray()) {
             return statementHelper
-                    .mapResultTo(ReflectionUtils.getGenericClass((ParameterizedType) genericReturnType, 0), rs)
+                    .mapResultTo(ReflectionUtils.getGenericClasses((ParameterizedType) genericReturnType)[0], rs)
                     .toArray();
         }
 

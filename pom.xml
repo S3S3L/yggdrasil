@@ -35,6 +35,7 @@
 
         <module>yggdrasil-annotation</module>
         <module>yggdrasil-bean</module>
+        <module>yggdrasil-boot</module>
         <module>yggdrasil-cache</module>
         <module>yggdrasil-configuration</module>
         <module>yggdrasil-compress</module>
@@ -247,6 +248,7 @@
 
         <testcontainers.version>1.17.6</testcontainers.version>
         <junit.version>5.9.2</junit.version>
+        <javafx.version>20</javafx.version>
     </properties>
 
     <profiles>
@@ -289,6 +291,11 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-compress</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-boot</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
@@ -389,6 +396,16 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-test</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-boot-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-boot-spring-adapter</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <!-- yggdrasil-spring-boot-starter -->
@@ -676,6 +693,12 @@
                 <groupId>io.etcd</groupId>
                 <artifactId>jetcd-test</artifactId>
                 <version>${etcd.version}</version>
+            </dependency>
+            <!-- JAVAFX -->
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
             </dependency>
             <!-- Test -->
             <dependency>

@@ -16,16 +16,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.s3s3l.yggdrasil.annotation.FromJson;
 import io.github.s3s3l.yggdrasil.annotation.FromObject;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.exception.ReflectException;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import io.github.s3s3l.yggdrasil.utils.verify.Verify;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -165,7 +167,8 @@ public abstract class ReflectionUtils {
     public static <T> T clone(T src, Class<T> type) {
         try {
             ReflectionBean srcReflection = new PropertyDescriptorReflectionBean(src);
-            T result = type.getConstructor().newInstance();
+            T result = type.getConstructor()
+                    .newInstance();
             ReflectionBean targetReflection = new PropertyDescriptorReflectionBean(result);
             for (Field field : getFields(type)) {
                 String fieldName = field.getName();
@@ -179,19 +182,24 @@ public abstract class ReflectionUtils {
         }
     }
 
+    public static boolean isAnnotationedWith(Class<?> cls, Class<? extends Annotation> annotationClass) {
+        return isAnnotationedWiths(cls, annotationClass);
+    }
+
     /**
      * 
      * 判断类型是否有指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *                        类型
-     * @param annotationClass
-     *                        注解类型
+     *            类型
+     * @param annotationClasses
+     *            注解类型
      * @return true：类型有指定注解；false：类型没有指定注解
      * @since JDK 1.8
      */
-    public static boolean isAnnotationedWith(Class<?> cls, Class<? extends Annotation> annotationClass) {
-        if (cls.getName()
+    @SuppressWarnings({ "unchecked" })
+    public static boolean isAnnotationedWiths(Class<?> cls, Class<?>... annotationClasses) {
+        if (cls.getPackageName()
                 .startsWith("java.lang.annotation")
                 || cls.getName()
                         .startsWith("kotlin.annotation")
@@ -200,12 +208,15 @@ public abstract class ReflectionUtils {
             return false;
         }
 
-        if (cls.isAnnotationPresent(annotationClass)) {
-            return true;
+        for (Class<?> annotationClass : annotationClasses) {
+            if (Annotation.class.isAssignableFrom(annotationClass)
+                    && cls.isAnnotationPresent((Class<? extends Annotation>) annotationClass)) {
+                return true;
+            }
         }
 
         for (Annotation annotation : cls.getAnnotations()) {
-            if (isAnnotationedWith(annotation.annotationType(), annotationClass)) {
+            if (isAnnotationedWiths(annotation.annotationType(), annotationClasses)) {
                 return true;
             }
         }
@@ -218,11 +229,11 @@ public abstract class ReflectionUtils {
      * 获取类型上的指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *                        类型
+     *            类型
      * @param annotationClass
-     *                        注解类型
+     *            注解类型
      * @param <T>
-     *                        注解类型
+     *            注解类型
      * @return 类型有指定注解：返回该注解；类型没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -248,9 +259,9 @@ public abstract class ReflectionUtils {
      * 判断方法是否有指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *                        方法
+     *            方法
      * @param annotationClass
-     *                        注解类型
+     *            注解类型
      * @return true：方法有指定注解；false：方法没有指定注解
      * @since JDK 1.8
      */
@@ -274,11 +285,11 @@ public abstract class ReflectionUtils {
      * 获取方法上的指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *                        方法
+     *            方法
      * @param annotationClass
-     *                        注解类型
+     *            注解类型
      * @param <T>
-     *                        注解类型
+     *            注解类型
      * @return 方法有指定注解：返回该注解；方法没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -315,25 +326,47 @@ public abstract class ReflectionUtils {
         return result;
     }
 
+    public static Class<?>[] resolveTypeArguments(Class<?> type, Class<?> iface) {
+        Class<?> currentType = type;
+        Type genericType = type;
+        while (currentType != Object.class) {
+            if (currentType == iface) {
+                return getTypeArguments(genericType);
+            }
+            Type[] genericInterfaces = currentType.getGenericInterfaces();
+            Class<?>[] interfaces = currentType.getInterfaces();
+            for (int i = 0; i < interfaces.length; i++) {
+                if (interfaces[i] == iface) {
+                    return getTypeArguments(genericInterfaces[i]);
+                }
+            }
+
+            genericType = currentType.getGenericSuperclass();
+            currentType = currentType.getSuperclass();
+        }
+
+        return new Class<?>[] {};
+    }
+
     /**
      * 
      * 获取泛型的Class对象
      * 
      * @author kehw_zwei
      * @param type
-     *             泛型
+     *            泛型
      * @param i
-     *             泛型类型的位置
+     *            泛型类型的位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */
-    public static Class<?> getClass(Type type, int i) {
+    public static Class<?>[] getTypeArguments(Type type) {
         if (type instanceof ParameterizedType) { // 处理泛型类型
-            return getGenericClass((ParameterizedType) type, i);
+            return getGenericClasses((ParameterizedType) type);
         } else if (type instanceof TypeVariable) {
-            return getClass(((TypeVariable<?>) type).getBounds()[0], 0); // 处理泛型擦拭对象
-        } else {// class本身也是type，强制转型
-            return (Class<?>) type;
+            return getTypeArguments(((TypeVariable<?>) type).getBounds()[0]); // 处理泛型擦拭对象
+        } else {
+            return new Class<?>[] {};
         }
     }
 
@@ -343,23 +376,27 @@ public abstract class ReflectionUtils {
      * 
      * @author kehw_zwei
      * @param parameterizedType
-     *                          参数类型
+     *            参数类型
      * @param i
-     *                          泛型类型位置
+     *            泛型类型位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */
-    public static Class<?> getGenericClass(ParameterizedType parameterizedType, int i) {
-        Object genericClass = parameterizedType.getActualTypeArguments()[i];
-        if (genericClass instanceof ParameterizedType) { // 处理多级泛型
-            return (Class<?>) ((ParameterizedType) genericClass).getRawType();
-        } else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
-            return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
-        } else if (genericClass instanceof TypeVariable) { // 处理泛型擦拭对象
-            return (Class<?>) getClass(((TypeVariable<?>) genericClass).getBounds()[0], 0);
-        } else {
-            return (Class<?>) genericClass;
-        }
+    public static Class<?>[] getGenericClasses(ParameterizedType parameterizedType) {
+        Type[] genericClasses = parameterizedType.getActualTypeArguments();
+        return Arrays.stream(genericClasses)
+                .flatMap(genericClass -> {
+                    if (genericClass instanceof ParameterizedType) { // 处理多级泛型
+                        return Stream.of((Class<?>) ((ParameterizedType) genericClass).getRawType());
+                    } else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
+                        return Stream.of((Class<?>) ((GenericArrayType) genericClass).getGenericComponentType());
+                    } else if (genericClass instanceof TypeVariable) { // 处理泛型擦拭对象
+                        return Arrays.stream(getTypeArguments(((TypeVariable<?>) genericClass).getBounds()[0]));
+                    } else {
+                        return Stream.of((Class<?>) genericClass);
+                    }
+                })
+                .toArray(size -> new Class<?>[size]);
     }
 
     public static boolean isClassExist(String className) {
@@ -437,5 +474,49 @@ public abstract class ReflectionUtils {
 
         Object value = rf.getFieldValue(meta.getFieldName());
         return checkAndGetObject(meta, value);
+    }
+
+    public static List<Field> getFieldsAnnotatedWith(Class<?> type, Class<? extends Annotation> annotationType) {
+        return getFields(type).stream()
+                .filter(field -> field.isAnnotationPresent(annotationType))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 
+     * 获取实现了指定接口的集合
+     * 
+     * @param interfaceClass
+     *            接口类型
+     * @param classes
+     *            类型列表
+     * @return 实现了指定接口的类型列表
+     * @since JDK 1.8
+     */
+    public static List<Class<?>> getClassesImplement(Class<?> interfaceClass,
+            Collection<Class<? extends Object>> classes) {
+        Verify.notNull(interfaceClass, "interfaceClass can not be NULL");
+        Verify.notNull(classes, "classes can not be NULL");
+        Verify.isInterface(interfaceClass, "interfaceClass must be a interface");
+        return classes.stream()
+                .filter(r -> interfaceClass.isAssignableFrom(r))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public static Set<Class<?>> getAllParentTypes(Class<?> type) {
+        Set<Class<?>> subTypes = new HashSet<>();
+        if (type == Object.class) {
+            return subTypes;
+        }
+        subTypes.add(type);
+        Class<?> superclass = type.getSuperclass();
+        if (superclass != null) {
+            subTypes.addAll(getAllParentTypes(superclass));
+        }
+        for (Class<?> iface : type.getInterfaces()) {
+            subTypes.addAll(getAllParentTypes(iface));
+        }
+        return subTypes;
     }
 }

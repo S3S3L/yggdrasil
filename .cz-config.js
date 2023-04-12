@@ -16,6 +16,7 @@ module.exports = {
     { name: 'annotation' },
     { name: 'apollo_starter' },
     { name: 'bean' },
+    { name: 'boot' },
     { name: 'cache' },
     { name: 'cache_starter' },
     { name: 'compress' },
