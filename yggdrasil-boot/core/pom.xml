@@ -114,11 +114,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-        <!-- Reflect -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
         <!-- Compile -->
         <dependency>
             <groupId>org.projectlombok</groupId>

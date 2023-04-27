@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import io.github.s3s3l.yggdrasil.boot.annotation.InnerComponent;
-import io.github.s3s3l.yggdrasil.boot.bean.BeanDefinition;
-import io.github.s3s3l.yggdrasil.boot.bean.DefaultBeanDefinition;
+import io.github.s3s3l.yggdrasil.boot.bean.def.BeanDefinition;
+import io.github.s3s3l.yggdrasil.boot.bean.def.DefaultBeanDefinition;
 import io.github.s3s3l.yggdrasil.boot.bean.resolver.BeanResolver;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner;

@@ -1,7 +1,5 @@
 package io.github.s3s3l.yggdrasil.boot.bean.meta;
 
-import java.lang.reflect.Parameter;
-
 import io.github.s3s3l.yggdrasil.utils.common.Named;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import lombok.AllArgsConstructor;
@@ -15,8 +13,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ParamMeta extends AnnotatableMeta implements Named {
-    private Parameter param;
+public class FactoryBeanMeta extends AnnotatableMeta implements Named {
+    private Class<?> type;
 
     @Override
     public String getName() {
@@ -24,7 +22,6 @@ public class ParamMeta extends AnnotatableMeta implements Named {
             return annotationMeta.getName();
         }
 
-        return param.getType()
-                .getSimpleName();
+        return type.getSimpleName();
     }
 }

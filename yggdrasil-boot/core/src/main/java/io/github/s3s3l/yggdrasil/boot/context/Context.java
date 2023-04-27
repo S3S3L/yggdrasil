@@ -3,7 +3,7 @@ package io.github.s3s3l.yggdrasil.boot.context;
 import java.util.List;
 import java.util.Map;
 
-import io.github.s3s3l.yggdrasil.boot.bean.BeanDefinition;
+import io.github.s3s3l.yggdrasil.boot.bean.def.BeanDefinition;
 
 public interface Context {
     void registerBean(BeanDefinition beanDefinition);
