@@ -70,59 +70,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${plugin.compiler.version}</version>
-                    <configuration>
-                        <source>${global.jdk.version}</source>
-                        <target>${global.jdk.version}</target>
-                        <encoding>${global.encoding}</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${plugin.source.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <encoding>${global.encoding}</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${plugin.javadoc.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
-                        <encoding>${global.encoding}</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${plugin.deploy.version}</version>
-                    <configuration>
-                        <encoding>${global.encoding}</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>${plugin.staging.version}</version>
@@ -155,6 +102,69 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${plugin.compiler.version}</version>
+                <configuration>
+                    <release>${global.jdk.version}</release>
+                    <source>${global.jdk.version}</source>
+                    <target>${global.jdk.version}</target>
+                    <encoding>${global.encoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${plugin.source.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>${global.encoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${plugin.javadoc.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <encoding>${global.encoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${plugin.deploy.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>${global.encoding}</encoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
