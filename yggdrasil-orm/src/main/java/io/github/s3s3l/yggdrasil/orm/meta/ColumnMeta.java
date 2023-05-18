@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 
 import io.github.s3s3l.yggdrasil.orm.handler.TypeHandler;
 import io.github.s3s3l.yggdrasil.orm.validator.Validator;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +30,7 @@ public class ColumnMeta {
     /**
      * 数据库字段类型
      */
-    private DatabaseType dbType;
+    private DbType dbType;
     /**
      * 对应JAVA对象中的字段名
      */

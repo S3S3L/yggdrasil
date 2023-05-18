@@ -20,6 +20,7 @@ import io.github.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
 import io.github.s3s3l.yggdrasil.bean.exception.VerifyException;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Condition;
+import io.github.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.GroupBy;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Limit;
@@ -45,7 +46,6 @@ import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.github.s3s3l.yggdrasil.utils.verify.CommonVerifier;
 import io.github.s3s3l.yggdrasil.utils.verify.Verifier;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -232,18 +232,20 @@ public class MetaManager {
 
             if (column != null) {
                 columnName = StringUtils.isEmpty(column.name()) ? field.getName() : column.name();
-                io.github.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType dbType = column.dbType();
+                DatabaseType dbType = column.dbType();
                 columnMeta = ColumnMeta.builder()
                         .field(field)
                         .name(columnName)
                         .alias(field.getName())
                         .validator(this.validatorFactory.getValidator(column.validator()))
                         .typeHandler(typeHandlerManager.getOrNew(column.typeHandler()))
-                        .dbType(DatabaseType.builder()
+                        .dbType(DbType.builder()
                                 .type(dbType.type())
                                 .args(Arrays.asList(dbType.args()))
                                 .primary(dbType.primary())
                                 .notNull(dbType.notNull())
+                                .def(dbType.def())
+                                .defValue(dbType.defValue())
                                 .build())
                         .build();
                 columns.add(columnMeta);

@@ -12,13 +12,15 @@ import io.github.s3s3l.yggdrasil.orm.bind.annotation.OrderBy;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
 import io.github.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
-import io.github.s3s3l.yggdrasil.orm.bind.express.common.DefaultDataBindExpress;
-import io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.JSqlParserDataBindExpress;
+import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import io.github.s3s3l.yggdrasil.orm.enumerations.ComparePattern;
+import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
 import io.github.s3s3l.yggdrasil.orm.handler.ArrayTypeHandler;
+import io.github.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
+import io.github.s3s3l.yggdrasil.orm.meta.TableMeta;
 import io.github.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import io.github.s3s3l.yggdrasil.orm.validator.PositiveNumberValidator;
 import lombok.AllArgsConstructor;
@@ -70,33 +72,34 @@ public class BindTest {
     }
 
     public static void main(String[] args) {
+        MetaManager metaManager = new MetaManager(MetaManagerConfig.defaultBuilder()
+                .tableDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.orm.test" })
+                .build());
+        io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType databaseType = io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType.POSTGRESQL;
 
-        MetaManager metaManager = new MetaManager(MetaManagerConfig.defaultBuilder().tableDefinePackages(new String[] {
-                "io.github.s3s3l.yggdrasil.orm.test" }).build());
-        DataBindExpress jsqlDataBindExpress = new JSqlParserDataBindExpress(metaManager);
-        DataBindExpress defaulDataBindExpress = new DefaultDataBindExpress(metaManager);
+        DataBindExpressFactory dataBindExpressFactory = new DataBindExpressFactory();
 
-        System.out.println("[DefaultDataBindExpress]"
-                + defaulDataBindExpress
-                        .getSelect(User.builder()
-                                .id("id1")
-                                .build())
-                        .getSql());
-        System.out.println("[JSqlParserDataBindExpress]"
-                + jsqlDataBindExpress
-                        .getSelect(User.builder()
-                                .id("id1")
-                                .build())
-                        .getSql());
+        dataBindExpressFactory.initDefault(metaManager);
+        DataBindExpress jsqlDataBindExpress = dataBindExpressFactory.getInstance(databaseType,
+                ExpressBuilderType.JSQLPARSER);
+        DataBindExpress defaulDataBindExpress = dataBindExpressFactory.getInstance(databaseType,
+                ExpressBuilderType.DEFAULT);
+
+        System.out.println("[DefaultDataBindExpress]" + defaulDataBindExpress.getSelect(User.builder()
+                .id("id1")
+                .build())
+                .getSql());
+        System.out.println("[JSqlParserDataBindExpress]" + jsqlDataBindExpress.getSelect(User.builder()
+                .id("id1")
+                .build())
+                .getSql());
         List<User> list = new LinkedList<>();
         list.add(User.builder()
                 .id("id1")
                 .build());
-        System.out.println("[DefaultDataBindExpress]" + defaulDataBindExpress
-                .getInsert(list)
+        System.out.println("[DefaultDataBindExpress]" + defaulDataBindExpress.getInsert(list)
                 .getSql());
-        System.out.println("[JSqlParserDataBindExpress]" + defaulDataBindExpress
-                .getInsert(list)
+        System.out.println("[JSqlParserDataBindExpress]" + defaulDataBindExpress.getInsert(list)
                 .getSql());
 
         list.add(User.builder()
@@ -105,8 +108,7 @@ public class BindTest {
                 .age(23)
                 .phones(new String[] { "phone2.1", "phone2.2" })
                 .build());
-        System.out.println("[DefaultDataBindExpress]" + new DefaultDataBindExpress(metaManager)
-                .getInsert(list)
+        System.out.println("[DefaultDataBindExpress]" + defaulDataBindExpress.getInsert(list)
                 .getSql());
 
         SqlStruct insert = jsqlDataBindExpress.getInsert(list);
@@ -206,8 +208,35 @@ public class BindTest {
                 .forEach(System.out::println);
 
         System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
-        System.out.println(defaulDataBindExpress.getCreate(User.class, false).getSql());
+        System.out.println(defaulDataBindExpress.getCreate(User.class, false)
+                .getSql());
         System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
-        System.out.println(jsqlDataBindExpress.getCreate(User.class, false).getSql());
+        System.out.println(jsqlDataBindExpress.getCreate(User.class, false)
+                .getSql());
+
+        TableMeta userTable = metaManager.getTable(User.class);
+        ColumnMeta columnMeta = userTable.getColumns()
+                .get(0);
+        // columnMeta.getDbType()
+        // .setNotNull(true);
+        columnMeta.setTableAlias(userTable.getName());
+        System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
+        System.out.println(defaulDataBindExpress.getColumnAdd(columnMeta)
+                .getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        System.out.println(jsqlDataBindExpress.getColumnAdd(columnMeta)
+                .getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
+        System.out.println(defaulDataBindExpress.getColumnDrop(columnMeta)
+                .getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        System.out.println(jsqlDataBindExpress.getColumnDrop(columnMeta)
+                .getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> DefaultDataBindExpress");
+        System.out.println(defaulDataBindExpress.getColumnAlter(columnMeta)
+                .getSql());
+        System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
+        System.out.println(jsqlDataBindExpress.getColumnAlter(columnMeta)
+                .getSql());
     }
 }

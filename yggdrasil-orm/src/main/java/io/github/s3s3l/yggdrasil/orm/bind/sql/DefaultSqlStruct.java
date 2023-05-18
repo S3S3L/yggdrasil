@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-
 /**
  * 
  * <p>
@@ -19,7 +17,7 @@ import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
  */
 public class DefaultSqlStruct implements SqlStruct {
 
-    private String sql = StringUtils.EMPTY_STRING;
+    private StringBuilder sql = new StringBuilder();
     private List<Object> params = new ArrayList<>();
 
     public void addParam(Object... param) {
@@ -32,18 +30,17 @@ public class DefaultSqlStruct implements SqlStruct {
     }
 
     public DefaultSqlStruct appendSql(String sql) {
-        this.sql = new StringBuilder(this.sql == null ? StringUtils.EMPTY_STRING : this.sql).append(sql)
-                .toString();
+        this.sql.append(sql);
         return this;
     }
 
     public void setSql(String sql) {
-        this.sql = sql;
+        this.sql = new StringBuilder(sql);
     }
 
     @Override
     public String getSql() {
-        return sql;
+        return sql.toString();
     }
 
     @Override

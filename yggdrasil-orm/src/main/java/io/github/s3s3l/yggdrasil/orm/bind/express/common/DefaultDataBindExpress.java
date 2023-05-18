@@ -9,6 +9,7 @@ import io.github.s3s3l.yggdrasil.orm.bind.ColumnStruct;
 import io.github.s3s3l.yggdrasil.orm.bind.condition.ConditionStruct;
 import io.github.s3s3l.yggdrasil.orm.bind.condition.RawConditionNode;
 import io.github.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
+import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.bind.select.SelectStruct;
 import io.github.s3s3l.yggdrasil.orm.bind.set.SetNode;
 import io.github.s3s3l.yggdrasil.orm.bind.set.SetStruct;
@@ -16,7 +17,7 @@ import io.github.s3s3l.yggdrasil.orm.bind.sql.DefaultSqlStruct;
 import io.github.s3s3l.yggdrasil.orm.bind.sql.SqlStruct;
 import io.github.s3s3l.yggdrasil.orm.bind.value.ValuesStruct;
 import io.github.s3s3l.yggdrasil.orm.exception.DataBindExpressException;
-import io.github.s3s3l.yggdrasil.orm.meta.DatabaseType;
+import io.github.s3s3l.yggdrasil.orm.meta.DbType;
 import io.github.s3s3l.yggdrasil.orm.meta.GroupByMeta;
 import io.github.s3s3l.yggdrasil.orm.meta.LimitMeta;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
@@ -38,7 +39,7 @@ import io.github.s3s3l.yggdrasil.utils.verify.Verify;
  * @version 1.0.0
  * @since JDK 1.8
  */
-public class DefaultDataBindExpress implements DataBindExpress {
+public abstract class DefaultDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
 
     public DefaultDataBindExpress(MetaManager metaManager) {
@@ -46,18 +47,24 @@ public class DefaultDataBindExpress implements DataBindExpress {
     }
 
     @Override
+    public ExpressBuilderType expressBuilderType() {
+        return ExpressBuilderType.DEFAULT;
+    }
+
+    @Override
     public SqlStruct getInsert(List<?> sources) {
         Verify.notEmpty(sources);
 
-        Class<?> modelType = sources.get(0).getClass();
+        Class<?> modelType = sources.get(0)
+                .getClass();
         TableMeta table = metaManager.getTable(modelType);
 
         DefaultSqlStruct struct = new DefaultSqlStruct();
 
         AtomicBoolean first = new AtomicBoolean(true);
         List<DefaultSqlStruct> valueStructs = sources.stream()
-                .map(r -> new ValuesStruct(table.getColumns())
-                        .toSqlStruct(new PropertyDescriptorReflectionBean(r), first.getAndSet(false)))
+                .map(r -> new ValuesStruct(table.getColumns()).toSqlStruct(new PropertyDescriptorReflectionBean(r),
+                        first.getAndSet(false)))
                 .collect(Collectors.toList());
 
         struct.setSql("INSERT INTO ");
@@ -78,11 +85,10 @@ public class DefaultDataBindExpress implements DataBindExpress {
         Class<?> conditionType = condition.getClass();
         TableMeta table = metaManager.getTable(conditionType);
 
-        SqlStruct deleteStruct = new ConditionStruct(metaManager.getDeleteCondition(
-                conditionType).stream().map(
-                        RawConditionNode::new)
-                .collect(Collectors.toList()))
-                .toSqlStruct(new PropertyDescriptorReflectionBean(condition));
+        SqlStruct deleteStruct = new ConditionStruct(metaManager.getDeleteCondition(conditionType)
+                .stream()
+                .map(RawConditionNode::new)
+                .collect(Collectors.toList())).toSqlStruct(new PropertyDescriptorReflectionBean(condition));
 
         struct.setSql("DELETE FROM ");
         struct.appendSql(table.getName());
@@ -108,12 +114,13 @@ public class DefaultDataBindExpress implements DataBindExpress {
         PropertyDescriptorReflectionBean sourceRef = new PropertyDescriptorReflectionBean(source);
         PropertyDescriptorReflectionBean conditionRef = new PropertyDescriptorReflectionBean(condition);
 
-        SqlStruct setStruct = new SetStruct(
-                table.getColumns().stream().map(SetNode::new).collect(Collectors.toList()))
-                .toSqlStruct(sourceRef);
-        SqlStruct conditionStruct = new ConditionStruct(metaManager.getUpdateCondition(
-                conditionType).stream().map(
-                        RawConditionNode::new)
+        SqlStruct setStruct = new SetStruct(table.getColumns()
+                .stream()
+                .map(SetNode::new)
+                .collect(Collectors.toList())).toSqlStruct(sourceRef);
+        SqlStruct conditionStruct = new ConditionStruct(metaManager.getUpdateCondition(conditionType)
+                .stream()
+                .map(RawConditionNode::new)
                 .collect(Collectors.toList())).toSqlStruct(conditionRef);
 
         if (setStruct == null) {
@@ -159,14 +166,15 @@ public class DefaultDataBindExpress implements DataBindExpress {
 
         PropertyDescriptorReflectionBean ref = new PropertyDescriptorReflectionBean(condition);
         boolean hasGroupBy = groupBy != null && !CollectionUtils.isEmpty(groupBy.getColumns());
-        SqlStruct selectStruct = new SelectStruct(
-                table.getColumns().stream()
-                        .filter(col -> !hasGroupBy || groupBy.getColumns().contains(col.getName()))
-                        .map(ColumnStruct::new).collect(Collectors.toList()))
-                .toSqlStruct(null);
-        SqlStruct conditionStruct = new ConditionStruct(metaManager.getSelectCondition(
-                conditionType).stream().map(
-                        RawConditionNode::new)
+        SqlStruct selectStruct = new SelectStruct(table.getColumns()
+                .stream()
+                .filter(col -> !hasGroupBy || groupBy.getColumns()
+                        .contains(col.getName()))
+                .map(ColumnStruct::new)
+                .collect(Collectors.toList())).toSqlStruct(null);
+        SqlStruct conditionStruct = new ConditionStruct(metaManager.getSelectCondition(conditionType)
+                .stream()
+                .map(RawConditionNode::new)
                 .collect(Collectors.toList())).toSqlStruct(ref);
 
         if (selectStruct == null) {
@@ -186,28 +194,46 @@ public class DefaultDataBindExpress implements DataBindExpress {
             return struct;
         }
 
-        if (hasGroupBy) {
-            struct.appendSql(" GROUP BY ").appendSql(String.join(", ", groupBy.getColumns()));
-        }
+        groupBy(struct, groupBy, hasGroupBy);
 
+        orderBy(struct, orderByMetas);
+
+        offsetLimit(struct, offset, limit, ref);
+
+        return struct;
+    }
+
+    protected void groupBy(DefaultSqlStruct struct, GroupByMeta groupBy, boolean hasGroupBy) {
+        if (hasGroupBy) {
+            struct.appendSql(" GROUP BY ")
+                    .appendSql(String.join(", ", groupBy.getColumns()));
+        }
+    }
+
+    protected void orderBy(DefaultSqlStruct struct, List<OrderByMeta> orderByMetas) {
         if (!CollectionUtils.isEmpty(orderByMetas)) {
             struct.appendSql(" ORDER BY ")
-                    .appendSql(String.join(", ",
-                            orderByMetas.stream()
-                                    .map(ob -> String.join(" ", ob.getName(), ob.isDesc() ? "DESC" : "AESC"))
-                                    .collect(Collectors.toList())));
+                    .appendSql(String.join(", ", orderByMetas.stream()
+                            .map(ob -> String.join(" ", ob.getName(), ob.isDesc() ? "DESC" : "AESC"))
+                            .collect(Collectors.toList())));
         }
+    }
 
+    protected void offsetLimit(DefaultSqlStruct struct,
+            OffsetMeta offset,
+            LimitMeta limit,
+            PropertyDescriptorReflectionBean ref) {
         if (limit != null) {
             struct.appendSql(" LIMIT ?");
-            struct.addParam(ref.getFieldValue(limit.getField().getName()));
+            struct.addParam(ref.getFieldValue(limit.getField()
+                    .getName()));
         }
 
         if (offset != null) {
             struct.appendSql(" OFFSET ?");
-            struct.addParam(ref.getFieldValue(offset.getField().getName()));
+            struct.addParam(ref.getFieldValue(offset.getField()
+                    .getName()));
         }
-        return struct;
     }
 
     @Override
@@ -223,31 +249,30 @@ public class DefaultDataBindExpress implements DataBindExpress {
         }
 
         struct.appendSql(table.getName() + " (");
-        struct.appendSql(
-                String.join(", ", table
-                        .getColumns().stream().map(col -> {
-                            List<String> args = new LinkedList<>();
-                            args.add(col.getName());
-                            DatabaseType dbType = col.getDbType();
-                            args.add(dbType.getType());
-                            if (!CollectionUtils.isEmpty(dbType.getArgs())) {
-                                args.add(String.format("(%s)",
-                                        String.join(", ", dbType.getArgs())));
-                            }
+        struct.appendSql(String.join(", ", table.getColumns()
+                .stream()
+                .map(col -> {
+                    List<String> args = new LinkedList<>();
+                    args.add(col.getName());
+                    DbType dbType = col.getDbType();
+                    args.add(dbType.getType());
+                    if (!CollectionUtils.isEmpty(dbType.getArgs())) {
+                        args.add(String.format("(%s)", String.join(", ", dbType.getArgs())));
+                    }
 
-                            StringBuilder sb = new StringBuilder(String.join(" ", args));
+                    StringBuilder sb = new StringBuilder(String.join(" ", args));
 
-                            if (dbType.isPrimary()) {
-                                sb.append(" PRIMARY KEY");
-                            }
+                    if (dbType.isPrimary()) {
+                        sb.append(" PRIMARY KEY");
+                    }
 
-                            if (dbType.isNotNull()) {
-                                sb.append(" NOT NULL");
-                            }
+                    if (dbType.isNotNull()) {
+                        sb.append(" NOT NULL");
+                    }
 
-                            return sb.toString();
-                        })
-                        .collect(Collectors.toList())));
+                    return sb.toString();
+                })
+                .collect(Collectors.toList())));
         struct.appendSql(")");
         return struct;
     }

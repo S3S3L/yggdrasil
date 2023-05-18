@@ -8,11 +8,13 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import freemarker.template.Configuration;
-import io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.JSqlParserDataBindExpress;
+import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.ds.DefaultDatasourceHolder;
+import io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.exec.CreateConfig;
 import io.github.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor;
+import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
@@ -37,10 +39,10 @@ public class Application {
                 .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm.proxy" })
                 .proxyConfigLocations(new String[] { "proxy" })
                 .build());
+        DataBindExpressFactory dataBindExpressFactory = new DataBindExpressFactory(metaManager);
         SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
-                .datasourceHolder(new DefaultDatasourceHolder(
-                        ConnManager.DEFAULT, datasource))
-                .dataBindExpress(new JSqlParserDataBindExpress(metaManager))
+                .datasourceHolder(new DefaultDatasourceHolder(ConnManager.DEFAULT, datasource, DatabaseType.HSQLDB))
+                .dataBindExpress(dataBindExpressFactory.getInstance(DatabaseType.HSQLDB, ExpressBuilderType.DEFAULT))
                 .metaManager(metaManager)
                 .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
                         .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
@@ -51,14 +53,13 @@ public class Application {
                 .build());
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
-        sqlExecutor.insert(Arrays.asList(
-                User.builder()
-                        .id(id)
-                        .username("username1")
-                        .password("pwd1")
-                        .realName("realName1")
-                        .age(18)
-                        .build(),
+        sqlExecutor.insert(Arrays.asList(User.builder()
+                .id(id)
+                .username("username1")
+                .password("pwd1")
+                .realName("realName1")
+                .age(18)
+                .build(),
                 User.builder()
                         .id(id2)
                         .username("username2")
@@ -67,73 +68,103 @@ public class Application {
                         .age(22)
                         .build()));
         log.info(">>>>>>>>>>>>>>>>>> select one");
-        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .id(id)
+                .build(), User.class)
+                .forEach(System.out::println);
         log.info(">>>>>>>>>>>>>>>>>> select all");
-        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .build(), User.class)
+                .forEach(System.out::println);
 
         // update age
-        sqlExecutor.update(User.builder().age(19).build(), UserCondition.builder().id(id).build());
+        sqlExecutor.update(User.builder()
+                .age(19)
+                .build(),
+                UserCondition.builder()
+                        .id(id)
+                        .build());
         log.info(">>>>>>>>>>>>>>>>>> select one after update");
-        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .id(id)
+                .build(), User.class)
+                .forEach(System.out::println);
         log.info(">>>>>>>>>>>>>>>>>> select all after update");
-        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .build(), User.class)
+                .forEach(System.out::println);
 
         // delete by id
-        sqlExecutor.delete(UserCondition.builder().id(id).build());
+        sqlExecutor.delete(UserCondition.builder()
+                .id(id)
+                .build());
         log.info(">>>>>>>>>>>>>>>>>> select one after delete");
-        sqlExecutor.select(UserCondition.builder().id(id).build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .id(id)
+                .build(), User.class)
+                .forEach(System.out::println);
         log.info(">>>>>>>>>>>>>>>>>> select all after delete");
-        sqlExecutor.select(UserCondition.builder().build(), User.class).forEach(System.out::println);
+        sqlExecutor.select(UserCondition.builder()
+                .build(), User.class)
+                .forEach(System.out::println);
 
         UserProxy userProxy = sqlExecutor.getProxy(UserProxy.class);
 
         log.info(">>>>>>>>>>>>>>>>>> proxy, count for in condition");
-        System.out.println(userProxy.userCount(UserCondition.builder().ids(new String[] { id, id2 }).build()));
+        System.out.println(userProxy.userCount(UserCondition.builder()
+                .ids(new String[] { id, id2 })
+                .build()));
 
         log.info(">>>>>>>>>>>>>>>>>> proxy, list for in condition");
-        userProxy.list(UserCondition.builder().ids(new String[] { id, id2 }).build()).forEach(System.out::println);
+        userProxy.list(UserCondition.builder()
+                .ids(new String[] { id, id2 })
+                .build())
+                .forEach(System.out::println);
 
         log.info(">>>>>>>>>>>>>>>>>> proxy, get one by id");
-        System.out.println(userProxy.get(UserCondition.builder().id(id2).build()));
+        System.out.println(userProxy.get(UserCondition.builder()
+                .id(id2)
+                .build()));
 
         log.info(">>>>>>>>>>>>>>>>>> transactional, commit");
         sqlExecutor.transactional();
         String id3 = StringUtils.getUUIDNoLine();
-        sqlExecutor.insert(Arrays.asList(
-                User.builder()
-                        .id(id3)
-                        .username("username3")
-                        .password("pwd3")
-                        .realName("realName3")
-                        .age(18)
-                        .build()));
+        sqlExecutor.insert(Arrays.asList(User.builder()
+                .id(id3)
+                .username("username3")
+                .password("pwd3")
+                .realName("realName3")
+                .age(18)
+                .build()));
         sqlExecutor.transactionalCommit();
-        System.out.println(userProxy.get(UserCondition.builder().id(id3).build()));
+        System.out.println(userProxy.get(UserCondition.builder()
+                .id(id3)
+                .build()));
 
         log.info(">>>>>>>>>>>>>>>>>> transactional, rollback");
         sqlExecutor.transactional();
         String id4 = StringUtils.getUUIDNoLine();
-        sqlExecutor.insert(Arrays.asList(
-                User.builder()
-                        .id(id4)
-                        .username("username4")
-                        .password("pwd4")
-                        .realName("realName4")
-                        .age(18)
-                        .build()));
+        sqlExecutor.insert(Arrays.asList(User.builder()
+                .id(id4)
+                .username("username4")
+                .password("pwd4")
+                .realName("realName4")
+                .age(18)
+                .build()));
         sqlExecutor.rollback();
-        System.out.println(userProxy.get(UserCondition.builder().id(id4).build()));
+        System.out.println(userProxy.get(UserCondition.builder()
+                .id(id4)
+                .build()));
 
         log.info(">>>>>>>>>>>>>>>>>> Pagin");
         for (int i = 10; i < 100; i++) {
-            sqlExecutor.insert(Arrays.asList(
-                    User.builder()
-                            .id(StringUtils.getUUIDNoLine())
-                            .username("username" + i)
-                            .password("pwd" + i)
-                            .realName("realName" + i)
-                            .age(i)
-                            .build()));
+            sqlExecutor.insert(Arrays.asList(User.builder()
+                    .id(StringUtils.getUUIDNoLine())
+                    .username("username" + i)
+                    .password("pwd" + i)
+                    .realName("realName" + i)
+                    .age(i)
+                    .build()));
         }
         UserCondition paginCondition = new UserCondition();
         paginCondition.setPageIndex(1);
@@ -142,8 +173,9 @@ public class Application {
 
         while (nextPage) {
             PaginResult<List<User>> pr = sqlExecutor.selectByPagin(paginCondition, User.class);
-            log.info("pagecount: {}, recordscount: {}, resultRecordsCount: {}", pr.getPageCount(),
-                    pr.getRecordsCount(), pr.getData().size());
+            log.info("pagecount: {}, recordscount: {}, resultRecordsCount: {}", pr.getPageCount(), pr.getRecordsCount(),
+                    pr.getData()
+                            .size());
             nextPage = pr.getPageCount() > paginCondition.getPageIndex();
             paginCondition.setPageIndex(paginCondition.getPageIndex() + 1);
         }

@@ -17,4 +17,8 @@ public @interface DatabaseType {
     boolean primary() default false;
 
     boolean notNull() default false;
+
+    boolean def() default false;
+
+    String defValue() default "";
 }

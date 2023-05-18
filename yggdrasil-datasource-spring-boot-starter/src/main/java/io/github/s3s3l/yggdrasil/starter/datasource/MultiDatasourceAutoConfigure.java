@@ -14,18 +14,6 @@ import javax.sql.DataSource;
 
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
-import io.github.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
-import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.AutoSwitchDatasourceConfiguration;
-import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.DatasourceName;
-import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.ShardingDatasourceConfiguration;
-import io.github.s3s3l.yggdrasil.starter.datasource.config.DatasourceConfiguration;
-import io.github.s3s3l.yggdrasil.starter.datasource.config.SwitchableDatasourceConfiguration;
-import io.github.s3s3l.yggdrasil.starter.datasource.feature.DatasourceFactory;
-import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionsHelper;
-import io.github.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -43,14 +31,27 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.SystemPropertyUtils;
 
+import io.github.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
 import io.github.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
+import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.spring.BeanUtils;
+import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.AutoSwitchDatasourceConfiguration;
+import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.DatasourceName;
+import io.github.s3s3l.yggdrasil.starter.datasource.MultiDatasourceConfiguration.ShardingDatasourceConfiguration;
+import io.github.s3s3l.yggdrasil.starter.datasource.config.DatasourceConfiguration;
+import io.github.s3s3l.yggdrasil.starter.datasource.config.SwitchableDatasourceConfiguration;
+import io.github.s3s3l.yggdrasil.starter.datasource.feature.DatasourceFactory;
 import io.github.s3s3l.yggdrasil.starter.datasource.feature.SqlExecutorFactory;
+import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import io.github.s3s3l.yggdrasil.utils.collection.MapBuilder;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
+import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionsHelper;
+import io.github.s3s3l.yggdrasil.utils.reflect.scan.ClassScanner;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.shardingsphere.shardingjdbc.jdbc.core.datasource.ShardingDataSource;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,6 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnMissingBean(DataSource.class)
 public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String META_MANAGER_BEAN_NAME = "metaManager";
+    private static final String DATA_BIND_EXPRESS_FACTORY_BEAN_NAME = "dataBindExpressFactory";
     /**
      * datasource bean名称后缀
      */
@@ -126,16 +128,13 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
      * 注册bean
      */
     @Override
-    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
-            BeanDefinitionRegistry registry) {
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         try {
             // 注册工厂bean
-            registry.registerBeanDefinition(
-                    DatasourceFactory.BEAN_NAME, BeanUtils.buildBeanDefinition(null, null, null,
-                            DatasourceFactory.class));
-            registry.registerBeanDefinition(
-                    SqlExecutorFactory.BEAN_NAME, BeanUtils.buildBeanDefinition(null, null, null,
-                            SqlExecutorFactory.class));
+            registry.registerBeanDefinition(DatasourceFactory.BEAN_NAME,
+                    BeanUtils.buildBeanDefinition(null, null, null, DatasourceFactory.class));
+            registry.registerBeanDefinition(SqlExecutorFactory.BEAN_NAME,
+                    BeanUtils.buildBeanDefinition(null, null, null, SqlExecutorFactory.class));
             // 注册数据源相关bean
             MultiDatasourceConfiguration resolvedConfiguration = resolveConfiguration();
             if (!resolvedConfiguration.isEnable()) {
@@ -156,8 +155,7 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         PropertySourcesPlaceholdersResolver resolver = new PropertySourcesPlaceholdersResolver(
                 ((ConfigurableEnvironment) environment).getPropertySources(),
                 new PropertyPlaceholderHelper(SystemPropertyUtils.PLACEHOLDER_PREFIX,
-                        SystemPropertyUtils.PLACEHOLDER_SUFFIX,
-                        SystemPropertyUtils.VALUE_SEPARATOR, true));
+                        SystemPropertyUtils.PLACEHOLDER_SUFFIX, SystemPropertyUtils.VALUE_SEPARATOR, true));
         this.configuration = new Binder(ConfigurationPropertySources.get(environment), resolver)
                 .bind(MultiDatasourceConfiguration.PREFIX, MultiDatasourceConfiguration.class)
                 .orElse(new MultiDatasourceConfiguration());
@@ -167,8 +165,10 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
     /**
      * 构建并注册数据源相关bean
      * 
-     * @param config   数据源配置
-     * @param registry 注册器
+     * @param config
+     *            数据源配置
+     * @param registry
+     *            注册器
      * @throws IOException
      */
     private void multipleDatasource(MultiDatasourceConfiguration config, BeanDefinitionRegistry registry)
@@ -185,14 +185,16 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         // 注册MetaManager
         registry.registerBeanDefinition(META_MANAGER_BEAN_NAME,
                 BeanUtils.buildBeanDefinition(new Object[] { config.getMeta() }, MetaManager.class));
+        // 注册DataBindExpressFactory
+        registry.registerBeanDefinition(DATA_BIND_EXPRESS_FACTORY_BEAN_NAME, BeanUtils.buildBeanDefinition(null, null,
+                new String[] { META_MANAGER_BEAN_NAME }, DataBindExpressFactory.class));
 
         // 构建所有需要启动的数据源实例
         log.trace("Starting registering common datasources.");
         for (Entry<String, SwitchableDatasourceConfiguration> entry : config.getDbs()
                 .entrySet()
                 .stream()
-                .filter(entry -> CollectionUtils.isEmpty(instances)
-                        || instances.contains(entry.getKey()))
+                .filter(entry -> CollectionUtils.isEmpty(instances) || instances.contains(entry.getKey()))
                 .collect(Collectors.toList())) {
             String datasourceName = entry.getKey();
             SwitchableDatasourceConfiguration datasourceConfig = entry.getValue();
@@ -213,8 +215,7 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         for (Entry<String, ShardingDatasourceConfiguration> entry : config.getSharding()
                 .entrySet()
                 .stream()
-                .filter(entry -> CollectionUtils.isEmpty(instances)
-                        || instances.contains(entry.getKey()))
+                .filter(entry -> CollectionUtils.isEmpty(instances) || instances.contains(entry.getKey()))
                 .collect(Collectors.toList())) {
             String datasourceName = entry.getKey();
             ShardingDatasourceConfiguration datasourceConfig = entry.getValue();
@@ -222,8 +223,7 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             String datasourceBeanName = datasourceName.concat(SHARDING_DATASOURCE_TAIL);
             log.trace("Starting building sharding datasource definition '{}'.", datasourceBeanName);
             BeanDefinition dataSourceDefinition = BeanUtils.buildBeanDefinitionForFactoryMethod(
-                    ShardingDataSource.class,
-                    DatasourceFactory.BEAN_NAME, "getShardingDataSource",
+                    ShardingDataSource.class, DatasourceFactory.BEAN_NAME, "getShardingDataSource",
                     new Object[] { datasourceConfig });
             log.trace("Finished building sharding datasource definition '{}'.", datasourceBeanName);
             registerDatasource(mybatisConf, registry, datasourceName, datasourceBeanName, dataSourceDefinition, null);
@@ -235,8 +235,7 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         for (Entry<String, AutoSwitchDatasourceConfiguration> entry : config.getAutoSwitchDbs()
                 .entrySet()
                 .stream()
-                .filter(entry -> CollectionUtils.isEmpty(instances)
-                        || instances.contains(entry.getKey()))
+                .filter(entry -> CollectionUtils.isEmpty(instances) || instances.contains(entry.getKey()))
                 .collect(Collectors.toList())) {
             String datasourceName = entry.getKey();
             AutoSwitchDatasourceConfiguration datasourceConfig = entry.getValue();
@@ -246,11 +245,9 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             LocalDateTime switchTime = datasourceConfig.getSwitchTime()
                     .toLocalDateTime();
             log.trace("Switch time '{}'", switchTime);
-            BeanDefinition dataSourceDefinition = BeanUtils.buildBeanDefinitionForFactoryMethod(
-                    DataSource.class,
-                    DatasourceFactory.BEAN_NAME, "getAutoSwitchDataSource",
-                    new Object[] { switchTime }, getDataSourceName(datasourceConfig.getCurrent()),
-                    getDataSourceName(datasourceConfig.getNext()));
+            BeanDefinition dataSourceDefinition = BeanUtils.buildBeanDefinitionForFactoryMethod(DataSource.class,
+                    DatasourceFactory.BEAN_NAME, "getAutoSwitchDataSource", new Object[] { switchTime },
+                    getDataSourceName(datasourceConfig.getCurrent()), getDataSourceName(datasourceConfig.getNext()));
             log.trace("Finished building auto switch datasource definition '{}'.", datasourceBeanName);
             registerDatasource(mybatisConf, registry, datasourceName, datasourceBeanName, dataSourceDefinition, null);
         }
@@ -262,7 +259,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
     /**
      * 获取数据源bean名称
      * 
-     * @param name 数据源名称
+     * @param name
+     *            数据源名称
      * @return
      */
     private String getDataSourceName(DatasourceName name) {
@@ -281,9 +279,12 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
     /**
      * 构建可切换数据源的BeanDefinition，并注册
      * 
-     * @param registry         注册器
-     * @param datasourceConfig 可切换数据源配置
-     * @param datasourceName   数据源名称
+     * @param registry
+     *            注册器
+     * @param datasourceConfig
+     *            可切换数据源配置
+     * @param datasourceName
+     *            数据源名称
      * @return
      */
     private BeanDefinition buildDatasourceDefinition(BeanDefinitionRegistry registry,
@@ -299,8 +300,7 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             log.trace("Starting building current datasource definition '{}'.", currentDatasourceName);
             BeanDefinition currentDataSourceDefinition = buildDataSourceBeanDefinition(datasourceConfig);
             log.trace("Finished building current datasource definition '{}'.", currentDatasourceName);
-            registerDatasource(registry, currentDatasourceName, currentDataSourceDefinition,
-                    datasourceConfig);
+            registerDatasource(registry, currentDatasourceName, currentDataSourceDefinition, datasourceConfig);
 
             // 构建待切换数据源，并注册
             String nextDatasourceName = datasourceName.concat(NEXT_TAIL);
@@ -308,8 +308,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
             BeanDefinition nextDataSourceDefinition = buildDataSourceBeanDefinition(datasourceConfig.getSwitchConf()
                     .getDb());
             log.trace("Finished building next datasource definition '{}'.", nextDatasourceName);
-            registerDatasource(registry, nextDatasourceName, nextDataSourceDefinition,
-                    datasourceConfig.getSwitchConf().getDb());
+            registerDatasource(registry, nextDatasourceName, nextDataSourceDefinition, datasourceConfig.getSwitchConf()
+                    .getDb());
 
             // 构建可切换数据源
             LocalDateTime switchTime = datasourceConfig.getSwitchConf()
@@ -329,24 +329,31 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
     /**
      * 构建普通数据源
      * 
-     * @param datasourceConfiguration 数据源配置
+     * @param datasourceConfiguration
+     *            数据源配置
      * @return
      */
     private BeanDefinition buildDataSourceBeanDefinition(DatasourceConfiguration datasourceConfiguration) {
 
-        return BeanUtils.buildBeanDefinition(new MapBuilder<>(new HashMap<String, Object>())
-                .put("poolProperties", datasourceConfiguration)
-                .build(), null, null, org.apache.tomcat.jdbc.pool.DataSource.class);
+        return BeanUtils.buildBeanDefinition(
+                new MapBuilder<>(new HashMap<String, Object>()).put("poolProperties", datasourceConfiguration)
+                        .build(),
+                null, null, org.apache.tomcat.jdbc.pool.DataSource.class);
     }
 
     /**
      * 注册数据源和mybatis相关BeanDefinition
      * 
-     * @param mybatisConf        mybatis配置
-     * @param registry           注册器
-     * @param datasourceName     数据源名称
-     * @param datasourceBeanName 数据源bean名称
-     * @param dataSource         数据源BeanDefinition
+     * @param mybatisConf
+     *            mybatis配置
+     * @param registry
+     *            注册器
+     * @param datasourceName
+     *            数据源名称
+     * @param datasourceBeanName
+     *            数据源bean名称
+     * @param dataSource
+     *            数据源BeanDefinition
      * @throws IOException
      */
     private void registerDatasource(MybatisConfiguration mybatisConf,
@@ -366,7 +373,8 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         }
     }
 
-    private void registerTransactionManager(BeanDefinitionRegistry registry, String datasourceName,
+    private void registerTransactionManager(BeanDefinitionRegistry registry,
+            String datasourceName,
             String datasourceBeanName) {
         // register transaction manager
         String transactionName = datasourceName.concat(TRANSACTION_TAIL);
@@ -383,9 +391,12 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
     /**
      * 注册数据源
      * 
-     * @param registry           注册器
-     * @param datasourceBeanName 数据源bean名称
-     * @param dataSource         数据源BeanDefinition
+     * @param registry
+     *            注册器
+     * @param datasourceBeanName
+     *            数据源bean名称
+     * @param dataSource
+     *            数据源BeanDefinition
      */
     private void registerDatasource(BeanDefinitionRegistry registry,
             String datasourceBeanName,
@@ -412,18 +423,14 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         if (isSpecificMetaConfig) {
             registry.registerBeanDefinition(sqlExecutorName,
                     BeanUtils.buildBeanDefinitionForFactoryMethod(DefaultSqlExecutor.class,
-                            SqlExecutorFactory.BEAN_NAME,
-                            "sqlExecutor",
-                            new Object[] { datasourceConfiguration, metaManager },
-                            datasourceBeanName));
+                            SqlExecutorFactory.BEAN_NAME, "sqlExecutor",
+                            new Object[] { datasourceConfiguration, metaManager }, datasourceBeanName,
+                            DATA_BIND_EXPRESS_FACTORY_BEAN_NAME));
         } else {
             registry.registerBeanDefinition(sqlExecutorName,
                     BeanUtils.buildBeanDefinitionForFactoryMethod(DefaultSqlExecutor.class,
-                            SqlExecutorFactory.BEAN_NAME,
-                            "sqlExecutor",
-                            new Object[] { datasourceConfiguration },
-                            META_MANAGER_BEAN_NAME,
-                            datasourceBeanName));
+                            SqlExecutorFactory.BEAN_NAME, "sqlExecutor", new Object[] { datasourceConfiguration },
+                            META_MANAGER_BEAN_NAME, datasourceBeanName, DATA_BIND_EXPRESS_FACTORY_BEAN_NAME));
         }
         log.trace("Register bean SqlExecutor: {}", sqlExecutorName);
         log.trace("Finished registering datasource executor definition of database: '{}'.", datasourceBeanName);
@@ -434,35 +441,32 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         if (metaManager != null) {
             proxyTypes = metaManager.allProxies();
         } else {
-            proxyTypes = new ClassScanner().scan(this.configuration.getMeta().getProxyDefinePackages()).stream()
+            proxyTypes = new ClassScanner().scan(this.configuration.getMeta()
+                    .getProxyDefinePackages())
+                    .stream()
                     .filter(type -> ReflectionUtils.isAnnotationedWith(type, ExecutorProxy.class))
                     .collect(Collectors.toSet());
         }
         for (Class<?> proxyType : proxyTypes) {
             String executorProxyName = datasourceBeanName + proxyType.getSimpleName() + EXECUTOR_PROXY_TAIL;
-            registry.registerBeanDefinition(
-                    executorProxyName,
-                    BeanUtils.buildBeanDefinitionForFactoryMethod(
-                            proxyType,
-                            sqlExecutorName,
-                            "getProxy",
-                            new Object[] { proxyType }));
+            registry.registerBeanDefinition(executorProxyName, BeanUtils.buildBeanDefinitionForFactoryMethod(proxyType,
+                    sqlExecutorName, "getProxy", new Object[] { proxyType }));
             log.trace("Register bean ExecutorProxy: {}", executorProxyName);
         }
         log.trace("Finished registering executor proxy definition of database: '{}'.", datasourceBeanName);
     }
 
-    // public <T> T executorProxy() {
-
-    // }
-
     /**
      * 构建并注册mybatis相关BeanDefinition
      * 
-     * @param mybatisConf        mybatis配置
-     * @param datasourceBeanName 数据源bean名称
-     * @param registry           注册器
-     * @param datasourceName     数据源名称
+     * @param mybatisConf
+     *            mybatis配置
+     * @param datasourceBeanName
+     *            数据源bean名称
+     * @param registry
+     *            注册器
+     * @param datasourceName
+     *            数据源名称
      * @throws IOException
      */
     private void registerMybatisBean(MybatisConfiguration mybatisConf,
@@ -474,22 +478,15 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         String sqlSessionFactoryName = datasourceName.concat(SQL_SESSION_FACTORY_TAIL);
         log.trace("Starting building sqlSession factory definition '{}'", sqlSessionFactoryName);
         PathMatchingResourcePatternResolver pathResolver = new PathMatchingResourcePatternResolver();
-        BeanDefinition sqlSessionFactoryBean = BeanUtils
-                .buildBeanDefinition(
-                        new MapBuilder<>(new HashMap<String, Object>())
-                                .put("typeAliasesPackage",
-                                        mybatisConf.getTypeAliasesPackage())
-                                .put("configLocation",
-                                        pathResolver.getResource(mybatisConf
-                                                .getConfig()))
-                                .put("mapperLocations",
-                                        pathResolver.getResources(mybatisConf
-                                                .getMapperLocations()))
-                                .build(),
-                        new MapBuilder<>(new HashMap<String, String>())
-                                .put("dataSource", datasourceBeanName)
-                                .build(),
-                        null, SqlSessionFactoryBean.class);
+        BeanDefinition sqlSessionFactoryBean = BeanUtils.buildBeanDefinition(
+                new MapBuilder<>(new HashMap<String, Object>())
+                        .put("typeAliasesPackage", mybatisConf.getTypeAliasesPackage())
+                        .put("configLocation", pathResolver.getResource(mybatisConf.getConfig()))
+                        .put("mapperLocations", pathResolver.getResources(mybatisConf.getMapperLocations()))
+                        .build(),
+                new MapBuilder<>(new HashMap<String, String>()).put("dataSource", datasourceBeanName)
+                        .build(),
+                null, SqlSessionFactoryBean.class);
 
         log.trace("Finished building sqlSession factory definition '{}'", sqlSessionFactoryName);
 
@@ -502,16 +499,15 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         BeanDefinition sessionTemplate = BeanUtils.buildBeanDefinition(null, null,
                 new String[] { sqlSessionFactoryName }, SqlSessionTemplate.class);
         registry.registerBeanDefinition(sessionTemplateName, sessionTemplate);
-        for (Class<?> mapperType : ReflectionsHelper.getAllTypes(Optional
-                .ofNullable(mybatisConf.getMapperPackages()
-                        .get(datasourceName))
+        for (Class<?> mapperType : ReflectionsHelper.getAllTypes(Optional.ofNullable(mybatisConf.getMapperPackages()
+                .get(datasourceName))
                 .orElse(StringUtils.EMPTY_STRING)
                 .concat("."))) {
             String mapperName = mapperType.getSimpleName();
 
             log.trace("Starting registering mapper definition '{}'", mapperName);
-            BeanDefinition mapper = BeanUtils.buildBeanDefinitionForFactoryMethod(mapperType,
-                    sessionTemplateName, "getMapper", new Object[] { mapperType });
+            BeanDefinition mapper = BeanUtils.buildBeanDefinitionForFactoryMethod(mapperType, sessionTemplateName,
+                    "getMapper", new Object[] { mapperType });
             registry.registerBeanDefinition(mapperName, mapper);
             log.trace("Finished registering mapper definition '{}'", mapperName);
         }

@@ -12,11 +12,11 @@ package io.github.s3s3l.yggdrasil.orm.enumerations;
  * @since JDK 1.8
  */
 public enum DatabaseType {
-    STANDARD_SQL(0, "StandardSql"),
     MYSQL(1, "MySql"),
     ORACLE(2, "Oracle"),
     POSTGRESQL(3, "Postgresql"),
-    SQLSERVER(4, "SqlServer");
+    SQLSERVER(4, "SqlServer"),
+    HSQLDB(5, "HSQLDB");
 
     private int value;
     private String info;

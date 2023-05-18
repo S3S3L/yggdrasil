@@ -5,9 +5,10 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.pool.ConnManager;
-
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
@@ -18,10 +19,13 @@ public class DefaultDatasourceHolder implements DatasourceHolder {
     private final ThreadLocal<Boolean> isTransactional = new ThreadLocal<>();
 
     private DataSource datasource;
+    @Getter
+    private DatabaseType databaseType;
 
     @Override
-    public void setDatasource(DataSource datasource) {
+    public void setDatasource(DataSource datasource, DatabaseType databaseType) {
         this.datasource = datasource;
+        this.databaseType = databaseType;
     }
 
     @Override

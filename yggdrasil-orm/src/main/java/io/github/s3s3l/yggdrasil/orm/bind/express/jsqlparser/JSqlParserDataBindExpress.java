@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.github.s3s3l.yggdrasil.orm.bind.express.DataBindExpress;
+import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.CreateBuilder;
 import io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.DeleteBuilder;
 import io.github.s3s3l.yggdrasil.orm.bind.express.jsqlparser.builder.InsertBuilder;
@@ -66,11 +67,16 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.SelectUtils;
 
-public class JSqlParserDataBindExpress implements DataBindExpress {
+public abstract class JSqlParserDataBindExpress implements DataBindExpress {
     private final MetaManager metaManager;
 
     public JSqlParserDataBindExpress(MetaManager metaManager) {
         this.metaManager = metaManager;
+    }
+
+    @Override
+    public ExpressBuilderType expressBuilderType() {
+        return ExpressBuilderType.JSQLPARSER;
     }
 
     @Override
@@ -281,20 +287,39 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
             return sqlStruct;
         }
 
+        groupBy(groupBy, builder);
+
+        orderBy(conditionType, builder);
+
+        offsetLimit(rb, offset, limit, builder);
+
+        sqlStruct.appendSql(builder.build()
+                .toString());
+        sqlStruct.addParams(whereStruct.getParams());
+
+        return sqlStruct;
+    }
+
+    protected void orderBy(Class<?> conditionType, SelectBuilder builder) {
+        builder.orderByElements(metaManager.getOrderBy(conditionType)
+                .stream()
+                .map(obm -> {
+                    OrderByElement ob = new OrderByElement();
+                    ob.setExpression(new Column(obm.getName()));
+                    ob.setAsc(!obm.isDesc());
+                    return ob;
+                })
+                .collect(Collectors.toList()));
+    }
+
+    protected void groupBy(GroupByMeta groupBy, SelectBuilder builder) {
         builder.groupByExpressions(groupBy.getColumns()
                 .stream()
                 .map(Column::new)
-                .collect(Collectors.toList()))
-                .orderByElements(metaManager.getOrderBy(conditionType)
-                        .stream()
-                        .map(obm -> {
-                            OrderByElement ob = new OrderByElement();
-                            ob.setExpression(new Column(obm.getName()));
-                            ob.setAsc(!obm.isDesc());
-                            return ob;
-                        })
-                        .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
+    }
 
+    protected void offsetLimit(ReflectionBean rb, OffsetMeta offset, LimitMeta limit, SelectBuilder builder) {
         if (offset != null) {
             Object offsetCount = rb.getFieldValue(offset.getField()
                     .getName());
@@ -314,12 +339,6 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
                 builder.limit(l);
             }
         }
-
-        sqlStruct.appendSql(builder.build()
-                .toString());
-        sqlStruct.addParams(whereStruct.getParams());
-
-        return sqlStruct;
     }
 
     private JSqlParserSqlStruct toExpression(ConditionMeta condition, ReflectionBean rb) {
@@ -496,6 +515,40 @@ public class JSqlParserDataBindExpress implements DataBindExpress {
 
         Statement drop = CCJSqlParserUtil.parse("DROP TABLE IF EXISTS t_user");
         System.out.println(drop);
+
+        // HSQLDB
+        Statement alter = CCJSqlParserUtil
+                .parse("ALTER TABLE PUBLIC.T_USER ADD TEST VARCHAR(25) DEFAULT '123' NOT NULL");
+        System.out.println(alter);
+
+        Statement alterDrop = CCJSqlParserUtil.parse("ALTER TABLE PUBLIC.T_USER DROP COLUMN GOOGLEUSERID");
+        System.out.println(alterDrop);
+
+        Statement alterChange = CCJSqlParserUtil.parse("ALTER TABLE PUBLIC.T_USER ALTER COLUMN GOOGLEUSERID BIGINT");
+        System.out.println(alterChange);
+
+        // MYSQL
+        alter = CCJSqlParserUtil.parse(
+                "ALTER TABLE `market`.`t_user` ADD COLUMN `test1` VARCHAR(45) NOT NULL DEFAULT 'test' AFTER `securetKey`;");
+        System.out.println(alter);
+
+        alterDrop = CCJSqlParserUtil.parse("ALTER TABLE PUBLIC.T_USER DROP COLUMN GOOGLEUSERID");
+        System.out.println(alterDrop);
+
+        alterChange = CCJSqlParserUtil.parse(
+                "ALTER TABLE `market`.`t_user` CHANGE COLUMN `securetKey` `securetKey` VARCHAR(128) NOT NULL DEFAULT 'test' ;");
+        System.out.println(alterChange);
+
+        // Postgresql
+        alter = CCJSqlParserUtil.parse(
+                "ALTER TABLE IF EXISTS public.t_test ADD COLUMN test character varying(64) NOT NULL DEFAULT 'test';");
+        System.out.println(alter);
+
+        alterDrop = CCJSqlParserUtil.parse("ALTER TABLE IF EXISTS public.t_test DROP COLUMN IF EXISTS createtime;");
+        System.out.println(alterDrop);
+
+        alterChange = CCJSqlParserUtil.parse("ALTER TABLE IF EXISTS public.t_test ALTER COLUMN createtime TYPE date;");
+        System.out.println(alterChange);
     }
 
 }

@@ -6,11 +6,15 @@ import java.util.List;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import io.github.s3s3l.yggdrasil.orm.bind.express.common.DefaultDataBindExpress;
+
+import freemarker.template.Configuration;
+import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.ds.DefaultDatasourceHolder;
+import io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.exec.CreateConfig;
 import io.github.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor;
+import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
@@ -23,8 +27,6 @@ import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
-
-import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,9 +39,10 @@ public class Application {
                 .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm.proxy" })
                 .proxyConfigLocations(new String[] { "proxy" })
                 .build());
+        DataBindExpressFactory dataBindExpressFactory = new DataBindExpressFactory(metaManager);
         SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
-                .datasourceHolder(new DefaultDatasourceHolder(ConnManager.DEFAULT, datasource))
-                .dataBindExpress(new DefaultDataBindExpress(metaManager))
+                .datasourceHolder(new DefaultDatasourceHolder(ConnManager.DEFAULT, datasource, DatabaseType.HSQLDB))
+                .dataBindExpress(dataBindExpressFactory.getInstance(DatabaseType.HSQLDB, ExpressBuilderType.DEFAULT))
                 .metaManager(metaManager)
                 .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
                         .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))

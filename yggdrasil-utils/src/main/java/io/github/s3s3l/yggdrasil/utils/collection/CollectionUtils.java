@@ -3,8 +3,10 @@ package io.github.s3s3l.yggdrasil.utils.collection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -125,6 +127,29 @@ public abstract class CollectionUtils {
         return collection.stream()
                 .filter(predicate)
                 .findFirst();
+    }
 
+    public static <T> boolean equals(Collection<T> left, Collection<T> right) {
+        if (left == null && right == null) {
+            return true;
+        }
+
+        if (left == null || right == null || left.size() != right.size()) {
+            return false;
+        }
+
+        Iterator<T> iLeft = left.iterator();
+        Iterator<T> iRight = right.iterator();
+
+        while (iLeft.hasNext()) {
+            T l = iLeft.next();
+            T r = iRight.next();
+
+            if (!Objects.equals(l, r)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

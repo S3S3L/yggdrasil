@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.s3s3l.yggdrasil.orm.meta.DatabaseType;
+import io.github.s3s3l.yggdrasil.orm.meta.DbType;
 import io.github.s3s3l.yggdrasil.orm.meta.TableMeta;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class CreateBuilder {
             ColumnDefinition columnDefinition = new ColumnDefinition();
             columnDefinition.setColumnName(col.getName());
 
-            DatabaseType dbType = col.getDbType();
+            DbType dbType = col.getDbType();
             ColDataType type = new ColDataType();
             type.setDataType(dbType.getType());
             type.setArgumentsStringList(CollectionUtils.isEmpty(dbType.getArgs()) ? null : dbType.getArgs());

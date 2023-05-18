@@ -15,6 +15,8 @@ import io.github.s3s3l.yggdrasil.orm.exception.ProxyGenerateException;
 import io.github.s3s3l.yggdrasil.orm.exception.SqlExecutingException;
 import io.github.s3s3l.yggdrasil.orm.handler.StatementHelper;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
+import io.github.s3s3l.yggdrasil.orm.meta.TableMeta;
+import io.github.s3s3l.yggdrasil.orm.meta.remote.RemoteMetaManager;
 import io.github.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
 import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
 import io.github.s3s3l.yggdrasil.orm.proxy.ExecutorProxyInvocationHandler;
@@ -41,6 +43,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
 
     private final StatementHelper statementHelper;
     private final MetaManager metaManager;
+    private final RemoteMetaManager remoteMetaManager;
     private final DataBindExpress dataBindExpress;
     private final FreeMarkerHelper freeMarkerHelper;
     private final DatasourceHolder datasourceHolder;
@@ -50,6 +53,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
             FreeMarkerHelper freeMarkerHelper, DatasourceHolder datasourceHolder) {
         this.statementHelper = new StatementHelper(metaManager);
         this.metaManager = metaManager;
+        this.remoteMetaManager = new RemoteMetaManager(datasourceHolder);
         this.dataBindExpress = dataBindExpress;
         this.freeMarkerHelper = freeMarkerHelper;
         this.datasourceHolder = datasourceHolder;
@@ -154,8 +158,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
                 SqlStruct countSqlStruct = dataBindExpress.getSelectCount(condition);
                 String countSql = countSqlStruct.getSql();
                 log.debug("Excuting countSql [{}].", countSql);
-                try (PreparedStatement preparedStatement = conn
-                        .prepareStatement(countSql)) {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(countSql)) {
                     statementHelper.setParams(countSqlStruct.getParams(), preparedStatement);
 
                     ResultSet rs = preparedStatement.executeQuery();
@@ -198,9 +201,29 @@ public class DefaultSqlExecutor implements SqlExecutor {
     @Override
     public boolean create(Class<?> tableType, CreateConfig config) {
         Verify.notNull(tableType);
+        // 获取定义的表信息
+        TableMeta defTable = this.metaManager.getTable(tableType);
+        if (defTable == null) {
+            throw new SqlExecutingException("Table for type " + tableType + " is not defined.");
+        }
+        // 获取当前数据库中的表信息
+        TableMeta currentTable = this.remoteMetaManager.getTable(defTable.getName());
+
+        // 如果当前数据库中没有对应的表，或者需要先删除再创建，则直接重建表
+        if (currentTable == null || config.isDropFirst()) {
+            return createNew(tableType, config);
+        }
+
+        // TODO：比较表差异，并做增量变更
+
+        return false;
+    }
+
+    private boolean createNew(Class<?> tableType, CreateConfig config) {
         if (config.isDropFirst()) {
             drop(tableType);
         }
+
         SqlStruct sqlStruct = dataBindExpress.getCreate(tableType, config.isForce());
         String sql = sqlStruct.getSql();
         log.debug("Excuting sql [{}].", sql);
@@ -255,8 +278,8 @@ public class DefaultSqlExecutor implements SqlExecutor {
         if (proxyMeta == null) {
             throw new ProxyGenerateException("Proxy meta not found. " + proxyInterfaceType.getName());
         }
-        return (P) Proxy.newProxyInstance(proxyMeta.getIface().getClassLoader(),
-                new Class<?>[] { proxyMeta.getIface() },
+        return (P) Proxy.newProxyInstance(proxyMeta.getIface()
+                .getClassLoader(), new Class<?>[] { proxyMeta.getIface() },
                 ExecutorProxyInvocationHandler.builder()
                         .proxyMeta(proxyMeta)
                         .freeMarkerHelper(freeMarkerHelper)
