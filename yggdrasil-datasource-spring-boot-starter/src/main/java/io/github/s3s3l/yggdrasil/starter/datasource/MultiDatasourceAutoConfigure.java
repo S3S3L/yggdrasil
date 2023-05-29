@@ -35,6 +35,7 @@ import io.github.s3s3l.yggdrasil.configuration.mybatis.MybatisConfiguration;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.ExecutorProxy;
 import io.github.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
+import io.github.s3s3l.yggdrasil.orm.factory.DbTypeHandlerFactory;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.spring.BeanUtils;
@@ -69,6 +70,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnMissingBean(DataSource.class)
 public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String META_MANAGER_BEAN_NAME = "metaManager";
+    private static final String DBTYPE_HANDLER_FACTORY_BEAN_NAME = "dbTypeHandlerFactory";
     private static final String DATA_BIND_EXPRESS_FACTORY_BEAN_NAME = "dataBindExpressFactory";
     /**
      * datasource bean名称后缀
@@ -182,12 +184,17 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         MybatisConfiguration mybatisConf = config.getMybatis();
         List<String> instances = config.getRequiredInstances();
 
-        // 注册MetaManager
+        // 注册 MetaManager
         registry.registerBeanDefinition(META_MANAGER_BEAN_NAME,
                 BeanUtils.buildBeanDefinition(new Object[] { config.getMeta() }, MetaManager.class));
-        // 注册DataBindExpressFactory
-        registry.registerBeanDefinition(DATA_BIND_EXPRESS_FACTORY_BEAN_NAME, BeanUtils.buildBeanDefinition(null, null,
-                new String[] { META_MANAGER_BEAN_NAME }, DataBindExpressFactory.class));
+
+        // // 注册 DbTypeHandlerFactory
+        // registry.registerBeanDefinition(DBTYPE_HANDLER_FACTORY_BEAN_NAME,
+        // BeanUtils.buildBeanDefinition(DbTypeHandlerFactory.class));
+        // 注册 DataBindExpressFactory
+        registry.registerBeanDefinition(DATA_BIND_EXPRESS_FACTORY_BEAN_NAME,
+                BeanUtils.buildBeanDefinition(null, null, new String[] { META_MANAGER_BEAN_NAME },
+                        new Object[] { DbTypeHandlerFactory.DEFAULT }, DataBindExpressFactory.class));
 
         // 构建所有需要启动的数据源实例
         log.trace("Starting registering common datasources.");

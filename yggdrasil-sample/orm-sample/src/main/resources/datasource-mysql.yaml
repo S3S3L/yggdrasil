@@ -1,0 +1,20 @@
+driverClassName: com.mysql.cj.jdbc.Driver
+url: jdbc:mysql://localhost:3306/test
+username: mysql
+password: admin123
+jmxEnabled: false
+testWhileIdle: false
+validationQuery: SELECT 1
+testOnBorrow: true
+testOnReturn: false
+validationInterval: 30000
+timeBetweenEvictionRunsMillis: 10000
+maxActive: 10
+maxIdle: 2
+minIdle: 1
+initialSize: 2
+maxWait: 60000
+removeAbandoned: true
+logAbandoned: true
+minEvictableIdleTimeMillis: 60000
+removeAbandonedTimeout: 60000

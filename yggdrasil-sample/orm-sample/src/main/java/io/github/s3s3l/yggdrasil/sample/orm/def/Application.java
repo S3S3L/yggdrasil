@@ -8,19 +8,19 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import freemarker.template.Configuration;
-import io.github.s3s3l.yggdrasil.orm.bind.express.ExpressBuilderType;
 import io.github.s3s3l.yggdrasil.orm.ds.DefaultDatasourceHolder;
-import io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.exec.CreateConfig;
 import io.github.s3s3l.yggdrasil.orm.exec.DefaultSqlExecutor;
 import io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor;
 import io.github.s3s3l.yggdrasil.orm.factory.DataBindExpressFactory;
+import io.github.s3s3l.yggdrasil.orm.factory.DbTypeHandlerFactory;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
 import io.github.s3s3l.yggdrasil.orm.pool.ConnManager;
 import io.github.s3s3l.yggdrasil.orm.wrapper.SqlObjectWrapper;
 import io.github.s3s3l.yggdrasil.sample.orm.condition.UserCondition;
+import io.github.s3s3l.yggdrasil.sample.orm.config.DatasourceConfig;
 import io.github.s3s3l.yggdrasil.sample.orm.dao.User;
 import io.github.s3s3l.yggdrasil.sample.orm.proxy.UserProxy;
 import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
@@ -32,25 +32,35 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Application {
     public static void main(String[] args) throws SQLException {
-        DataSource datasource = new DataSource(
-                JacksonUtils.YAML.toObject(FileUtils.getFirstExistResource("datasource.yaml"), PoolProperties.class));
+
+        DatasourceConfig config = DatasourceConfig.POSTGRESQL_DEFAULT;
+
+        DataSource datasource = new DataSource(JacksonUtils.YAML
+                .toObject(FileUtils.getFirstExistResource(config.getConfigFile()), PoolProperties.class));
         MetaManager metaManager = new MetaManager(MetaManagerConfig.defaultBuilder()
                 .tableDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm" })
                 .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.sample.orm.proxy" })
                 .proxyConfigLocations(new String[] { "proxy" })
                 .build());
-        DataBindExpressFactory dataBindExpressFactory = new DataBindExpressFactory(metaManager);
+        DataBindExpressFactory dataBindExpressFactory = new DataBindExpressFactory(metaManager, DbTypeHandlerFactory.DEFAULT);
         SqlExecutor sqlExecutor = DefaultSqlExecutor.builder()
-                .datasourceHolder(new DefaultDatasourceHolder(ConnManager.DEFAULT, datasource, DatabaseType.HSQLDB))
-                .dataBindExpress(dataBindExpressFactory.getInstance(DatabaseType.HSQLDB, ExpressBuilderType.DEFAULT))
+                .datasourceHolder(
+                        new DefaultDatasourceHolder(ConnManager.DEFAULT, datasource, config.getDatabaseType()))
+                .dataBindExpress(
+                        dataBindExpressFactory.getInstance(config.getDatabaseType(), config.getExpressBuilderType()))
                 .metaManager(metaManager)
-                .freeMarkerHelper(new FreeMarkerHelper().config(config -> config
-                        .setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
+                .freeMarkerHelper(new FreeMarkerHelper().config(
+                        c -> c.setObjectWrapper(new SqlObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS))))
                 .build();
         sqlExecutor.create(User.class, CreateConfig.builder()
-                .dropFirst(true)
+                .dropFirst(false)
                 .force(false)
+                .autoAlterColumn(true)
+                .autoDropColumn(true)
                 .build());
+        sqlExecutor.delete(UserCondition.builder()
+                .build());
+        System.exit(0);
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
         sqlExecutor.insert(Arrays.asList(User.builder()

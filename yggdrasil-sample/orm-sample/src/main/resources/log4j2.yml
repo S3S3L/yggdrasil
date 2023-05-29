@@ -5,7 +5,7 @@ Configuration:
     - name: logPath
       value: logs
     - name: pattern
-      value: '[%p] %d{yyyy-MMM-dd HH:mm:ss} - %m%n'
+      value: '[%highlight{%-5p}{ERROR=Bright RED, WARN=Bright Yellow, INFO=Bright Green, DEBUG=Bright Cyan, TRACE=Bright White}] %style{%d{yyyy-MMM-dd HH:mm:ss}}{Yellow} %style{%t}{Cyan} %style{%-24c{1}}{Green} - %style{%m}{White}%n'
   Appenders:
     Console:
       name: consoleAppender
@@ -55,7 +55,7 @@ Configuration:
         max: 5
   Loggers:
     Root:
-      level: info
+      level: debug
       AppenderRef:
       - ref: consoleAppender
       - ref: serverAppender

@@ -63,7 +63,7 @@
         </dependency>
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
-			<artifactId>yggdrasil-orm</artifactId>
+			<artifactId>yggdrasil-orm-core</artifactId>
         </dependency>
 		<dependency>
 			<groupId>io.github.s3s3l</groupId>
