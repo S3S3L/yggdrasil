@@ -22,4 +22,8 @@ public class RemoteMetaManager {
     public TableMeta getTable(String tableName) {
         return tables.computeIfAbsent(tableName, k -> databaseMetaHelper.getTableMeta(k, datasourceHolder));
     }
+
+    public void refresh() {
+        tables.clear();
+    }
 }

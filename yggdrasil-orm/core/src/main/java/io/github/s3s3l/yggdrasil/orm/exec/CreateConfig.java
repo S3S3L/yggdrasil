@@ -22,7 +22,8 @@ public class CreateConfig {
     @Builder.Default
     private boolean dropFirst = false;
     /**
-     * 是否检查字段类型，如果类型不匹配则抛出异常
+     * 是否检查字段类型，如果类型不匹配则抛出异常 <br>
+     * TODO: 对现有字段和代码定义类型做校验，如果不兼容需要抛出异常
      */
     @Builder.Default
     private boolean columnTypeCheck = true;
