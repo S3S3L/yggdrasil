@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class DbType {
     private JDBCType type;
+    private String typeName;
     private List<String> args;
     @Builder.Default
     private boolean primary = false;

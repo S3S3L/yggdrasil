@@ -67,6 +67,7 @@ public class HSQLDBDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
                     DbType dbType = DbType.builder()
                             .notNull(!strToBoolean(rs.getString(HSQLDBColumnMetaColumns.IS_NULLABLE.name())))
                             .type(JDBCType.valueOf(rs.getInt(HSQLDBColumnMetaColumns.DATA_TYPE.name())))
+                            .typeName(rs.getString(HSQLDBColumnMetaColumns.TYPE_NAME.name()))
                             .build();
                     switch (dataType) {
                         // varchar
@@ -82,7 +83,7 @@ public class HSQLDBDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
 
                     columns.add(ColumnMeta.builder()
                             .name(colName)
-                            .dbType(dbType)
+                            .dbType(dbTypeHandler.toJdbcType(dbType))
                             .tableName(realTableName)
                             .build());
                 }

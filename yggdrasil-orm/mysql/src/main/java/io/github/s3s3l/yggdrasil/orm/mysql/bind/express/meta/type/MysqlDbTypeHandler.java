@@ -39,5 +39,24 @@ public class MysqlDbTypeHandler implements DbTypeHandler {
 
         return typeBuf.toString();
     }
-    
+
+    @Override
+    public DbType toJdbcType(DbType dbType) {
+        if (dbType == null) {
+            return null;
+        }
+
+        DbType jdbcDbType = DbType.builder()
+                .type(dbType.getType())
+                .array(dbType.isArray())
+                .primary(dbType.isPrimary())
+                .notNull(dbType.isNotNull())
+                .def(dbType.isDef())
+                .defValue(dbType.getDefValue())
+                .args(dbType.getArgs())
+                .build();
+
+        return jdbcDbType;
+    }
+
 }

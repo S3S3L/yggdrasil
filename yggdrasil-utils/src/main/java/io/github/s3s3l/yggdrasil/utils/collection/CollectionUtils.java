@@ -130,11 +130,11 @@ public abstract class CollectionUtils {
     }
 
     public static <T> boolean equals(Collection<T> left, Collection<T> right) {
-        if (left == null && right == null) {
+        if (isEmpty(left) && isEmpty(right)) {
             return true;
         }
 
-        if (left == null || right == null || left.size() != right.size()) {
+        if (isEmpty(left) || isEmpty(right) || left.size() != right.size()) {
             return false;
         }
 

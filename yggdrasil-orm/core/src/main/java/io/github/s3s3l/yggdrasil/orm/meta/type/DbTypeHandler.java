@@ -8,4 +8,11 @@ public interface DbTypeHandler extends BaseOnDatabase {
     String getDataTypeStr(DbType dbType);
 
     String getFullTypeDef(DbType dbType);
+
+    /**
+     * 将数据库类型转换成JDBC类型
+     * @param dbType
+     * @return
+     */
+    DbType toJdbcType(DbType dbType);
 }

@@ -1,5 +1,7 @@
 package io.github.s3s3l.yggdrasil.orm.postgresql.meta.type;
 
+import java.sql.JDBCType;
+
 import io.github.s3s3l.yggdrasil.orm.enumerations.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.meta.DbType;
 import io.github.s3s3l.yggdrasil.orm.meta.type.DbTypeHandler;
@@ -43,6 +45,45 @@ public class PsqlDbTypeHandler implements DbTypeHandler {
         }
 
         return typeBuf.toString();
+    }
+
+    @Override
+    public DbType toJdbcType(DbType dbType) {
+        if (dbType == null) {
+            return null;
+        }
+
+        DbType jdbcDbType = DbType.builder()
+                .type(dbType.getType())
+                .array(dbType.isArray())
+                .primary(dbType.isPrimary())
+                .notNull(dbType.isNotNull())
+                .def(dbType.isDef())
+                .defValue(dbType.getDefValue())
+                .args(dbType.getArgs())
+                .build();
+
+        switch (dbType.getType()) {
+            case ARRAY:
+                jdbcDbType.setArray(true);
+                jdbcDbType.setType(JDBCType.valueOf(dbType.getTypeName()
+                        .substring(1)
+                        .toUpperCase()));
+                break;
+            case BIT:
+                switch (dbType.getTypeName()) {
+                    case "bool":
+                        jdbcDbType.setType(JDBCType.BOOLEAN);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return jdbcDbType;
     }
 
 }

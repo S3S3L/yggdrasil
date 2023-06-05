@@ -65,6 +65,7 @@ public class PsqlDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
                     DbType dbType = DbType.builder()
                             .notNull(!strToBoolean(rs.getString(PsqlColumnMetaColumns.IS_NULLABLE.name())))
                             .type(JDBCType.valueOf(rs.getInt(PsqlColumnMetaColumns.DATA_TYPE.name())))
+                            .typeName(rs.getString(PsqlColumnMetaColumns.TYPE_NAME.name()))
                             .build();
                     switch (dataType) {
                         // varchar
@@ -80,7 +81,7 @@ public class PsqlDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
 
                     columns.add(ColumnMeta.builder()
                             .name(colName)
-                            .dbType(dbType)
+                            .dbType(dbTypeHandler.toJdbcType(dbType))
                             .tableName(tableName)
                             .build());
                 }

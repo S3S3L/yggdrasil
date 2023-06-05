@@ -66,6 +66,7 @@ public class MysqlDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
                     DbType dbType = DbType.builder()
                             .notNull(!strToBoolean(rs.getString(MysqlColumnMetaColumns.IS_NULLABLE.name())))
                             .type(JDBCType.valueOf(rs.getInt(MysqlColumnMetaColumns.DATA_TYPE.name())))
+                            .typeName(rs.getString(MysqlColumnMetaColumns.TYPE_NAME.name()))
                             .build();
                     switch (dataType) {
                         // varchar
@@ -81,7 +82,7 @@ public class MysqlDatabaseMetaHelper extends AbstractDatabaseMetaHelper {
 
                     columns.add(ColumnMeta.builder()
                             .name(colName)
-                            .dbType(dbType)
+                            .dbType(dbTypeHandler.toJdbcType(dbType))
                             .tableName(tableName)
                             .build());
                 }

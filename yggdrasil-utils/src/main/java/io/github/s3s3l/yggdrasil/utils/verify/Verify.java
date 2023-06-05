@@ -1,11 +1,13 @@
 package io.github.s3s3l.yggdrasil.utils.verify;
 
 import java.util.Collection;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 import io.github.s3s3l.yggdrasil.bean.exception.VerifyException;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.log.base.LogHelper;
-import org.slf4j.Logger;
 
 /**
  * ClassName:Verify <br>
@@ -796,24 +798,42 @@ public abstract class Verify {
     }
 
     public static void assertEquals(Object src, Object compare) {
-        assertEquals(src, compare,
-                String.format("[Verify failed] - provided object must be equated with %s, but it is %s", compare, src));
+        assertEquals(src, compare, () -> String
+                .format("[Verify failed] - provided object must be equated with %s, but it is %s", compare, src));
     }
 
     public static void assertEquals(Object src, Object compare, String message) {
+        assertEquals(src, compare, () -> message);
+    }
+
+    /**
+     * 断言两个对象一致<br>
+     * 需要抛出异常的时候再进行错误信息构建，降低性能消耗
+     * 
+     */
+    public static void assertEquals(Object src, Object compare, Supplier<String> messageSupplier) {
         if (src == null || !src.equals(compare)) {
-            throw new VerifyException(message);
+            throw new VerifyException(messageSupplier.get());
         }
     }
 
     public static void assertNotEquals(Object src, Object compare) {
-        assertNotEquals(src, compare, String
+        assertNotEquals(src, compare, () -> String
                 .format("[Verify failed] - provided object must not be equated with %s, but it is %s", compare, src));
     }
 
     public static void assertNotEquals(Object src, Object compare, String message) {
+        assertNotEquals(src, compare, () -> message);
+    }
+
+    /**
+     * 断言两个对象不一致<br>
+     * 需要抛出异常的时候再进行错误信息构建，降低性能消耗
+     * 
+     */
+    public static void assertNotEquals(Object src, Object compare, Supplier<String> messageSupplier) {
         if ((src == null && compare != null) || (src != null && src.equals(compare))) {
-            throw new VerifyException(message);
+            throw new VerifyException(messageSupplier.get());
         }
     }
 
