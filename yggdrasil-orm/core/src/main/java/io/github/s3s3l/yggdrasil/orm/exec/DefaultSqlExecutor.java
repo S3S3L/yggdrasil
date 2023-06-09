@@ -156,6 +156,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
         Verify.notNull(resultType);
 
         PaginResult<List<R>> result = new PaginResult<>();
+        condition.setPagin(true);
         condition.prepare();
 
         try {

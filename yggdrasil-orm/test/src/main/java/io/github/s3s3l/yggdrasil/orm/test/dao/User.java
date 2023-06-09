@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.orm.postgresql.test.dao;
+package io.github.s3s3l.yggdrasil.orm.test.dao;
 
 import java.sql.JDBCType;
 
@@ -30,6 +30,6 @@ public class User {
     private String password;
     @Column(dbType = @DatabaseType(type = JDBCType.BOOLEAN))
     private Boolean deleted;
-    @Column(dbType = @DatabaseType(type = JDBCType.VARCHAR, array = true))
-    private String[] remarks;
+    // @Column(dbType = @DatabaseType(type = JDBCType.VARCHAR, array = true), typeHandler = ArrayTypeHandler.class)
+    // private String[] remarks;
 }

@@ -1,12 +1,14 @@
-package io.github.s3s3l.yggdrasil.orm.postgresql.test;
+package io.github.s3s3l.yggdrasil.orm.test.base;
 
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import io.github.s3s3l.yggdrasil.orm.exec.CreateConfig;
 import io.github.s3s3l.yggdrasil.orm.exec.SqlExecutor;
@@ -14,31 +16,31 @@ import io.github.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.TableMeta;
 import io.github.s3s3l.yggdrasil.orm.meta.remote.RemoteMetaManager;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.config.DatasourceConfig;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.dao.OldUser;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.dao.User;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.helper.TestHelper;
+import io.github.s3s3l.yggdrasil.orm.test.dao.OldUser;
+import io.github.s3s3l.yggdrasil.orm.test.dao.User;
+import io.github.s3s3l.yggdrasil.orm.test.helper.TestHelper;
 import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 
-public class CreateTableTest {
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public abstract class CreateTableTest implements BaseTest {
+    private final TestHelper testHelper = getHelper();
 
-    private static final DatasourceConfig CONFIG = DatasourceConfig.POSTGRESQL_DEFAULT;
+    private int oldColumnSize;
+    private int columnSize;
+    private long totalColumnSize;
+    private SqlExecutor sqlExecutor = testHelper.getSqlExecutor();
+    private MetaManager metaManager = testHelper.getMetaManager();
+    private RemoteMetaManager remoteMetaManager = testHelper.getRemoteMetaManager();
 
-    private static int oldColumnSize;
-    private static int columnSize;
-    private static long totalColumnSize;
-    private static SqlExecutor sqlExecutor;
-    private static MetaManager metaManager;
-    private static RemoteMetaManager remoteMetaManager;
+    protected Class<?> tableType() {
+        return User.class;
+    }
 
-    @BeforeAll
-    public static void beforeAll() {
-        sqlExecutor = TestHelper.getSqlExecutor(CONFIG);
-        metaManager = TestHelper.getMetaManager();
-        remoteMetaManager = TestHelper.getRemoteMetaManager(CONFIG);
+    @BeforeEach
+    public void createOld() {
 
         TableMeta oldTable = metaManager.getTable(OldUser.class);
-        TableMeta table = metaManager.getTable(User.class);
+        TableMeta table = metaManager.getTable(tableType());
 
         oldColumnSize = oldTable.getColumns()
                 .size();
@@ -52,10 +54,6 @@ public class CreateTableTest {
                         .map(ColumnMeta::getName))
                 .distinct()
                 .count();
-    }
-
-    @BeforeEach
-    public void createOld() {
         sqlExecutor.create(OldUser.class, CreateConfig.builder()
                 .dropFirst(true)
                 .build());
@@ -64,44 +62,50 @@ public class CreateTableTest {
 
     @AfterEach
     public void drop() {
-        sqlExecutor.drop(User.class);
+        sqlExecutor.drop(tableType());
         checkNoTable();
     }
 
+    @Order(1)
     @Test
     public void dropFirst() {
-        sqlExecutor.create(User.class, CreateConfig.builder()
+        sqlExecutor.create(tableType(), CreateConfig.builder()
                 .dropFirst(true)
                 .build());
 
         checkTable(columnSize);
     }
 
+    @Order(2)
     @Test
     public void autoAddColumn() {
-        sqlExecutor.create(User.class, CreateConfig.builder()
+        sqlExecutor.create(tableType(), CreateConfig.builder()
                 .build());
 
         checkTable(totalColumnSize);
     }
 
+    @Order(3)
     @Test
     public void autoDropColumn() {
-        sqlExecutor.create(User.class, CreateConfig.builder()
+        sqlExecutor.create(tableType(), CreateConfig.builder()
                 .autoDropColumn(true)
                 .build());
 
         checkTable(columnSize);
     }
 
+    @Order(4)
     @Test
     public void autoAlterColumn() {
-        sqlExecutor.create(User.class, CreateConfig.builder()
+        sqlExecutor.create(tableType(), CreateConfig.builder()
                 .autoAlterColumn(true)
                 .build());
 
         checkTable(totalColumnSize);
-        TableMeta defTableMeta = metaManager.getTable(User.class);
+        TableMeta defTableMeta = metaManager.getTable(tableType());
+
+        remoteMetaManager.refresh();
         TableMeta tableMeta = remoteMetaManager.getTable(User.TABLE_NAME);
         Assertions.assertEquals(CollectionUtils.getFirst(defTableMeta.getColumns(), r -> r.getName()
                 .equalsIgnoreCase("password"))

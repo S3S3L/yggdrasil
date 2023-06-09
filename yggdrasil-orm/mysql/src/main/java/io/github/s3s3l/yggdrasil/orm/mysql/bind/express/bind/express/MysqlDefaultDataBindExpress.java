@@ -30,16 +30,17 @@ public class MysqlDefaultDataBindExpress extends DefaultDataBindExpress {
             OffsetMeta offset,
             LimitMeta limit,
             PropertyDescriptorReflectionBean ref) {
-        if (limit != null && offset != null) {
+        Object limitVal = ref.getFieldValue(limit.getField()
+                .getName());
+        Object offsetVal = ref.getFieldValue(offset.getField()
+                .getName());
+        if (limit != null && offset != null && limitVal != null && offsetVal != null) {
             struct.appendSql(" LIMIT ?, ?");
-            struct.addParam(ref.getFieldValue(offset.getField()
-                    .getName()));
-            struct.addParam(ref.getFieldValue(limit.getField()
-                    .getName()));
-        } else if (limit != null) {
+            struct.addParam(offsetVal);
+            struct.addParam(limitVal);
+        } else if (limit != null && limitVal != null) {
             struct.appendSql(" LIMIT ?");
-            struct.addParam(ref.getFieldValue(limit.getField()
-                    .getName()));
+            struct.addParam(limitVal);
         }
     }
 

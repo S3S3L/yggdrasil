@@ -2,7 +2,6 @@ package io.github.s3s3l.yggdrasil.orm.pagin;
 
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Limit;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Offset;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +14,12 @@ import lombok.experimental.SuperBuilder;
 public class ConditionForPagination {
     private int pageSize;
     private int pageIndex;
+    private boolean pagin;
 
     @Offset
-    private long offset;
+    private Long offset;
     @Limit
-    private long limit;
+    private Long limit;
 
     public void prepare() {
         if (pageSize <= 0) {
@@ -30,7 +30,7 @@ public class ConditionForPagination {
             pageIndex = 1;
         }
 
-        offset = (pageIndex - 1) * pageSize;
-        limit = pageSize;
+        offset = Long.valueOf((pageIndex - 1) * pageSize);
+        limit = Long.valueOf(pageSize);
     }
 }

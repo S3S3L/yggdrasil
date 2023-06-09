@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.orm.postgresql.test.dao;
+package io.github.s3s3l.yggdrasil.orm.test.dao;
 
 import java.sql.JDBCType;
 

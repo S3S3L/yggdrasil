@@ -41,18 +41,18 @@ public class MysqlJSqlParserDataBindExpress extends JSqlParserDataBindExpress {
     protected void offsetLimit(ReflectionBean rb, OffsetMeta offset, LimitMeta limit, SelectBuilder builder) {
 
         if (limit != null) {
-            Object limitCount = rb.getFieldValue(limit.getField()
+            Object limitVal = rb.getFieldValue(limit.getField()
                     .getName());
-            if (limitCount != null) {
+            if (limitVal != null) {
                 Limit l = new Limit();
-                l.setRowCount(new LongValue((long) limitCount));
+                l.setRowCount(new LongValue((long) limitVal));
                 builder.limit(l);
 
                 if (offset != null) {
-                    Object offsetCount = rb.getFieldValue(offset.getField()
+                    Object offsetVal = rb.getFieldValue(offset.getField()
                             .getName());
-                    if (offsetCount != null) {
-                        l.setOffset(new LongValue((long) offsetCount));
+                    if (offsetVal != null) {
+                        l.setOffset(new LongValue((long) offsetVal));
                     }
                 }
             }

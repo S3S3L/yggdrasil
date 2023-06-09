@@ -228,15 +228,21 @@ public abstract class DefaultDataBindExpress implements DataBindExpress {
             LimitMeta limit,
             PropertyDescriptorReflectionBean ref) {
         if (limit != null) {
-            struct.appendSql(" LIMIT ?");
-            struct.addParam(ref.getFieldValue(limit.getField()
-                    .getName()));
+            Object limitVal = ref.getFieldValue(limit.getField()
+                    .getName());
+            if (limitVal != null) {
+                struct.appendSql(" LIMIT ?");
+                struct.addParam(limitVal);
+            }
         }
 
         if (offset != null) {
-            struct.appendSql(" OFFSET ?");
-            struct.addParam(ref.getFieldValue(offset.getField()
-                    .getName()));
+            Object offsetVal = ref.getFieldValue(offset.getField()
+                    .getName());
+            if (offsetVal != null) {
+                struct.appendSql(" OFFSET ?");
+                struct.addParam(offsetVal);
+            }
         }
     }
 

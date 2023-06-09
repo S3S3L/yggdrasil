@@ -144,8 +144,8 @@ public class BindTest {
                 .names(Arrays.asList("name5.1", "name5.2"))
                 .maxAge(18)
                 .minAge(6)
-                .offset(0)
-                .limit(10)
+                .offset(0L)
+                .limit(10L)
                 .build();
         System.out.println(">>>>>>>>>>>>>>>>> JSqlParserDataBindExpress");
         SqlStruct conditionSelect = jsqlDataBindExpress.getSelect(selectCondition);
@@ -184,8 +184,8 @@ public class BindTest {
                         .names(Arrays.asList("name6.1", "name6.2"))
                         .maxAge(18)
                         .minAge(6)
-                        .offset(0)
-                        .limit(10)
+                        .offset(0L)
+                        .limit(10L)
                         .build());
         System.out.println(conditionUpdate.getSql());
         conditionUpdate.getParams()
@@ -201,8 +201,8 @@ public class BindTest {
                         .names(Arrays.asList("name6.1", "name6.2"))
                         .maxAge(18)
                         .minAge(6)
-                        .offset(0)
-                        .limit(10)
+                        .offset(0L)
+                        .limit(10L)
                         .build());
         System.out.println(conditionUpdate.getSql());
 

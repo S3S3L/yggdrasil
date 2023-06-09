@@ -325,21 +325,21 @@ public abstract class JSqlParserDataBindExpress implements DataBindExpress {
 
     protected void offsetLimit(ReflectionBean rb, OffsetMeta offset, LimitMeta limit, SelectBuilder builder) {
         if (offset != null) {
-            Object offsetCount = rb.getFieldValue(offset.getField()
+            Object offsetVal = rb.getFieldValue(offset.getField()
                     .getName());
-            if (offsetCount != null) {
+            if (offsetVal != null) {
                 Offset os = new Offset();
-                os.setOffset(new LongValue((long) offsetCount));
+                os.setOffset(new LongValue((long) offsetVal));
                 builder.offset(os);
             }
         }
 
         if (limit != null) {
-            Object limitCount = rb.getFieldValue(limit.getField()
+            Object limitVal = rb.getFieldValue(limit.getField()
                     .getName());
-            if (limitCount != null) {
+            if (limitVal != null) {
                 Limit l = new Limit();
-                l.setRowCount(new LongValue((long) limitCount));
+                l.setRowCount(new LongValue((long) limitVal));
                 builder.limit(l);
             }
         }

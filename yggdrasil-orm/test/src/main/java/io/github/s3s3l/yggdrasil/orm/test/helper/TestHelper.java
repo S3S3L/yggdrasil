@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.orm.postgresql.test.helper;
+package io.github.s3s3l.yggdrasil.orm.test.helper;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -13,21 +13,27 @@ import io.github.s3s3l.yggdrasil.orm.meta.MetaManager;
 import io.github.s3s3l.yggdrasil.orm.meta.MetaManagerConfig;
 import io.github.s3s3l.yggdrasil.orm.meta.remote.RemoteMetaManager;
 import io.github.s3s3l.yggdrasil.orm.pool.ConnManager;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.config.DatasourceConfig;
+import io.github.s3s3l.yggdrasil.orm.test.config.DatasourceConfig;
 import io.github.s3s3l.yggdrasil.orm.wrapper.SqlObjectWrapper;
 import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
 import io.github.s3s3l.yggdrasil.utils.file.FileUtils;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 
-public abstract class TestHelper {
+public class TestHelper {
 
-    private static DataSource dataSource;
-    private static MetaManager metaManager;
-    private static RemoteMetaManager remoteMetaManager;
-    private static DefaultDatasourceHolder datasourceHolder;
-    private static SqlExecutor sqlExecutor;
+    public final DatasourceConfig config;
 
-    public static SqlExecutor getSqlExecutor(DatasourceConfig config) {
+    public TestHelper(DatasourceConfig config) {
+        this.config = config;
+    }
+
+    private DataSource dataSource;
+    private MetaManager metaManager;
+    private RemoteMetaManager remoteMetaManager;
+    private DefaultDatasourceHolder datasourceHolder;
+    private SqlExecutor sqlExecutor;
+
+    public SqlExecutor getSqlExecutor() {
 
         if (sqlExecutor == null) {
             MetaManager metaManager = getMetaManager();
@@ -47,7 +53,7 @@ public abstract class TestHelper {
         return sqlExecutor;
     }
 
-    public static DefaultDatasourceHolder getDatasourceHolder(DatasourceConfig config) {
+    public DefaultDatasourceHolder getDatasourceHolder(DatasourceConfig config) {
         if (datasourceHolder == null) {
             datasourceHolder = new DefaultDatasourceHolder(ConnManager.DEFAULT, getDatasource(config),
                     config.getDatabaseType());
@@ -55,11 +61,11 @@ public abstract class TestHelper {
         return datasourceHolder;
     }
 
-    public static MetaManager getMetaManager() {
+    public MetaManager getMetaManager() {
         if (metaManager == null) {
             metaManager = new MetaManager(MetaManagerConfig.defaultBuilder()
-                    .tableDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.orm.postgresql.test" })
-                    .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.orm.postgresql.test.proxy" })
+                    .tableDefinePackages(config.getTableDefinePackages())
+                    .proxyDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.orm.test.proxy" })
                     .proxyConfigLocations(new String[] { "proxy" })
                     .build());
         }
@@ -67,7 +73,7 @@ public abstract class TestHelper {
         return metaManager;
     }
 
-    public static RemoteMetaManager getRemoteMetaManager(DatasourceConfig config) {
+    public RemoteMetaManager getRemoteMetaManager() {
         if (remoteMetaManager == null) {
             remoteMetaManager = new RemoteMetaManager(getDatasourceHolder(config));
         }
@@ -75,10 +81,11 @@ public abstract class TestHelper {
         return remoteMetaManager;
     }
 
-    public static DataSource getDatasource(DatasourceConfig config) {
+    public DataSource getDatasource(DatasourceConfig config) {
         if (dataSource == null) {
-            dataSource = new DataSource(JacksonUtils.YAML
-                    .toObject(FileUtils.getFirstExistResource(config.getConfigFile()), PoolProperties.class));
+            PoolProperties props = JacksonUtils.YAML.toObject(FileUtils.getFirstExistResource(config.getConfigFile()),
+                    PoolProperties.class);
+            dataSource = new DataSource(props);
         }
         return dataSource;
     }

@@ -1,9 +1,9 @@
-package io.github.s3s3l.yggdrasil.orm.postgresql.test.condition;
+package io.github.s3s3l.yggdrasil.orm.test.condition;
 
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Condition;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.SqlModel;
 import io.github.s3s3l.yggdrasil.orm.pagin.ConditionForPagination;
-import io.github.s3s3l.yggdrasil.orm.postgresql.test.dao.User;
+import io.github.s3s3l.yggdrasil.orm.test.dao.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

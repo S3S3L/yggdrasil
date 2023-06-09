@@ -308,7 +308,7 @@ public class MetaManager {
             Offset o = field.getAnnotation(Offset.class);
 
             if (o != null) {
-                if (!long.class.isAssignableFrom(fieldType)) {
+                if (!long.class.isAssignableFrom(fieldType) && !Long.class.isAssignableFrom(fieldType)) {
                     throw new VerifyException("@Offset can only mark on 'Long' type field.");
                 }
                 conditionContext.setOffset(OffsetMeta.builder()
@@ -319,7 +319,7 @@ public class MetaManager {
             Limit l = field.getAnnotation(Limit.class);
 
             if (l != null) {
-                if (!long.class.isAssignableFrom(fieldType)) {
+                if (!long.class.isAssignableFrom(fieldType) && !Long.class.isAssignableFrom(fieldType)) {
                     throw new VerifyException("@Limit can only mark on 'Long' type field.");
                 }
                 conditionContext.setLimit(LimitMeta.builder()

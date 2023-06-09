@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.schema.Column;
@@ -83,8 +85,19 @@ public class InsertBuilder {
         Select select = new Select();
         SetOperationList body = new SetOperationList();
         body.addSelects(new ValuesStatement(itemsList));
+        body.addBrackets(Boolean.FALSE);
         select.setSelectBody(body);
         insert.setSelect(select);
         return insert;
+    }
+
+    public static void main(String[] args) {
+        List<Expression> expressions = new LinkedList<>();
+        expressions.add(new JdbcParameter());
+        Insert insert = new InsertBuilder().table(new Table("test"))
+                .columns(new Column("col1"))
+                .itemsLists(new ExpressionList(expressions))
+                .build();
+        System.out.println(insert);
     }
 }
