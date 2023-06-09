@@ -14,7 +14,7 @@ jobs:
     - name: Pull docker image nacos
       run: docker pull nacos/nacos-server:v2.2.0
     - name: Pull docker image postgres
-      run: docker pull postgresql:12.14
+      run: docker pull postgres:12.14
     - name: Build docker image zookeeper
       run: docker build -f yggdrasil-test/src/main/resources/zk/Dockerfile_remote_tar -t yggdrasil/zookeeper:v1.0.0 yggdrasil-test/src/main/resources/zk/
     - name: Build with Maven
