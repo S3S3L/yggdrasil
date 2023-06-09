@@ -1,19 +1,15 @@
 package io.github.s3s3l.yggdrasil.orm.postgresql.test.def;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
+import io.github.s3s3l.yggdrasil.orm.postgresql.test.condition.PgUserCondition;
 import io.github.s3s3l.yggdrasil.orm.postgresql.test.config.TestConfig;
 import io.github.s3s3l.yggdrasil.orm.postgresql.test.dao.PgUser;
 import io.github.s3s3l.yggdrasil.orm.test.base.CurdTest;
+import io.github.s3s3l.yggdrasil.orm.test.condition.UserCondition;
 import io.github.s3s3l.yggdrasil.orm.test.helper.TestHelper;
 
 public class DefaultCurdTest extends CurdTest<PgUser> {
-
-    @Test
-    public void select() {
-        super.select();
-    }
 
     @Override
     public TestHelper getHelper() {
@@ -40,6 +36,19 @@ public class DefaultCurdTest extends CurdTest<PgUser> {
                 .realName("realName" + index)
                 .deleted(false)
                 .remarks(new String[] { "remark1." + index, "remark2." + index })
+                .build();
+    }
+
+    @Override
+    protected UserCondition convertCondition(UserCondition condition) {
+        return PgUserCondition.builder()
+                .id(condition.getId())
+                .ids(condition.getIds())
+                .limit(condition.getLimit())
+                .offset(condition.getOffset())
+                .pageIndex(condition.getPageIndex())
+                .pageSize(condition.getPageSize())
+                .pagin(condition.isPagin())
                 .build();
     }
 }

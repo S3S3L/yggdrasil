@@ -17,5 +17,7 @@ public class TestConfig {
             .configFile("datasource.yaml")
             .databaseType(DatabaseType.POSTGRESQL)
             .expressBuilderType(ExpressBuilderType.JSQLPARSER)
+            .tableDefinePackages(new String[] { "io.github.s3s3l.yggdrasil.orm.test",
+                    "io.github.s3s3l.yggdrasil.orm.postgresql.test" })
             .build();
 }

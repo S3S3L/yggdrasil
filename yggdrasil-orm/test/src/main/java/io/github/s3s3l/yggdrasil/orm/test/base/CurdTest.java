@@ -44,19 +44,19 @@ public abstract class CurdTest<T extends User> implements BaseTest {
     @Test
     public void delete() {
         sqlExecutor.insert(Arrays.asList(user1, user2));
-        int result = sqlExecutor.delete(UserCondition.builder()
+        int result = sqlExecutor.delete(convertCondition(UserCondition.builder()
                 .id(id)
-                .build());
+                .build()));
         Assertions.assertEquals(1, result);
 
-        User user = sqlExecutor.selectOne(UserCondition.builder()
+        User user = sqlExecutor.selectOne(convertCondition(UserCondition.builder()
                 .id(id)
-                .build(), tableType());
+                .build()), tableType());
         Assertions.assertNull(user);
 
-        user = sqlExecutor.selectOne(UserCondition.builder()
+        user = sqlExecutor.selectOne(convertCondition(UserCondition.builder()
                 .id(id2)
-                .build(), tableType());
+                .build()), tableType());
         Assertions.assertNotNull(user);
     }
 
@@ -64,8 +64,8 @@ public abstract class CurdTest<T extends User> implements BaseTest {
     public void select() {
         sqlExecutor.insert(Arrays.asList(user1, user2));
 
-        List<T> users = sqlExecutor.select(UserCondition.builder()
-                .build(), tableType());
+        List<T> users = sqlExecutor.select(convertCondition(UserCondition.builder()
+                .build()), tableType());
         Assertions.assertEquals(2, users.size());
         T user = CollectionUtils.getFirst(users, u -> u.getId()
                 .equals(id));
@@ -76,9 +76,9 @@ public abstract class CurdTest<T extends User> implements BaseTest {
     public void selectOne() {
         sqlExecutor.insert(Arrays.asList(user1, user2));
 
-        T user = sqlExecutor.selectOne(UserCondition.builder()
+        T user = sqlExecutor.selectOne(convertCondition(UserCondition.builder()
                 .id(id)
-                .build(), tableType());
+                .build()), tableType());
         assertUser(user, user1);
     }
 
@@ -92,11 +92,11 @@ public abstract class CurdTest<T extends User> implements BaseTest {
                 .mapToObj(i -> buildUser(StringUtils.getUUIDNoLine(), i))
                 .collect(Collectors.toList()));
 
-        UserCondition paginCondition = UserCondition.builder()
+        UserCondition paginCondition = convertCondition(UserCondition.builder()
                 .pagin(true)
                 .pageIndex(1)
                 .pageSize(pageSize)
-                .build();
+                .build());
         PaginResult<List<T>> paginResult = sqlExecutor.selectByPagin(paginCondition, tableType());
         Assertions.assertEquals(recordsCount, paginResult.getRecordsCount());
         Assertions.assertEquals(pageCount, paginResult.getPageCount());
@@ -112,24 +112,28 @@ public abstract class CurdTest<T extends User> implements BaseTest {
         sqlExecutor.update(User.builder()
                 .username(newUsername)
                 .build(),
-                UserCondition.builder()
+                convertCondition(UserCondition.builder()
                         .id(id)
-                        .build());
+                        .build()));
 
-        T user = sqlExecutor.selectOne(UserCondition.builder()
+        T user = sqlExecutor.selectOne(convertCondition(UserCondition.builder()
                 .id(id)
-                .build(), tableType());
+                .build()), tableType());
         assertUser(newUsername, user, user1);
 
-        user = sqlExecutor.selectOne(UserCondition.builder()
+        user = sqlExecutor.selectOne(convertCondition(UserCondition.builder()
                 .id(id2)
-                .build(), tableType());
+                .build()), tableType());
         assertUser(user, user2);
     }
 
     protected abstract Class<T> tableType();
 
     protected abstract T buildUser(String id, long index);
+
+    protected UserCondition convertCondition(UserCondition condition) {
+        return condition;
+    }
 
     protected void assertUser(T user, T other) {
         assertUser(other.getUsername(), user, other);
@@ -140,6 +144,5 @@ public abstract class CurdTest<T extends User> implements BaseTest {
         Assertions.assertEquals(newUsername, user.getUsername());
         Assertions.assertEquals(other.getPassword(), user.getPassword());
         Assertions.assertEquals(other.getDeleted(), user.getDeleted());
-        // Assertions.assertArrayEquals(user1.getRemarks(), user.getRemarks());
     }
 }
