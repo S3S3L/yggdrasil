@@ -25,29 +25,10 @@
         </developer>
     </developers>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <configuration>
-                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <parent>
         <groupId>io.github.s3s3l</groupId>
-        <artifactId>yggdrasil-parent</artifactId>
+        <artifactId>yggdrasil-sample</artifactId>
         <version>3.7.0-RELEASE</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>

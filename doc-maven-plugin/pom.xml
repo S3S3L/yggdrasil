@@ -34,28 +34,6 @@
                 <version>3.6.0</version>
             </plugin>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <release>11</release>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -76,34 +54,6 @@
                     <useStandardDocletOptions>false</useStandardDocletOptions>
                     <additionalparam>-Xdoclint:none</additionalparam>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>io.github.s3s3l</groupId>
-                <artifactId>doc-maven-plugin</artifactId>
-                <version>${project.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <configuration>
-                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
                 </configuration>
             </plugin>
         </plugins>
