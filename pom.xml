@@ -237,7 +237,7 @@
 
         <spring.boot.version>2.7.8</spring.boot.version>
 
-        <google.guava.version>31.1-jre</google.guava.version>
+        <google.guava.version>32.0.0-jre</google.guava.version>
         <googleauth.versioin>0.5.0</googleauth.versioin>
         <zxing.version>3.2.1</zxing.version>
         <apache.commons.version>3.4</apache.commons.version>
