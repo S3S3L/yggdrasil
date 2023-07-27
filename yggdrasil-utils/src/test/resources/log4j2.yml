@@ -57,7 +57,7 @@ Configuration:
       - ref: consoleAppender
       - ref: commonAppender
     - name: debug
-      level: debug
+      level: info
       additivity: false
       AppenderRef:
       - ref: consoleAppender

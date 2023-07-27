@@ -55,7 +55,7 @@ Configuration:
         max: 5
   Loggers:
     Root:
-      level: debug
+      level: info
       AppenderRef:
       - ref: consoleAppender
       - ref: serverAppender
