@@ -1,6 +1,6 @@
 FROM openjdk:11
 WORKDIR /opt/zookeeper
-ADD https://dlcdn.apache.org/zookeeper/zookeeper-3.8.1/apache-zookeeper-3.8.1-bin.tar.gz .
+ADD https://archive.apache.org/dist/zookeeper/zookeeper-3.8.1/apache-zookeeper-3.8.1-bin.tar.gz .
 RUN tar -xvf apache-zookeeper-3.8.1-bin.tar.gz
 RUN mkdir zookeeper
 RUN mv /opt/zookeeper/apache-zookeeper-*/* /opt/zookeeper/zookeeper/
