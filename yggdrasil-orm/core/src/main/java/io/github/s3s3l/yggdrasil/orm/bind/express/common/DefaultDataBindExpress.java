@@ -280,6 +280,11 @@ public abstract class DefaultDataBindExpress implements DataBindExpress {
                         sb.append(" NOT NULL");
                     }
 
+                    if (dbType.isDef()) {
+                        sb.append(" DEFAULT ")
+                                .append(dbType.getDefValue());
+                    }
+
                     return sb.toString();
                 })
                 .collect(Collectors.toList())));

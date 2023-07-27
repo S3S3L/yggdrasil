@@ -19,7 +19,6 @@ import io.github.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +32,7 @@ public class StatementHelper {
         Verify.notNull(preparedStatement);
         for (int i = 1; i <= params.size(); i++) {
             Object param = params.get(i - 1);
-            log.debug("param{}: {}", i, param);
+            log.trace("param{}: {}", i, param);
             preparedStatement.setObject(i, param);
         }
     }

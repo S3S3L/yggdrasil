@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,6 +63,11 @@ public class DefaultSqlExecutor implements SqlExecutor {
         this.dataBindExpress = dataBindExpress;
         this.freeMarkerHelper = freeMarkerHelper;
         this.datasourceHolder = datasourceHolder;
+    }
+
+    @Override
+    public <S> int insert(S source) {
+        return insert(Arrays.asList(source));
     }
 
     @Override
@@ -145,7 +151,7 @@ public class DefaultSqlExecutor implements SqlExecutor {
                     throw new SqlExecutingException(e);
                 }
             });
-        } catch (SQLException | SecurityException e) {
+        } catch (SQLException e) {
             throw new SqlExecutingException(e);
         }
     }

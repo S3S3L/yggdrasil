@@ -1,30 +1,15 @@
 ``` mermaid
 graph LR
 
-Container-->Environment
-Container-->Context
+subgraph 生命周期
 
-subgraph EnvironmentTypes
-
-Environment-.-SystemEnv
-Environment-.-ApplicationArgs
-Environment-.-JVMArgs
-Environment-.-LocalConfigFile
-Environment-.-RemoteConfigCenter
-
-end
-
-subgraph BeanCreationStep
-
-BuildInstanceByDefaultConstructor-->BuildInstanceByConstructor-->BuildInstanceByMethod
-
-end
-
-subgraph BeanTypes
-
-Bean-.-Configuration{{Configuration}}===数据对象
-Bean-.-Service{{Service}}===业务处理对象
-Bean-.-Component{{Component}}===工具对象
+加载配置
+-->扫描Bean
+-->构建依赖树
+-->检查循环依赖
+-->实例化Bean对象
+-->设置属性
+-->注入依赖
 
 end
 ```

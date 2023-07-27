@@ -46,7 +46,7 @@ public class SqlExecutorFactory {
 
         if (autoCreateConfig != null && autoCreateConfig.isEnable()) {
             for (Class<?> table : metaManager.allTableTypes()) {
-                log.debug("Auto create table for type: {}", table);
+                log.info("Auto create table for type: {}", table.getName());
                 sqlExecutor.create(table, autoCreateConfig);
             }
         }

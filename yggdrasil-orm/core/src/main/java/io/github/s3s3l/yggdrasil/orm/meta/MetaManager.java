@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.github.s3s3l.yggdrasil.bean.exception.ResourceNotFoundException;
@@ -92,13 +93,12 @@ public class MetaManager {
     }
 
     public TableMeta resolve(Class<?> type) {
-        log.debug("Resolve: {}", type.getName());
         return tables.computeIfAbsent(type, key -> {
             if (ReflectionUtils.isAnnotationedWith(type, TableDefine.class)) {
-                log.trace("Resolve table define: {}", type.getName());
+                log.info("Resolve table define: {}", type.getName());
                 return resolveTableDefine(ReflectionUtils.getAnnotation(type, TableDefine.class), type);
             } else if (ReflectionUtils.isAnnotationedWith(type, SqlModel.class)) {
-                log.trace("Resolve sql model: {}", type.getName());
+                log.info("Resolve sql model: {}", type.getName());
                 return resolveSqlModel(ReflectionUtils.getAnnotation(type, SqlModel.class), type);
             }
             throw new DataBindExpressException(
@@ -107,7 +107,7 @@ public class MetaManager {
     }
 
     public ProxyMeta resolveProxy(Class<?> type) {
-        log.debug("Resolve proxy meta: {}", type.getName());
+        log.info("Resolve proxy meta: {}", type.getName());
         return proxyMetas.computeIfAbsent(type, key -> {
             ProxyMeta proxyMeta = new ProxyMeta();
             proxyMeta.setIface(type);
@@ -143,9 +143,14 @@ public class MetaManager {
     }
 
     private void loadProxyConfig() {
-        log.debug("Loading proxy config. locations: {}", String.join(", ", proxyConfigLocations));
+        if (proxyConfigLocations == null || proxyConfigLocations.length <= 0) {
+            return;
+        }
+
+        log.info("Loading proxy config. locations: {}", String.join(", ", proxyConfigLocations));
+
         for (String location : proxyConfigLocations) {
-            log.debug("Starting load proxy config from {}", location);
+            log.info("Starting load proxy config from {}", location);
             for (File configFile : FileUtils.tree(location, file -> file.isFile() && (file.getName()
                     .endsWith(".yml")
                     || file.getName()
@@ -153,7 +158,7 @@ public class MetaManager {
                 String absolutePath = configFile.getAbsolutePath();
                 ProxyConfig proxyConfig = JacksonUtils.YAML.toObject(configFile, ProxyConfig.class);
 
-                log.trace("Loaded proxy config from {}. config: {}", absolutePath, proxyConfig);
+                log.debug("Loaded proxy config from {}. config: {}", absolutePath, proxyConfig);
 
                 verifier.verify(proxyConfig, ProxyConfig.class);
 
@@ -175,7 +180,7 @@ public class MetaManager {
                     proxyMethodMeta.setType(proxyMethod.getType());
                 }
             }
-            log.debug("Finished load proxy config from {}", location);
+            log.info("Finished load proxy config from {}", location);
         }
     }
 
@@ -222,6 +227,9 @@ public class MetaManager {
 
     private void resolveType(Class<?> type, TableMeta table, boolean newTable) {
         List<ColumnMeta> columns = new LinkedList<>();
+        Map<String, ColumnMeta> columnMap = table.getColumns()
+                .stream()
+                .collect(Collectors.toMap(ColumnMeta::getName, Function.identity()));
         List<ConditionMeta> selectConditions = new LinkedList<>();
         List<ConditionMeta> updateConditions = new LinkedList<>();
         List<ConditionMeta> deleteConditions = new LinkedList<>();
@@ -260,21 +268,24 @@ public class MetaManager {
                                 .build())
                         .build();
                 columns.add(columnMeta);
+                columnMap.put(columnName, columnMeta);
                 aliasMap.put(columnName.toUpperCase(), field.getName());
             }
 
             Condition condition = field.getAnnotation(Condition.class);
 
             if (condition != null) {
-                if (columnMeta == null) {
-                    columnMeta = ColumnMeta.builder()
+                String conditionColumnName = StringUtils.isEmpty(condition.column()) ? columnName : condition.column();
+                ColumnMeta conditionColumnMeta = columnMap.getOrDefault(conditionColumnName, columnMeta);
+                if (conditionColumnMeta == null) {
+                    conditionColumnMeta = ColumnMeta.builder()
                             .name(StringUtils.isEmpty(condition.column()) ? columnName : condition.column())
                             .build();
                 }
 
                 ConditionMeta conditionMeta = ConditionMeta.builder()
                         .field(field)
-                        .column(columnMeta)
+                        .column(conditionColumnMeta)
                         .pattern(condition.pattern())
                         .validator(this.validatorFactory.getValidator(condition.validator()))
                         .build();

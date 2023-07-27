@@ -1,5 +1,6 @@
 package io.github.s3s3l.yggdrasil.orm.meta;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -24,5 +25,6 @@ public class TableMeta {
     /**
      * 字段
      */
-    private List<ColumnMeta> columns;
+    @Builder.Default
+    private List<ColumnMeta> columns = new LinkedList<>();
 }

@@ -20,6 +20,17 @@ import io.github.s3s3l.yggdrasil.orm.pagin.PaginResult;
 public interface SqlExecutor extends Transactable {
 
     /**
+     * 插入一条数据
+     * 
+     * @param <S>
+     *            数据类型
+     * @param source
+     *            数据对象
+     * @return 成功插入的数据条数
+     */
+    <S> int insert(S source);
+
+    /**
      * 插入一组数据
      * 
      * @param <S>

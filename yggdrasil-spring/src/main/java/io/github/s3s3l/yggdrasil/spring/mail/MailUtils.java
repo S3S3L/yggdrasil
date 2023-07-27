@@ -1,15 +1,11 @@
 package io.github.s3s3l.yggdrasil.spring.mail;
 
-import java.util.Properties;
-
-import javax.mail.Message.RecipientType;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import io.github.s3s3l.yggdrasil.spring.mail.enumerations.MailSendStatus;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.util.StringUtils;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import io.github.s3s3l.yggdrasil.spring.mail.enumerations.MailSendStatus;
 
 /**
  * ClassName:MailUtils <br>
@@ -27,17 +23,16 @@ public class MailUtils {
         this.mailSender = mailSender;
     }
 
-    public MailSendStatus sendMail(String subject, Object body, String from, String... tos) {
+    public MailSendStatus sendMail(String subject, String body, String from, String... tos) {
         MailSendStatus result = MailSendStatus.SUCCESS;
 
         try {
-            Session session = Session.getDefaultInstance(new Properties());
-            MimeMessage message = new MimeMessage(session);
-            message.setContent(body, "text/html;charset=utf-8");
-            message.setFrom(from);
-            message.setSubject(subject);
-            message.setRecipients(RecipientType.TO,
-                    InternetAddress.parse(StringUtils.arrayToCommaDelimitedString(tos)));
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setText(body, true);
+            helper.setFrom(from);
+            helper.setSubject(subject);
+            helper.setTo(tos);
 
             mailSender.send(message);
         } catch (Exception e) {

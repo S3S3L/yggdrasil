@@ -8,13 +8,15 @@ import java.nio.charset.StandardCharsets;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
-import io.github.s3s3l.yggdrasil.utils.common.BarcodeUtils;
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-import io.github.s3s3l.yggdrasil.utils.file.FileFormat;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+
+import io.github.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
+import io.github.s3s3l.yggdrasil.utils.common.BarcodeUtils;
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
+import io.github.s3s3l.yggdrasil.utils.file.FileFormat;
 
 /**
  * googleauth 工具类 <br>
@@ -72,22 +74,25 @@ public class GoogleAuthUtils {
      *             or interrupted I/O operations.
      * @since JDK 1.8
      */
-    public static String getQrcodeBase64(String userName, String secretKey, int width, int height)
-            throws WriterException,
-            IOException {
+    public static String getQrcodeBase64(String userName, String secretKey, int width, int height) {
 
-        StringBuilder sb = new StringBuilder("otpauth://totp/").append(userName)
-                .append("?secret=")
-                .append(secretKey);
-        BufferedImage imgBuffer = BarcodeUtils.getBarcodeBufferedStream(sb.toString(), width, height,
-                StandardCharsets.UTF_8, BarcodeFormat.QR_CODE);
+        try {
+            StringBuilder sb = new StringBuilder("otpauth://totp/").append(userName)
+                    .append("?secret=")
+                    .append(secretKey);
+            BufferedImage imgBuffer;
+            imgBuffer = BarcodeUtils.getBarcodeBufferedStream(sb.toString(), width, height, StandardCharsets.UTF_8,
+                    BarcodeFormat.QR_CODE);
 
-        ByteArrayOutputStream buff = new ByteArrayOutputStream();
-        ImageIO.write(imgBuffer, FileFormat.JPG.name(), buff);
+            ByteArrayOutputStream buff = new ByteArrayOutputStream();
+            ImageIO.write(imgBuffer, FileFormat.JPG.name(), buff);
 
-        StringBuilder base64String = new StringBuilder(StringUtils.BASE64HEADER)
-                .append(Base64.encodeBase64String(buff.toByteArray()));
-        return base64String.toString();
+            StringBuilder base64String = new StringBuilder(StringUtils.BASE64HEADER)
+                    .append(Base64.encodeBase64String(buff.toByteArray()));
+            return base64String.toString();
+        } catch (WriterException | IOException e) {
+            throw new ResourceProcessException(e);
+        }
     }
 
     public static byte[] base64ToImage(String base64String) {

@@ -42,6 +42,11 @@ public class PsqlDefaultDataBindExpress extends DefaultDataBindExpress {
         if (dbType.isNotNull()) {
             struct.appendSql(" NOT NULL");
         }
+
+        if (dbType.isDef()) {
+            struct.appendSql(" DEFAULT ")
+                    .appendSql(dbType.getDefValue());
+        }
         struct.appendSql(";");
 
         return struct;
