@@ -2,6 +2,11 @@ package io.github.s3s3l.yggdrasil.configuration.redis;
 
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 /**
  * <p>
  * </p>
@@ -12,24 +17,12 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
  * @version 1.0.0
  * @since JDK 1.8
  */
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RedisClusterConfiguration {
 
     private RedisProperties master;
     private RedisProperties slave;
-
-    public RedisProperties getMaster() {
-        return master;
-    }
-
-    public void setMaster(RedisProperties master) {
-        this.master = master;
-    }
-
-    public RedisProperties getSlave() {
-        return slave;
-    }
-
-    public void setSlave(RedisProperties slave) {
-        this.slave = slave;
-    }
 }

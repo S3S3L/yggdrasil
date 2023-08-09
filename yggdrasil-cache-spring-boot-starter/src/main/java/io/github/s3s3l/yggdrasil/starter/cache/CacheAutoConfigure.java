@@ -1,11 +1,13 @@
 package io.github.s3s3l.yggdrasil.starter.cache;
 
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import javax.servlet.Filter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
@@ -28,6 +30,7 @@ import io.github.s3s3l.yggdrasil.cache.redis.RedisCacheHolder;
 import io.github.s3s3l.yggdrasil.redis.base.IRedis;
 import io.github.s3s3l.yggdrasil.spring.BeanUtils;
 import io.github.s3s3l.yggdrasil.utils.interceptor.Interceptor;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 
 /**
  * <p>
@@ -44,6 +47,7 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
     private static final String COMPLEX_CACHE_HELPER = "complexCacheHelper";
     private static final String BEAN_NAME = "cacheAutoConfigure";
     private static final String CACHE_HANDLER_INTERCEPTOR = "cacheHandlerInterceptor";
+    private static final String WRAPPER_FILTER_REGISTRATION = "wrapperFilterRegistration";
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private CacheConfiguration configuration;
@@ -81,6 +85,8 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
         registry.registerBeanDefinition("complexCacheInterceptor", BeanUtils.buildBeanDefinitionForFactoryMethod(
                 Interceptor.class, BEAN_NAME, "cacheInterceptor", null, COMPLEX_CACHE_HELPER));
         if (this.configuration.isWeb()) {
+            registry.registerBeanDefinition(WRAPPER_FILTER_REGISTRATION, BeanUtils.buildBeanDefinitionForFactoryMethod(
+                    FilterRegistrationBean.class, BEAN_NAME, "wrapperFilterRegistration", null));
             registry.registerBeanDefinition(CACHE_HANDLER_INTERCEPTOR, BeanUtils.buildBeanDefinitionForFactoryMethod(
                     HandlerInterceptor.class, BEAN_NAME, "handlerInterceptor", null, COMPLEX_CACHE_HELPER));
             registry.registerBeanDefinition("cacheInterceptorRegister", BeanUtils.buildBeanDefinitionForFactoryMethod(
@@ -126,7 +132,8 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
                     .remoteHolder(() -> new RedisCacheHolder(dataRedis, checker, this.configuration.getKeyPrefix()))
                     .compressProp(this.configuration.getCompress())
                     .compressor(this.configuration.getCompressorSupplier()
-                            .getConstructor().newInstance())
+                            .getConstructor()
+                            .newInstance())
                     .localExpireAfterAccess(this.configuration.getLocalExpireAfterAccess())
                     .localExpireAfterWrite(this.configuration.getLocalExpireAfterWrite())
                     .localMaxNum(this.configuration.getLocalMaxNum())
@@ -136,6 +143,15 @@ public class CacheAutoConfigure implements ImportBeanDefinitionRegistrar, Enviro
         } catch (Exception e) {
             throw new ConfigurationException(e);
         }
+    }
+    
+    public FilterRegistrationBean<Filter> wrapperFilterRegistration() {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new WrapperFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("wrapperFilter");
+        registration.setOrder(1);
+        return registration;
     }
 
 }

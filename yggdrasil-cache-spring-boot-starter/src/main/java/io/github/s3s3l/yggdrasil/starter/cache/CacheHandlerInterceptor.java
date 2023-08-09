@@ -6,17 +6,18 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.lang.Nullable;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+
 import io.github.s3s3l.yggdrasil.annotation.Cache;
 import io.github.s3s3l.yggdrasil.annotation.CacheExpire;
 import io.github.s3s3l.yggdrasil.cache.helper.ComplexCacheHelper;
 import io.github.s3s3l.yggdrasil.cache.key.CacheKeyGenerator;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
-import org.springframework.lang.Nullable;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.util.ContentCachingResponseWrapper;
-
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -59,20 +60,27 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
                 .path(request.getRequestURI())
                 .params(request.getParameterMap())
                 .method(request.getMethod())
-                .body(request.getInputStream().readAllBytes())
+                .body(request.getInputStream()
+                        .readAllBytes())
                 .build());
         log.trace("fetching cache. cacheKey: {}", cacheKey);
         // 获取缓存数据
-        byte[] cacheData = cacheHelper.get(cacheKey, scope);
+        byte[] cacheDataBytes = cacheHelper.get(cacheKey, scope);
 
-        if (cacheData == null) {
+        if (cacheDataBytes == null) {
             // 未获取到缓存
             log.info("No aviliable cache was found.");
             return true;
         }
 
         try (OutputStream os = response.getOutputStream()) {
-            os.write(cacheData, 0, cacheData.length);
+            HttpCacheData cacheData = JacksonUtils.JSON.toObject(cacheDataBytes, HttpCacheData.class);
+            cacheData.getHeaders()
+                    .entrySet()
+                    .forEach(header -> {
+                        response.setHeader(header.getKey(), header.getValue());
+                    });
+            os.write(cacheData.getContent(), 0, cacheData.getContent().length);
             os.flush();
         }
 
@@ -82,7 +90,9 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+    public void afterCompletion(HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
             @Nullable Exception ex) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             return;
@@ -100,13 +110,12 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
                 // 过期缓存
                 cacheHelper.expire(scope);
             }
-        } else if (ex != null && ReflectionUtils.isAnnotationedWith(method, Cache.class)) {
-            ContentCachingResponseWrapper res;
-            if (response instanceof ContentCachingResponseWrapper) {
-                res = (ContentCachingResponseWrapper) response;
-            } else {
-                res = new ContentCachingResponseWrapper(response);
+        } else if (ex == null && ReflectionUtils.isAnnotationedWith(method, Cache.class)) {
+            if (!(response instanceof ContentCachingResponseWrapper)) {
+                log.trace("Response not instance of ContentCachingResponseWrapper. Skip.");
+                return;
             }
+            ContentCachingResponseWrapper res = (ContentCachingResponseWrapper) response;
 
             log.info("Method [{}] annotationed with [{}]. Putting cache data.", method, Cache.class);
 
@@ -118,12 +127,19 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
                     .path(request.getRequestURI())
                     .params(request.getParameterMap())
                     .method(request.getMethod())
-                    .body(request.getInputStream().readAllBytes())
+                    .body(request.getInputStream()
+                            .readAllBytes())
                     .build());
-            log.trace("putting cache. cacheKey: {}", cacheKey);
 
             // 更新缓存
-            cacheHelper.update(cacheKey, res.getContentAsByteArray(), scope);
+            log.trace("putting cache. cacheKey: {}", cacheKey);
+
+            HttpCacheData cacheData = HttpCacheData.builder()
+                    .content(res.getContentAsByteArray())
+                    .build()
+                    .setHeader("Content-Type", request.getContentType());
+            cacheHelper.update(cacheKey, JacksonUtils.JSON.toStructuralBytes(cacheData), scope);
+            // cacheHelper.update(cacheKey, res.getContentAsByteArray(), scope);
         }
     }
 
