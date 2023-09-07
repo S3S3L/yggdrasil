@@ -139,7 +139,6 @@ public class CacheHandlerInterceptor implements HandlerInterceptor {
                     .build()
                     .setHeader("Content-Type", request.getContentType());
             cacheHelper.update(cacheKey, JacksonUtils.JSON.toStructuralBytes(cacheData), scope);
-            // cacheHelper.update(cacheKey, res.getContentAsByteArray(), scope);
         }
     }
 

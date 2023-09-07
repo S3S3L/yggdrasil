@@ -1,0 +1,35 @@
+yggdrasil:
+  redis:
+    enable: true # 组件开关
+    primary: test # 定义主要的IRedis Bean
+    masterSlave:
+      test:
+        master:
+          host: 127.0.0.1
+        #   port: 6379 # 此示例通过testcontainer启动redis，所以端口在运行时自动注入。正常使用的时候通过此属性指定redis端口
+          database: 0
+          timeout: 3000
+          jedis:
+            pool: # some pool config
+              maxActive: 8
+              maxIdle: 4
+              maxWait: 3000
+              minIdle: 1
+  cache:
+    enable: true # 组件开关
+    web: true # 标识是否自动注入web接口拦截器
+    version-redis: testRedis # 缓存版本控制Redis，与redis配置中的名称对应，可以与data-redis相同
+    data-redis: testRedis # 数据缓存Redis，与redis配置中的名称对应，可以与version-redis相同
+    remote-expire-after-write: 600 # 远程缓存失效时间，单位：秒
+    local-expire-after-access: 600 # 本地缓存访问后失效时间，单位：秒
+    local-expire-after-write: 600 # 本地缓存写入后失效时间，单位：秒
+    local-max-num: 500 # 本地缓存最大数量，该配置为个数，最终缓存占用以单个对象大小×缓存个数为准
+    compressor-supplier: io.github.s3s3l.yggdrasil.compress.DefaultZstdCompressSupliers # 压缩器提供者，任意实现Supplier<Compressor>的类全路径
+    compress: # 压缩配置
+      compress-key: false # 是否对key进行压缩，默认为false
+      compress-value: false # 是否对value进行压缩，默认为false
+      key-config:
+        level: 0 # key的压缩级别，默认为0
+      value-config:
+        level: 0 # value的压缩级别，默认为0
+        ignore-null-value: false # 是否忽略null值，默认为false。当为false时，value为null会抛出错误

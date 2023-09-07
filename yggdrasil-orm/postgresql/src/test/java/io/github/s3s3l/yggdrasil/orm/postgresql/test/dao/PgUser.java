@@ -9,6 +9,7 @@ import io.github.s3s3l.yggdrasil.orm.handler.ArrayTypeHandler;
 import io.github.s3s3l.yggdrasil.orm.test.dao.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -16,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @TableDefine(table = User.TABLE_NAME)
 public class PgUser extends User {
     

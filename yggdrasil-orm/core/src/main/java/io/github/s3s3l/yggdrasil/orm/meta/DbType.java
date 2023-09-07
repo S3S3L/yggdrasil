@@ -2,9 +2,7 @@ package io.github.s3s3l.yggdrasil.orm.meta;
 
 import java.sql.JDBCType;
 import java.util.List;
-import java.util.Objects;
 
-import io.github.s3s3l.yggdrasil.utils.collection.CollectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,16 +29,38 @@ public class DbType {
     private boolean array = false;
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + (notNull ? 1231 : 1237);
+        result = prime * result + (def ? 1231 : 1237);
+        result = prime * result + ((defValue == null) ? 0 : defValue.hashCode());
+        result = prime * result + (array ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof DbType)) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DbType other = (DbType) obj;
+        if (type != other.type)
+            return false;
+        if (notNull != other.notNull)
+            return false;
+        if (def != other.def)
+            return false;
+        if (defValue == null) {
+            if (other.defValue != null)
+                return false;
+        } else if (!defValue.equals(other.defValue)) {
             return false;
         }
-
-        DbType o = (DbType) obj;
-
-        return this.type.equals(o.type)
-                // && Objects.equals(this.primary, o.primary) // 主键不支持变更，所以不参与比较
-                && Objects.equals(this.notNull, o.notNull) && Objects.equals(this.def, o.def)
-                && Objects.equals(this.defValue, o.defValue) && CollectionUtils.equals(this.args, o.args);
+        return array == other.array;
     }
 }

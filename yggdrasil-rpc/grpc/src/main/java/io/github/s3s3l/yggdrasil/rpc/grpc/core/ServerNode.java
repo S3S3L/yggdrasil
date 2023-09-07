@@ -4,6 +4,7 @@ import io.github.s3s3l.yggdrasil.register.core.node.Node;
 import io.github.s3s3l.yggdrasil.rpc.core.server.ServerStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ServerNode extends Node {
     private ServerStatus status;
     private String group;

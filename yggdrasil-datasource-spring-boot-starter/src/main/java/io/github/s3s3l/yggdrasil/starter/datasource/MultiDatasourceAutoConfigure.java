@@ -70,7 +70,6 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnMissingBean(DataSource.class)
 public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final String META_MANAGER_BEAN_NAME = "metaManager";
-    private static final String DBTYPE_HANDLER_FACTORY_BEAN_NAME = "dbTypeHandlerFactory";
     private static final String DATA_BIND_EXPRESS_FACTORY_BEAN_NAME = "dataBindExpressFactory";
     /**
      * datasource bean名称后缀
@@ -188,9 +187,6 @@ public class MultiDatasourceAutoConfigure implements ImportBeanDefinitionRegistr
         registry.registerBeanDefinition(META_MANAGER_BEAN_NAME,
                 BeanUtils.buildBeanDefinition(new Object[] { config.getMeta() }, MetaManager.class));
 
-        // // 注册 DbTypeHandlerFactory
-        // registry.registerBeanDefinition(DBTYPE_HANDLER_FACTORY_BEAN_NAME,
-        // BeanUtils.buildBeanDefinition(DbTypeHandlerFactory.class));
         // 注册 DataBindExpressFactory
         registry.registerBeanDefinition(DATA_BIND_EXPRESS_FACTORY_BEAN_NAME,
                 BeanUtils.buildBeanDefinition(null, null, new String[] { META_MANAGER_BEAN_NAME },

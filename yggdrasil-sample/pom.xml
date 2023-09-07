@@ -36,6 +36,7 @@
 
     <modules>
         <module>datasource-starter-sample</module>
+        <module>cache-starter-sample</module>
         <module>orm-sample</module>
         <module>register-sample</module>
     </modules>

@@ -96,7 +96,13 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     }
 
     public enum Action {
-        READ, WRITE, DELETE, UPDATE, CHECK, GEO_WRITE, GEO_READ
+        READ,
+        WRITE,
+        DELETE,
+        UPDATE,
+        CHECK,
+        GEO_WRITE,
+        GEO_READ
     }
 
     public <T> T execute(Function<Jedis, T> call, Action action) {
@@ -123,10 +129,6 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     private void accept(Consumer<Jedis> action) {
         try (Jedis jedis = getConnectionForWrite()) {
             action.accept(jedis);
-        } catch (Exception e) {
-            logger.warn("127.0.0.1||0||{}||jedis execute in order redis error:", e.getClass()
-                    .getName(), e);
-            throw e;
         }
     }
 
@@ -448,8 +450,8 @@ public class JedisClusterHelper implements InitializableRedis<RedisClusterConfig
     }
 
     @Override
-    public List<GeoRadiusResponse> georadius(String key, double longitude, double latitude, double radius,
-            GeoUnit unit) {
+    public List<GeoRadiusResponse>
+            georadius(String key, double longitude, double latitude, double radius, GeoUnit unit) {
         return execute(jedis -> jedis.georadius(key, longitude, latitude, radius, unit), Action.GEO_READ);
     }
 

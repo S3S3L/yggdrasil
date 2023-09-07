@@ -64,6 +64,9 @@
         <module>yggdrasil-register</module>
         <module>yggdrasil-rpc</module>
         <module>yggdrasil-sample</module>
+
+        <module>yggdrasil-spring-pack</module>
+        <module>yggdrasil-spring-web-pack</module>
     </modules>
 
     <build>
@@ -223,7 +226,7 @@
 
         <gpg.skip>false</gpg.skip>
 
-        <spring.boot.version>2.7.8</spring.boot.version>
+        <spring.boot.version>2.7.14</spring.boot.version>
 
         <google.guava.version>31.1-jre</google.guava.version>
         <googleauth.versioin>0.5.0</googleauth.versioin>
@@ -257,6 +260,7 @@
         <etcd.version>0.7.5</etcd.version>
 
         <testcontainers.version>1.17.6</testcontainers.version>
+        <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
         <junit.version>5.9.2</junit.version>
         <javafx.version>20</javafx.version>
     </properties>
@@ -297,6 +301,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.redis.testcontainers</groupId>
+                <artifactId>testcontainers-redis-junit</artifactId>
+                <version>${testcontainers.redis.version}</version>
+            </dependency>
             <!-- Junit -->
             <dependency>
                 <groupId>org.junit</groupId>
@@ -314,11 +323,6 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-boot</artifactId>
-                <version>${yggdrasil.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.s3s3l</groupId>
-                <artifactId>yggdrasil-spring</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
@@ -419,6 +423,22 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-boot-spring-adapter</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <!-- yggdrasil-spring -->
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-spring</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-spring-pack</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-spring-web-pack</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <!-- yggdrasil-orm -->

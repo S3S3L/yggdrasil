@@ -6,7 +6,6 @@
 
 - 本地缓存
 - Redis缓存
-- RedisClient支持
 - 混合缓存
 - 内容压缩
 
@@ -28,12 +27,13 @@
 yggdrasil:
   cache:
     enable: true # 组件开关
+    web: true # 是否自动注册spring-web拦截器和servlet过滤器
     version-redis: versionRedis # 缓存版本控制Redis，与redis配置中的名称对应，可以与data-redis相同
     data-redis: dataRedis # 数据缓存Redis，与redis配置中的名称对应，可以与version-redis相同
     remote-expire-after-write: 600 # 远程缓存失效时间，单位：秒
     local-expire-after-access: 600 # 本地缓存访问后失效时间，单位：秒
     local-expire-after-write: 600 # 本地缓存写入后失效时间，单位：秒
-    local-max-num: 500 # 本地缓存最大数量，该配置为个数，最终缓存占用以单个对象大小×缓存个数为准
+    local-max-num: 500 # 本地缓存最大数量，该配置为个数，最终内存占用以单个对象大小×缓存个数为准
     compressor-supplier: io.github.s3s3l.yggdrasil.compress.DefaultZstdCompressSupliers # 压缩器提供者，任意实现Supplier<Compressor>的类全路径
     compress: # 压缩配置
       compress-key: false # 是否对key进行压缩，默认为false
@@ -144,6 +144,49 @@ public class YourService {
         cache.expire(cacheScope);
 
         return result;
+    }
+}
+```
+
+#### web服务注解
+
+``` java
+@RequestMapping("test")
+@RestController
+public class TestController {
+    private static final AtomicInteger COUNT = new AtomicInteger(0);
+
+    /**
+     * 添加到count作用域的缓存。缓存存在时，计数不会增长。
+     * 
+     * @return
+     */
+    @Cache("count")
+    @GetMapping("getCountWithCache")
+    public int getCountWithCache() {
+        return getCount();
+    }
+
+    /**
+     * 不使用缓存获取count计数
+     * 
+     * @return
+     */
+    @GetMapping("getCountNoCache")
+    public int getCountNoCache() {
+        return getCount();
+    }
+
+    /**
+     * 使count作用域的缓存失效
+     */
+    @CacheExpire("count")
+    @GetMapping("expireCache")
+    public void expireCache() {
+    }
+
+    private int getCount() {
+        return COUNT.incrementAndGet();
     }
 }
 ```

@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=io.github.s3s3l.yggdrasil.sample.cache.configuration.RedisServerConfiguration

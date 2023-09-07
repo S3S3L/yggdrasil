@@ -33,6 +33,9 @@ import org.reflections.util.FilterBuilder;
  */
 public abstract class ReflectionsHelper {
 
+    private ReflectionsHelper() {
+    }
+
     /**
      * 
      * 获取指定包下所有拥有指定注解的方法
