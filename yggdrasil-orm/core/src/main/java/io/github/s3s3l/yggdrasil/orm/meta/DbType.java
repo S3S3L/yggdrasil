@@ -33,6 +33,7 @@ public class DbType {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ((args == null) ? 0 : args.hashCode());
         result = prime * result + (notNull ? 1231 : 1237);
         result = prime * result + (def ? 1231 : 1237);
         result = prime * result + ((defValue == null) ? 0 : defValue.hashCode());
@@ -51,6 +52,11 @@ public class DbType {
         DbType other = (DbType) obj;
         if (type != other.type)
             return false;
+        if (args == null) {
+            if (other.args != null)
+                return false;
+        } else if (!args.equals(other.args))
+            return false;
         if (notNull != other.notNull)
             return false;
         if (def != other.def)
@@ -58,9 +64,10 @@ public class DbType {
         if (defValue == null) {
             if (other.defValue != null)
                 return false;
-        } else if (!defValue.equals(other.defValue)) {
+        } else if (!defValue.equals(other.defValue))
             return false;
-        }
-        return array == other.array;
+        if (array != other.array)
+            return false;
+        return true;
     }
 }
