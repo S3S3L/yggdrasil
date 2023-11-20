@@ -49,6 +49,7 @@
         <module>yggdrasil-mybatis</module>
         <module>yggdrasil-orm</module>
         <module>yggdrasil-persistence</module>
+        <module>yggdrasil-physic</module>
         <module>yggdrasil-redis</module>
         <module>yggdrasil-resource</module>
         <module>yggdrasil-spring</module>
@@ -231,7 +232,6 @@
         <google.guava.version>31.1-jre</google.guava.version>
         <googleauth.versioin>0.5.0</googleauth.versioin>
         <zxing.version>3.2.1</zxing.version>
-        <apache.commons.version>3.4</apache.commons.version>
         <apache.poi.version>5.2.3</apache.poi.version>
         <tomcat.version>10.1.2</tomcat.version>
         <shardingjdbc.version>3.1.0</shardingjdbc.version>
@@ -373,6 +373,11 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-persistence</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-physic</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
@@ -718,6 +723,12 @@
                 <artifactId>annotations-api</artifactId>
                 <version>6.0.53</version>
                 <scope>provided</scope>
+            </dependency>
+            <!-- commons -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.6.1</version>
             </dependency>
             <!-- curator framework -->
             <dependency>
