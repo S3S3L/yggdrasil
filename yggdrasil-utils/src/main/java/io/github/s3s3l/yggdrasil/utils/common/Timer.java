@@ -1,7 +1,5 @@
 package io.github.s3s3l.yggdrasil.utils.common;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -13,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Timer implements AutoCloseable{
+public class Timer implements AutoCloseable {
 
     private static ThreadLocal<Timer> current = new ThreadLocal<>();
 
@@ -21,13 +19,13 @@ public class Timer implements AutoCloseable{
     private final Consumer<TimePiece> handler;
 
     private boolean isRuning = false;
-    private LocalDateTime start;
-    private LocalDateTime pre;
+    private long start;
+    private long pre;
     private Thread worker;
 
     public Timer() {
-        this.handler = piece -> System.out.println(String.format("%s total cost: %dms; delta cost: %dms", piece.name,
-                piece.start.until(piece.that, ChronoUnit.MILLIS), piece.pre.until(piece.that, ChronoUnit.MILLIS)));
+        this.handler = piece -> System.out.println(String.format("[%s] total cost: %dms; delta cost: %dms", piece.name,
+                piece.that - piece.start, piece.that - piece.pre));
     }
 
     public Timer(Consumer<TimePiece> handler) {
@@ -39,7 +37,7 @@ public class Timer implements AutoCloseable{
             throw new TimerException("A timer is already running in current thread.");
         }
         worker = new Thread(() -> {
-            while (isRuning || !queue.isEmpty()) {
+            while (isRuning) {
                 try {
                     handler.accept(queue.take());
                 } catch (InterruptedException e) {
@@ -48,7 +46,7 @@ public class Timer implements AutoCloseable{
             }
         });
         isRuning = true;
-        start = LocalDateTime.now();
+        start = System.currentTimeMillis();
         pre = start;
         current.set(this);
         worker.start();
@@ -74,7 +72,7 @@ public class Timer implements AutoCloseable{
         if (!isRuning) {
             throw new TimerException("Timer not started.");
         }
-        LocalDateTime now = LocalDateTime.now();
+        long now = System.currentTimeMillis();
         boolean tickResult = queue.offer(TimePiece.builder()
                 .name(name)
                 .that(now)
@@ -101,9 +99,9 @@ public class Timer implements AutoCloseable{
     @AllArgsConstructor
     public static class TimePiece {
         private String name;
-        private LocalDateTime start;
-        private LocalDateTime pre;
-        private LocalDateTime that;
+        private Long start;
+        private Long pre;
+        private Long that;
     }
 
     public static class TimerException extends RuntimeException {
