@@ -1,6 +1,8 @@
 package io.github.s3s3l.yggdrasil.utils.promise;
 
+import java.util.concurrent.ExecutionException;
+
 @FunctionalInterface
-interface Operator {
-    void operate();
+interface Operator<T> {
+    T operate() throws InterruptedException, ExecutionException;
 }
