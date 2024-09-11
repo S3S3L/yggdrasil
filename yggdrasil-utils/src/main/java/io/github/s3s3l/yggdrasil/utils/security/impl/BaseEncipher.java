@@ -12,6 +12,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.security.Encipher;
 import io.github.s3s3l.yggdrasil.utils.security.SecurityUtils;
 
@@ -93,6 +94,10 @@ public abstract class BaseEncipher implements Encipher {
     @Override
     public String encrypt(String src) {
 
+        if (StringUtils.isEmpty(src)) {
+            throw new IllegalArgumentException("src can not be null.");
+        }
+
         if (secretKey == null || secretKey.isDestroyed()) {
             throw new IllegalArgumentException("SecretKey not set.");
         }
@@ -111,6 +116,10 @@ public abstract class BaseEncipher implements Encipher {
 
     @Override
     public String decrypt(String src) {
+
+        if (StringUtils.isEmpty(src)) {
+            throw new IllegalArgumentException("src can not be null.");
+        }
 
         if (secretKey == null || secretKey.isDestroyed()) {
             throw new IllegalArgumentException("SecretKey not set.");

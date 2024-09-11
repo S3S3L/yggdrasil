@@ -77,20 +77,6 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <classifier>linux_amd64</classifier>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.github.luben</groupId>
-            <artifactId>zstd-jni</artifactId>
-            <classifier>darwin_x86_64</classifier>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.github.luben</groupId>
-            <artifactId>zstd-jni</artifactId>
-            <classifier>win_amd64</classifier>
-            <optional>true</optional>
         </dependency>
         <!-- Tomcat -->
         <dependency>
