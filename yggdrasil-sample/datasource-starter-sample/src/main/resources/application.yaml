@@ -28,6 +28,7 @@ yggdrasil:
       test:
         autoCreate: 
           enable: true
+        databaseType: HSQLDB
         driverClassName: org.hsqldb.jdbc.JDBCDriver
         url: jdbc:hsqldb:file:./db/test
         username: test

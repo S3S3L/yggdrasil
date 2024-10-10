@@ -6,6 +6,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -16,7 +17,7 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
-import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
+import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.instrumentation.log4j.appender.v2_17.OpenTelemetryAppender;
@@ -33,8 +34,8 @@ import io.opentelemetry.semconv.ServiceAttributes;
 @SpringBootApplication(scanBasePackages = { "io.github.s3s3l.yggdrasil.sample.trace" })
 public class Application {
     public static void main(String[] args) throws IOException {
-        // SpringApplication.run(Application.class, args);
-        testEs();
+        SpringApplication.run(Application.class, args);
+        // testEs();
     }
 
     static void testEs() throws IOException {
@@ -91,8 +92,8 @@ public class Application {
 
         SdkLoggerProvider sdkLoggerProvider = SdkLoggerProvider.builder()
                 .addLogRecordProcessor(
-                        BatchLogRecordProcessor.builder(OtlpHttpLogRecordExporter.builder()
-                                .setEndpoint("http://localhost:3100/otlp/v1/logs").build())
+                        BatchLogRecordProcessor.builder(OtlpGrpcLogRecordExporter.builder()
+                                .setEndpoint("http://localhost:4317").build())
                                 .build())
                 .setResource(resource)
                 .build();

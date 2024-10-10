@@ -50,7 +50,7 @@ public class RollController {
     }
 
     @GetMapping("/echo")
-    public @ResponseBody String echo(@RequestParam String msg) {
+    public @ResponseBody String echo(@RequestParam("msg") String msg) {
         return msg;
     }
 

@@ -14,7 +14,6 @@ import io.github.s3s3l.yggdrasil.orm.handler.TypeHandler;
 import io.github.s3s3l.yggdrasil.orm.meta.ColumnMeta;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -84,6 +83,16 @@ public class ValuesStruct implements DataBindNode {
                                     });
                         }
                         sb.append(String.join(",", paramPlaceHolders)).append("]");
+                        if (paramPlaceHolders.isEmpty()) {
+                            Class<?> componentType = fieldType.getComponentType();
+                            if (int.class.isAssignableFrom(componentType)) {
+                                sb.append("::int[]");
+                            } else if (double.class.isAssignableFrom(componentType)) {
+                                sb.append("::float[]");
+                            } else {
+                                sb.append("::text[]");
+                            }
+                        }
                         return sb.toString();
                     } else if (Collection.class.isAssignableFrom(fieldType)) {
                         StringBuilder sb = new StringBuilder("ARRAY[");

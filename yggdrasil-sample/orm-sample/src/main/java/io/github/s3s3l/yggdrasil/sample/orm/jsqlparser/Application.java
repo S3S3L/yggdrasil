@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Application {
     public static void main(String[] args) throws SQLException {
 
-        DatasourceConfig config = DatasourceConfig.POSTGRESQL_DEFAULT;
+        DatasourceConfig config = DatasourceConfig.POSTGRESQL_JSQLPARSER;
 
         DataSource datasource = new DataSource(JacksonUtils.YAML
                 .toObject(FileUtils.getFirstExistResource(config.getConfigFile()), PoolProperties.class));
@@ -60,7 +60,6 @@ public class Application {
                 .autoDropColumn(true)
                 .build());
 
-        System.exit(0);
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
         sqlExecutor.insert(Arrays.asList(User.builder()

@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
-io.github.s3s3l.yggdrasil.starter.redis.MultiRedisAutoConfigure

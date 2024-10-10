@@ -1,7 +1,5 @@
-driverClassName: org.postgresql.Driver
-url: jdbc:postgresql://localhost:5432/test
-username: psql
-password: Psql@1122
+driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+url: jdbc:tc:postgresql:12.14:///test
 jmxEnabled: false
 testWhileIdle: false
 validationQuery: SELECT 1

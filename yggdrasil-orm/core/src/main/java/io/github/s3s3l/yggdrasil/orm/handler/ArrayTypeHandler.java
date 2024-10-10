@@ -51,6 +51,9 @@ public class ArrayTypeHandler implements TypeHandler {
 
     @Override
     public Object toJavaType(Object result, Class<?> clazz, Type type) {
+        if (result == null) {
+            return null;
+        }
         try {
             if (clazz.isArray()) {
                 if (double[].class.isAssignableFrom(clazz)) {

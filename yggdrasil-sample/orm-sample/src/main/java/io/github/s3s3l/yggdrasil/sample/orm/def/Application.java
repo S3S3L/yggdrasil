@@ -60,7 +60,6 @@ public class Application {
                 .build());
         sqlExecutor.delete(UserCondition.builder()
                 .build());
-        System.exit(0);
         String id = StringUtils.getUUIDNoLine();
         String id2 = StringUtils.getUUIDNoLine();
         sqlExecutor.insert(Arrays.asList(User.builder()

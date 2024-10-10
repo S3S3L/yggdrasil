@@ -5,6 +5,7 @@ import java.sql.JDBCType;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.Column;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.DatabaseType;
 import io.github.s3s3l.yggdrasil.orm.bind.annotation.TableDefine;
+import io.github.s3s3l.yggdrasil.orm.handler.ArrayTypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,6 @@ public class User {
     private int age;
     @Column(dbType = @DatabaseType(type = JDBCType.BOOLEAN))
     private Boolean deleted;
-    @Column(dbType = @DatabaseType(type = JDBCType.VARCHAR, array = true))
+    @Column(dbType = @DatabaseType(type = JDBCType.VARCHAR, array = true), typeHandler = ArrayTypeHandler.class)
     private String[] remarks;
 }

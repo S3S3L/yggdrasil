@@ -1,7 +1,5 @@
-driverClassName: com.mysql.cj.jdbc.Driver
-url: jdbc:mysql://localhost:3306/test
-username: mysql
-password: admin123
+driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+url: jdbc:tc:mysql:8.0.33:///test
 jmxEnabled: false
 testWhileIdle: false
 validationQuery: SELECT 1
