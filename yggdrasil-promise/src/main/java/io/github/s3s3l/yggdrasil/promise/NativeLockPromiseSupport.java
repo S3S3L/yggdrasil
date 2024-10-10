@@ -1,16 +1,14 @@
-package io.github.s3s3l.yggdrasil.utils.promise;
+package io.github.s3s3l.yggdrasil.promise;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class PromiseSupport<T> implements Future<T> {
+class NativeLockPromiseSupport<T> extends PromiseSupport<T> {
     private static final int RUNNING = 1;
     private static final int FAILED = -1;
     private static final int COMPLETED = 0;
@@ -19,28 +17,37 @@ class PromiseSupport<T> implements Future<T> {
 
     private volatile int state = RUNNING;
     private T value;
-    @Getter(AccessLevel.PACKAGE)
-    private Exception exception;
 
-    PromiseSupport() {
+    NativeLockPromiseSupport(ExecutorService executorService) {
+        super(executorService);
         lock = new Object();
     }
 
-    void fullfill() {
+    @Override
+    public void fullfill() {
         synchronized (lock) {
             lock.notifyAll();
         }
     }
 
-    void fulfill(T value) {
-        this.value = value;
-        state = COMPLETED;
-        fullfill();
+    @Override
+    public void fulfill(Operator<T> operator) {
+        executorService.submit(() -> {
+            try {
+                this.value = operator.operate();
+                state = COMPLETED;
+                fullfill();
+            } catch (Exception e) {
+                fulfillWithException(e);
+            }
+        });
     }
 
-    void fulfillWithException(Exception exception) {
+    @Override
+    public void fulfillWithException(Exception exception) {
         this.exception = exception;
         state = FAILED;
+        handleException(exception);
         log.debug("Promise fulfillWithException", exception);
         fullfill();
     }
@@ -70,10 +77,14 @@ class PromiseSupport<T> implements Future<T> {
                 lock.wait();
             }
         }
-        if (state == COMPLETED) {
-            return value;
+
+        switch (state) {
+            case COMPLETED:
+                return value;
+            case FAILED:
+            default:
+                return null;
         }
-        throw new ExecutionException(exception);
     }
 
     @Override
@@ -82,20 +93,18 @@ class PromiseSupport<T> implements Future<T> {
             return value;
         }
         synchronized (lock) {
-            while (state == RUNNING) {
-                try {
-                    lock.wait(unit.toMillis(timeout));
-                } catch (InterruptedException e) {
-                    log.warn("Interrupted", e);
-                    Thread.currentThread()
-                            .interrupt();
-                }
+            try {
+                lock.wait(unit.toMillis(timeout));
+            } catch (InterruptedException e) {
+                System.out.println("excetpion");
+                Thread.currentThread()
+                        .interrupt();
             }
         }
         if (state == COMPLETED) {
             return value;
         }
-        throw new ExecutionException(exception);
+        throw new TimeoutException();
     }
 
 }

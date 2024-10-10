@@ -12,6 +12,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.github.s3s3l.yggdrasil.redis.JedisUtils.JedisConfiguration;
 import io.github.s3s3l.yggdrasil.redis.base.InitializableRedis;
 import io.github.s3s3l.yggdrasil.redis.base.MessageHandler;
@@ -20,22 +25,17 @@ import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import redis.clients.jedis.GeoCoordinate;
-import redis.clients.jedis.GeoRadiusResponse;
-import redis.clients.jedis.GeoUnit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
-import redis.clients.jedis.Tuple;
+import redis.clients.jedis.args.GeoUnit;
 import redis.clients.jedis.params.GeoRadiusParam;
 import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.GeoRadiusResponse;
+import redis.clients.jedis.resps.Tuple;
 
 public class JedisUtils implements InitializableRedis<JedisConfiguration> {
 
@@ -584,7 +584,7 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
     }
 
     @Override
-    public Set<String> zrange(String key, long start, long stop) {
+    public List<String> zrange(String key, long start, long stop) {
         return execute(jedis -> jedis.zrange(key, start, stop));
     }
 
@@ -599,7 +599,7 @@ public class JedisUtils implements InitializableRedis<JedisConfiguration> {
     }
 
     @Override
-    public Set<Tuple> zrangeByScore(String key, double min, double max) {
+    public List<Tuple> zrangeByScore(String key, double min, double max) {
         return execute(jedis -> jedis.zrangeByScoreWithScores(key, min, max));
     }
 

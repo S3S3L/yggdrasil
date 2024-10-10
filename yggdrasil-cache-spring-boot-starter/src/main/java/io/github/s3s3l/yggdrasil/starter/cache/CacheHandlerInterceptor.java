@@ -3,9 +3,6 @@ package io.github.s3s3l.yggdrasil.starter.cache;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,6 +15,8 @@ import io.github.s3s3l.yggdrasil.cache.key.CacheKeyGenerator;
 import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -1,0 +1,14 @@
+spring: 
+  application: 
+    name: trace-sample
+server:
+  port: 20080
+management:
+  endpoints:
+    web: 
+      exposure: 
+        include: "*"
+  endpoint: 
+    health: 
+      show: 
+        details: always

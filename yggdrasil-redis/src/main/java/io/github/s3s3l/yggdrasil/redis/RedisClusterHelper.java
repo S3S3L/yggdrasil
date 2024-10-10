@@ -14,6 +14,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.github.s3s3l.yggdrasil.bean.redis.HAPClusterNode;
 import io.github.s3s3l.yggdrasil.bean.redis.HAPNode;
 import io.github.s3s3l.yggdrasil.redis.base.InitializableRedis;
@@ -22,30 +27,25 @@ import io.github.s3s3l.yggdrasil.redis.exception.RedisExcuteException;
 import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.github.s3s3l.yggdrasil.utils.verify.Verify;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
+import redis.clients.jedis.Connection;
 import redis.clients.jedis.GeoCoordinate;
-import redis.clients.jedis.GeoRadiusResponse;
-import redis.clients.jedis.GeoUnit;
 import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
-import redis.clients.jedis.Tuple;
+import redis.clients.jedis.args.GeoUnit;
 import redis.clients.jedis.params.GeoRadiusParam;
 import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.GeoRadiusResponse;
+import redis.clients.jedis.resps.Tuple;
 
-public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jedis>> {
+public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Connection>> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private StructuralHelper jsonHelper = JacksonUtils.JSON;
     private JedisCluster cluster;
 
-    public static RedisClusterHelper create(Set<HAPNode> clusterNodes, GenericObjectPoolConfig<Jedis> poolConfig) {
+    public static RedisClusterHelper create(Set<HAPNode> clusterNodes, GenericObjectPoolConfig<Connection> poolConfig) {
         RedisClusterHelper operation = new RedisClusterHelper();
         operation.cluster = new JedisCluster(clusterNodes.stream()
                 .map(r -> new HostAndPort(r.getHost(), r.getPort()))
@@ -54,7 +54,7 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jed
     }
 
     @Override
-    public void init(HAPClusterNode<Jedis> configuration) {
+    public void init(HAPClusterNode<Connection> configuration) {
         cluster = new JedisCluster(configuration.getClusterConfig()
                 .stream()
                 .map(r -> new HostAndPort(r.getHost(), r.getPort()))
@@ -548,7 +548,7 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jed
     }
 
     @Override
-    public Set<String> zrange(String key, long start, long stop) {
+    public List<String> zrange(String key, long start, long stop) {
         return execute(jedis -> jedis.zrange(key, start, stop));
     }
 
@@ -563,7 +563,7 @@ public class RedisClusterHelper implements InitializableRedis<HAPClusterNode<Jed
     }
 
     @Override
-    public Set<Tuple> zrangeByScore(String key, double min, double max) {
+    public List<Tuple> zrangeByScore(String key, double min, double max) {
         return execute(jedis -> jedis.zrangeByScoreWithScores(key, min, max));
     }
 

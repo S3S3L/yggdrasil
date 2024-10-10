@@ -11,7 +11,7 @@ import io.github.s3s3l.yggdrasil.annotation.apollo.ApolloConfiguration;
 import io.github.s3s3l.yggdrasil.bean.redis.HAPClusterNode;
 import io.github.s3s3l.yggdrasil.configuration.redis.RedisClusterConfiguration;
 import lombok.Data;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Connection;
 
 /**
  * <p>
@@ -33,5 +33,5 @@ public class DefaultRedisClientConfiguration {
     private String primary;
     private Set<String> requiredInstances;
     private Map<String, RedisClusterConfiguration> masterSlave = new HashMap<>();
-    private Map<String, HAPClusterNode<Jedis>> cluster = new HashMap<>();
+    private Map<String, HAPClusterNode<Connection>> cluster = new HashMap<>();
 }

@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.utils.promise;
+package io.github.s3s3l.yggdrasil.promise;
 
 import java.util.concurrent.ExecutionException;
 

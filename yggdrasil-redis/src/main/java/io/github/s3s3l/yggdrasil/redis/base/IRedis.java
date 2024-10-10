@@ -6,13 +6,13 @@ import java.util.Set;
 import java.util.function.Function;
 
 import redis.clients.jedis.GeoCoordinate;
-import redis.clients.jedis.GeoRadiusResponse;
-import redis.clients.jedis.GeoUnit;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Transaction;
-import redis.clients.jedis.Tuple;
+import redis.clients.jedis.args.GeoUnit;
 import redis.clients.jedis.params.GeoRadiusParam;
 import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.GeoRadiusResponse;
+import redis.clients.jedis.resps.Tuple;
 
 public interface IRedis {
 
@@ -148,13 +148,13 @@ public interface IRedis {
 
     long zadd(String key, double score, String member);
 
-    Set<String> zrange(String key, long start, long stop);
+    List<String> zrange(String key, long start, long stop);
 
     long zrem(String key, String... member);
 
     long zremRangeByScore(String key, double min, double max);
 
-    Set<Tuple> zrangeByScore(String key, double min, double max);
+    List<Tuple> zrangeByScore(String key, double min, double max);
 
     Double zscoreBymember(String key, String member);
 

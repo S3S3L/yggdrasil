@@ -4,13 +4,13 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.View;
 
+import io.github.s3s3l.yggdrasil.utils.common.FreeMarkerHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,8 @@ public class FreeMarkerView implements View {
     private FreeMarkerHelper freeMarkerHelper;
     private String template;
 
-    public void render(@Nullable Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+    public void render(@Nullable Map<String, ?> model, @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response)
             throws Exception {
         response.setContentType("text/html");
         try (OutputStream os = response.getOutputStream()) {

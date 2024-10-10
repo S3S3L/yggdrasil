@@ -30,6 +30,7 @@ module.exports = {
     { name: 'mybatis' },
     { name: 'orm' },
     { name: 'presistence' },
+    { name: 'promise' },
     { name: 'rabbitmq_starter' },
     { name: 'redis' },
     { name: 'redis_starter' },

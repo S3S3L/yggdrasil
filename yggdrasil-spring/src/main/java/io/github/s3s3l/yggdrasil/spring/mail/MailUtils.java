@@ -1,11 +1,10 @@
 package io.github.s3s3l.yggdrasil.spring.mail;
 
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import io.github.s3s3l.yggdrasil.spring.mail.enumerations.MailSendStatus;
+import jakarta.mail.internet.MimeMessage;
 
 /**
  * ClassName:MailUtils <br>

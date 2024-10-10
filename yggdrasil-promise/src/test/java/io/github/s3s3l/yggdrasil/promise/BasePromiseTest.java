@@ -1,8 +1,11 @@
-package io.github.s3s3l.yggdrasil.utils.promise;
+package io.github.s3s3l.yggdrasil.promise;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-public class PromiseTest {
+public abstract class BasePromiseTest {
 
     @Data
     @SuperBuilder
@@ -96,6 +99,40 @@ public class PromiseTest {
         async2.get();
         Assertions.assertEquals(1, list.get(1).getF2());
         Assertions.assertEquals(2, list.get(0).getF2());
+    }
+
+    @Test
+    void timeoutTest() {
+        Promise<Object> async = Promise.async(() -> {
+            sleep(1000);
+            return TestObject.builder().f1("async1").f2(1).build();
+        });
+        Assertions.assertThrows(TimeoutException.class, () -> {
+            async.get(500, TimeUnit.MILLISECONDS);
+        });
+    }
+
+    @Test
+    void errorTest() throws InterruptedException, ExecutionException {
+        Promise<Object> async = Promise.async(() -> {
+            sleep(1000);
+            throw new RuntimeException("error");
+        });
+        Assertions.assertEquals(null, async.get());
+    }
+
+    @Test
+    void errorHandlerTest() throws InterruptedException, ExecutionException {
+        AtomicBoolean error = new AtomicBoolean(false);
+        Promise<Object> async = Promise.async(() -> {
+            sleep(1000);
+            throw new RuntimeException("error");
+        }).error(e -> {
+            error.set(true);
+        });
+        Assertions.assertEquals(false, error.get());
+        async.get();
+        Assertions.assertEquals(true, error.get());
     }
 
     void sleep(long millis) {

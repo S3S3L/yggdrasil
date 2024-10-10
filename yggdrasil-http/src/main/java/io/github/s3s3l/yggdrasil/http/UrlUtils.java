@@ -14,18 +14,19 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
-import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
-import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
-import io.github.s3s3l.yggdrasil.utils.verify.Verify;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.net.URLEncodedUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
+import io.github.s3s3l.yggdrasil.utils.stuctural.StructuralHelper;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonHelper;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
+import io.github.s3s3l.yggdrasil.utils.verify.Verify;
 
 /**
  * <p>

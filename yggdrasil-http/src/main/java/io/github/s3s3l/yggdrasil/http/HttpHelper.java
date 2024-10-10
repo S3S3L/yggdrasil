@@ -3,7 +3,7 @@ package io.github.s3s3l.yggdrasil.http;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.apache.http.entity.ContentType;
+import org.apache.hc.core5.http.ContentType;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;

@@ -35,10 +35,10 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy</artifactId>
-        </dependency>
+        </dependency> -->
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

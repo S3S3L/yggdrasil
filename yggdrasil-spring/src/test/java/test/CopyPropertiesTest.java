@@ -2,7 +2,7 @@ package test;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.BeanUtils;
 
 import io.github.s3s3l.yggdrasil.test.TimeCalExtension;
@@ -12,8 +12,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@ExtendWith(TimeCalExtension.class)
 public class CopyPropertiesTest {
+
+    @RegisterExtension
+    TimeCalExtension timeCalExtension = new TimeCalExtension();
+
     private long loopTimes = 100_000L;
 
     @Data
