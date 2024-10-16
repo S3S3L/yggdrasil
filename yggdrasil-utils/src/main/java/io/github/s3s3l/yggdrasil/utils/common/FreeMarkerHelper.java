@@ -6,14 +6,13 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import io.github.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
-import io.github.s3s3l.yggdrasil.utils.security.SecurityUtils;
-
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import io.github.s3s3l.yggdrasil.bean.exception.ResourceProcessException;
+import io.github.s3s3l.yggdrasil.utils.security.SecurityUtils;
 
 public class FreeMarkerHelper {
     private final Configuration templateConfig;
@@ -55,9 +54,5 @@ public class FreeMarkerHelper {
 
     public String format(String format, Object data) {
         return format(SecurityUtils.getMD5(format), () -> format, data);
-    }
-
-    public void addTemplate(String templateName, String format) {
-        templateLoader.putTemplate(templateName, format);
     }
 }

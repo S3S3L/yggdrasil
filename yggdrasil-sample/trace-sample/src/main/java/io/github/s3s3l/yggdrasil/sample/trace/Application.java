@@ -6,14 +6,15 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -34,8 +35,8 @@ import io.opentelemetry.semconv.ServiceAttributes;
 @SpringBootApplication(scanBasePackages = { "io.github.s3s3l.yggdrasil.sample.trace" })
 public class Application {
     public static void main(String[] args) throws IOException {
-        SpringApplication.run(Application.class, args);
-        // testEs();
+        // SpringApplication.run(Application.class, args);
+        testEs();
     }
 
     static void testEs() throws IOException {
@@ -59,6 +60,12 @@ public class Application {
         ElasticsearchClient esClient = new ElasticsearchClient(transport);
 
         // Use the client...
+        esClient.search(builder -> builder.index("otel*")
+                .query(q -> q.bool(b->b.filter(f->f.multiMatch(m->m.type(TextQueryType.BestFields).query("echo"))))),
+                // .q("echo and \"request log in span\""),
+                Object.class).hits().hits().forEach(hit -> {
+                    System.out.println(JacksonUtils.JSON.toStructuralString(hit.source()));
+                });
 
         // Close the transport, freeing the underlying thread
         transport.close();

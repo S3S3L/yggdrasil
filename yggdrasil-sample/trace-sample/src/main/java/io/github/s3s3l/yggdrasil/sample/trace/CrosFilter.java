@@ -39,10 +39,9 @@ public class CrosFilter implements Filter {
 
         try (Scope scope = span.makeCurrent()) {
 
-            log.info("request log in span. path: {}", request.getRequestURI());
-
             span.setAttribute("path", request.getRequestURI());
-            span.getSpanContext().getTraceId();
+
+            log.info("request log in span. path: {}", request.getRequestURI());
 
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");

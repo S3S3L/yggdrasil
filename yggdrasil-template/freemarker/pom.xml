@@ -2,7 +2,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yggdrasil-trace</artifactId>
+    <artifactId>yggdrasil-template-freemarker</artifactId>
 
     <licenses>
         <license>
@@ -38,13 +38,14 @@
         <!-- Yggdrasil -->
         <dependency>
             <groupId>io.github.s3s3l</groupId>
-            <artifactId>yggdrasil-utils</artifactId>
+            <artifactId>yggdrasil-template-core</artifactId>
+        </dependency>
+        <!-- FreeMarker -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
-        </dependency>
         <!-- Compile -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -2,7 +2,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yggdrasil-test</artifactId>
+    <artifactId>yggdrasil-otel</artifactId>
 
     <licenses>
         <license>
@@ -31,17 +31,19 @@
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.7.0-RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
+        <!-- Yggdrasil -->
         <dependency>
             <groupId>io.github.s3s3l</groupId>
             <artifactId>yggdrasil-utils</artifactId>
         </dependency>
-        <!-- Log -->
+
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
         </dependency>
         <!-- Compile -->
         <dependency>
@@ -51,20 +53,9 @@
         </dependency>
         <!-- Test -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

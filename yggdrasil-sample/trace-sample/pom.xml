@@ -59,6 +59,10 @@
         </dependency>
         <dependency>
             <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-es</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
             <artifactId>yggdrasil-utils</artifactId>
         </dependency>
         <!-- Http -->

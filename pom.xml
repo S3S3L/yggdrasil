@@ -53,8 +53,9 @@
         <module>yggdrasil-redis</module>
         <module>yggdrasil-resource</module>
         <module>yggdrasil-spring</module>
+        <module>yggdrasil-template</module>
         <module>yggdrasil-test</module>
-        <module>yggdrasil-trace</module>
+        <module>yggdrasil-otel</module>
         <module>yggdrasil-utils</module>
         <module>yggdrasil-web</module>
 
@@ -424,12 +425,22 @@
             </dependency>
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-template-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-template-freemarker</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-test</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
-                <artifactId>yggdrasil-trace</artifactId>
+                <artifactId>yggdrasil-otel</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <dependency>

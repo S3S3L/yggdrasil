@@ -14,10 +14,15 @@ import java.io.Reader;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,23 +80,23 @@ public abstract class FileUtils {
      * 分割文件
      * 
      * @param srcPath
-     *            源文件路径，支持classpath中的文件
+     *                      源文件路径，支持classpath中的文件
      * @param destPath
-     *            目标文件，如/tmp/test.txt，最终会生成/tmp/test.txt.00,/tmp/test.txt.01
-     *            ...等多个文件
+     *                      目标文件，如/tmp/test.txt，最终会生成/tmp/test.txt.00,/tmp/test.txt.01
+     *                      ...等多个文件
      * @param sizePerSplit
-     *            每个分片的大小，单位B。会向上浮动最多maxLineSize。不能为负数。
+     *                      每个分片的大小，单位B。会向上浮动最多maxLineSize。不能为负数。
      * @param maxLineSize
-     *            查找行尾的最大长度。会从每个分片的默认位置向后查找最近的行尾作为最终分割位置。不能为负数。
+     *                      查找行尾的最大长度。会从每个分片的默认位置向后查找最近的行尾作为最终分割位置。不能为负数。
      * @param lineSeparator
-     *            行尾符号
+     *                      行尾符号
      * @param executor
-     *            执行线程池。每个分片的切割工作会作为一个独立的任务并发进行。会同时打开多次源文件（和并发数相同）。为空时，所有任务串行的在当前线程中执行。
+     *                      执行线程池。每个分片的切割工作会作为一个独立的任务并发进行。会同时打开多次源文件（和并发数相同）。为空时，所有任务串行的在当前线程中执行。
      * @return 目标文件地址
      * @throws IOException
-     *             遇到IO错误的时候会抛出
+     *                         遇到IO错误的时候会抛出
      * @throws VerifyException
-     *             在入参不合法的情况下抛出
+     *                         在入参不合法的情况下抛出
      * @since JDK 1.8
      */
     public static Map<String, Path> split(final String srcPath,
@@ -151,9 +156,9 @@ public abstract class FileUtils {
      * 生成分片文件名
      * 
      * @param destPath
-     *            目标文件路径
+     *                 目标文件路径
      * @param part
-     *            分片号
+     *                 分片号
      * @return 分片文件名
      * @since JDK 1.8
      */
@@ -169,16 +174,16 @@ public abstract class FileUtils {
      * 从文件中查找下一个指定字符的位置
      * 
      * @param begin
-     *            开始位置
+     *                 开始位置
      * @param end
-     *            结束位置
+     *                 结束位置
      * @param file
-     *            文件
+     *                 文件
      * @param seekChar
-     *            需要查找的字符
+     *                 需要查找的字符
      * @return 下一个指定字符的位置，如果没找到则返回-1
      * @throws IOException
-     *             遇到IO错误的时候会抛出
+     *                     遇到IO错误的时候会抛出
      * @since JDK 1.8
      */
     private static long findNext(long begin, long end, RandomAccessFile file, char seekChar) throws IOException {
@@ -201,15 +206,15 @@ public abstract class FileUtils {
      * 将源文件的一部分写入到目标文件
      * 
      * @param byteSize
-     *            写入块的大小
+     *                      写入块的大小
      * @param position
-     *            开始位置
+     *                      开始位置
      * @param sourceChannel
-     *            源文件
+     *                      源文件
      * @param dest
-     *            目标文件路径
+     *                      目标文件路径
      * @throws IOException
-     *             遇到IO错误的时候会抛出
+     *                     遇到IO错误的时候会抛出
      * @since JDK 1.8
      */
     private static void writePartToFile(long byteSize, long position, FileChannel sourceChannel, Path dest)
@@ -226,11 +231,11 @@ public abstract class FileUtils {
      * 输入流到文件
      * 
      * @param file
-     *            目标文件
+     *              目标文件
      * @param input
-     *            输入流
+     *              输入流
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static void saveToFile(File file, InputStream input) throws IOException {
@@ -242,13 +247,13 @@ public abstract class FileUtils {
      * 输入流到文件
      * 
      * @param file
-     *            目标文件
+     *                  目标文件
      * @param input
-     *            输入流
+     *                  输入流
      * @param overwrite
-     *            是否覆盖
+     *                  是否覆盖
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static void saveToFile(File file, InputStream input, boolean overwrite) throws IOException {
@@ -266,7 +271,7 @@ public abstract class FileUtils {
      * 创建不存在的父目录
      * 
      * @param file
-     *            文件
+     *             文件
      * @since JDK 1.8
      */
     public static void createMissingDirectories(File file) {
@@ -282,7 +287,7 @@ public abstract class FileUtils {
      * 获取文件拓展名
      * 
      * @param file
-     *            文件
+     *             文件
      * @return 拓展名（不带'.'）
      * @since JDK 1.8
      */
@@ -299,11 +304,25 @@ public abstract class FileUtils {
     }
 
     /**
+     * 返回文件名（不带拓展名）
+     * 
+     * @param fileName
+     * @return
+     */
+    public static String getFileNameWithoutExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < fileName.length()) {
+            return fileName.substring(0, dotIndex);
+        }
+        return fileName;
+    }
+
+    /**
      * 
      * 获取文件类型
      * 
      * @param file
-     *            文件
+     *             文件
      * @return 文件类型
      * @since JDK 1.8
      */
@@ -316,14 +335,14 @@ public abstract class FileUtils {
      * 拆分文件内容到字符串列表
      * 
      * @param filepath
-     *            文件路径
+     *                 文件路径
      * @param splitor
-     *            分割字符串
+     *                 分割字符串
      * @param charset
-     *            字符集
+     *                 字符集
      * @return 字符串列表
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static List<String> splitFile(String filepath, String splitor, Charset charset) throws IOException {
@@ -335,14 +354,14 @@ public abstract class FileUtils {
      * 拆分文件内容到字符串列表
      * 
      * @param filepath
-     *            文件路径
+     *                 文件路径
      * @param splitor
-     *            分割字符串
+     *                 分割字符串
      * @param charset
-     *            字符集
+     *                 字符集
      * @return 字符串列表
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static List<String> splitFile(File file, String splitor, Charset charset) throws IOException {
@@ -368,12 +387,12 @@ public abstract class FileUtils {
      * 读取整个文件内容
      * 
      * @param filepath
-     *            路径
+     *                 路径
      * @param charset
-     *            字符集
+     *                 字符集
      * @return 文件的文本内容
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static String readToEnd(String filepath, Charset charset) throws IOException {
@@ -448,7 +467,7 @@ public abstract class FileUtils {
      * 相对路径转化为绝对路径
      * 
      * @param path
-     *            相对路径
+     *             相对路径
      * @return 绝对路径
      * @since JDK 1.8
      */
@@ -469,12 +488,12 @@ public abstract class FileUtils {
      * 获取gzip文件的reader
      * 
      * @param path
-     *            文件路径
+     *                 文件路径
      * @param encoding
-     *            编码
+     *                 编码
      * @return {@link BufferedReader}
      * @throws IOException
-     *             {@link IOException}
+     *                     {@link IOException}
      * @since JDK 1.8
      */
     public static BufferedReader readGZIPFile(String path, String encoding) throws IOException {
@@ -489,10 +508,10 @@ public abstract class FileUtils {
      * Get full path from relative path or class path.
      * 
      * @param path
-     *            Path string with prifix {@value #CLASS_PATH_PRIFIX} for
-     *            classpath or {@value #FILE_PATH_PRIFIX} for relative path or
-     *            non prifix for both (will first check relative path. if not
-     *            exist, then return classpath).
+     *             Path string with prifix {@value #CLASS_PATH_PRIFIX} for
+     *             classpath or {@value #FILE_PATH_PRIFIX} for relative path or
+     *             non prifix for both (will first check relative path. if not
+     *             exist, then return classpath).
      * @return full path string.
      * @since JDK 1.8
      */
@@ -518,7 +537,7 @@ public abstract class FileUtils {
      * 获取首个存在的文件
      * 
      * @param paths
-     *            文件路径列表
+     *              文件路径列表
      * @return 首个存在的文件
      * @since JDK 1.8
      */
@@ -595,19 +614,19 @@ public abstract class FileUtils {
      * 文件内容按行去重
      * 
      * @param in
-     *            输入文件
+     *                     输入文件
      * @param out
-     *            输出文件
+     *                     输出文件
      * @param workspace
-     *            工作目录
+     *                     工作目录
      * @param shardNum
-     *            分片数量
+     *                     分片数量
      * @param maxShardSize
-     *            分片文件最大大小。若分片大于该大小会自动执行二次分片
+     *                     分片文件最大大小。若分片大于该大小会自动执行二次分片
      * @param maxLineSize
-     *            单行最大字符数
+     *                     单行最大字符数
      * @param executor
-     *            执行线程池
+     *                     执行线程池
      * @throws IOException
      * @since JDK 1.8
      */
@@ -900,5 +919,38 @@ public abstract class FileUtils {
         }
 
         return relativePath.toString();
+    }
+
+    /**
+     * 递归查找匹配通配符的文件
+     * 
+     * @param dir     search directory
+     * @param pattern glob or regex. [glob|regex]:xxx
+     * @return
+     * @throws IOException
+     */
+    public static List<Path> findMatchedFiles(Path dir, String pattern) throws IOException {
+        List<Path> matchedFiles = new ArrayList<>();
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(pattern);
+
+        // 使用 Files.walkFileTree 递归遍历目录
+        Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                // 如果文件路径匹配通配符，则将其加入结果列表
+                if (pathMatcher.matches(file)) {
+                    matchedFiles.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                // 忽略无法访问的文件
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return matchedFiles;
     }
 }
