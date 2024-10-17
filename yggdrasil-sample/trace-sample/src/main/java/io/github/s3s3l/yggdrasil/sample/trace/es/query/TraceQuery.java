@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Template("log_query")
-public class LogQuery extends BaseQuery {
-    private String body;
+@Template("trace_query")
+public class TraceQuery extends BaseQuery {
+    private String path;
 }

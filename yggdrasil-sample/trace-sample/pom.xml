@@ -63,6 +63,14 @@
         </dependency>
         <dependency>
             <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-otel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-template-freemarker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
             <artifactId>yggdrasil-utils</artifactId>
         </dependency>
         <!-- Http -->

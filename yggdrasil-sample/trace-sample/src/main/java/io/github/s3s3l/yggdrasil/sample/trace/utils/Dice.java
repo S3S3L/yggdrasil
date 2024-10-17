@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.sample.trace;
+package io.github.s3s3l.yggdrasil.sample.trace.utils;
 
 import java.util.ArrayList;
 import java.util.List;

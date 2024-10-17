@@ -1,9 +1,9 @@
 package io.github.s3s3l.yggdrasil.sample.trace.es.query;
 
-import io.github.s3s3l.yggdrasil.template.Template;
+import java.time.ZonedDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -11,8 +11,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Template("log_query")
-public class LogQuery extends BaseQuery {
-    private String body;
+public abstract class BaseQuery {
+    private ZonedDateTime start;
+    private ZonedDateTime end;
+    private String index;
 }

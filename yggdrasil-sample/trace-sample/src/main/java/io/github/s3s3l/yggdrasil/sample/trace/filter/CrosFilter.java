@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.sample.trace;
+package io.github.s3s3l.yggdrasil.sample.trace.filter;
 
 import java.io.IOException;
 
@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+import io.github.s3s3l.yggdrasil.sample.trace.controller.RollController;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;

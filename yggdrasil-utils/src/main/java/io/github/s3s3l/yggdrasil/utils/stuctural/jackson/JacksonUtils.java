@@ -121,7 +121,7 @@ public class JacksonUtils implements JacksonHelper {
      */
     private JacksonUtils(JsonFactory factory) {
         this.factory = factory;
-        this.mapper = new ObjectMapper(this.factory);
+        this.mapper = new ObjectMapper(this.factory).findAndRegisterModules();
         this.writer = mapper.writer();
     }
 

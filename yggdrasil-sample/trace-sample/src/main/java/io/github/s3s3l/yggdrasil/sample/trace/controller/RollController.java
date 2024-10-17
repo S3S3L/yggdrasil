@@ -1,4 +1,4 @@
-package io.github.s3s3l.yggdrasil.sample.trace;
+package io.github.s3s3l.yggdrasil.sample.trace.controller;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.github.s3s3l.yggdrasil.promise.Promise;
+import io.github.s3s3l.yggdrasil.sample.trace.utils.Dice;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
