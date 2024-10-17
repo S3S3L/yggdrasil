@@ -1,0 +1,44 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  debug:
+    verbosity: detailed
+  elasticsearch/trace:
+    endpoints: [https://host.docker.internal:9200]
+    user: elastic
+    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    traces_index: otel_trace_index
+    tls:
+      insecure_skip_verify: true
+  elasticsearch/log:
+    endpoints: [https://host.docker.internal:9200]
+    user: elastic
+    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    logs_index: otel_log_index
+    tls:
+      insecure_skip_verify: true
+  elasticsearch/metric:
+    endpoints: [https://host.docker.internal:9200]
+    user: elastic
+    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    index: otel_metric_index
+    tls:
+      insecure_skip_verify: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [elasticsearch/trace]
+    metrics:
+      receivers: [otlp]
+      exporters: [elasticsearch/metric]
+    logs:
+      receivers: [otlp]
+      exporters: [elasticsearch/log]

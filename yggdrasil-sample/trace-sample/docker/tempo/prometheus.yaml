@@ -1,0 +1,21 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+  - job_name: 'tempo'
+    static_configs:
+      - targets: [ 'tempo:3200' ]
+  - job_name: 'yggdrasil'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s # This can be adjusted based on our needs
+    static_configs:
+      - targets: ['host.docker.internal:20080']
+  - job_name: 'loki'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs: 
+      - targets: ['host.docker.internal:3100']
