@@ -32,16 +32,17 @@ public class CrosFilter implements Filter {
         ContentCachingResponseWrapper response = new ContentCachingResponseWrapper((HttpServletResponse) res);
         HttpServletRequest request = new HttpServletRequestWrapper((HttpServletRequest) req);
 
-        Tracer tracer = openTelemetry.getTracer(CrosFilter.class.getName(), "0.1.0");
-        Span span = tracer.spanBuilder("request").startSpan();
+        Tracer tracer = openTelemetry.getTracer("HttpRequest", "0.1.0");
+        String requestURI = request.getRequestURI();
+        Span span = tracer.spanBuilder(requestURI).startSpan();
 
-        log.info("request log out span. path: {}", request.getRequestURI());
+        log.info("request log out span. path: {}", requestURI);
 
         try (Scope scope = span.makeCurrent()) {
 
-            span.setAttribute("path", request.getRequestURI());
+            span.setAttribute("path", requestURI);
 
-            log.info("request log in span. path: {}", request.getRequestURI());
+            log.info("request log in span. path: {}", requestURI);
 
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");

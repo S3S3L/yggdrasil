@@ -12,6 +12,6 @@ services:
       - 4318:4318 # OTLP http receiver
       - 55679:55679 # zpages extension
     networks: 
-      - elasticsearch
+      - es-cluster
 networks:
-  elasticsearch: 
+  es-cluster: 

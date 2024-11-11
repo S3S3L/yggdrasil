@@ -13,11 +13,16 @@ import java.time.format.DateTimeFormatter;
  * @since JDK 1.8
  */
 public abstract class DefaultDateTimeFormatter {
-    private DefaultDateTimeFormatter() {}
+	private DefaultDateTimeFormatter() {
+	}
 
-	public static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_PATTERN = "yyyy-MM-dd";
+	public static final String TIME_PATTERN = "HH:mm:ss";
 
-	public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
-	public static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss");
+	public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern(DATE_PATTERN);
+
+	public static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern(TIME_PATTERN);
 }

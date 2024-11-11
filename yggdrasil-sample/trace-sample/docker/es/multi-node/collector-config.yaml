@@ -10,23 +10,23 @@ exporters:
   debug:
     verbosity: detailed
   elasticsearch/trace:
-    endpoints: [https://host.docker.internal:9200]
+    endpoints: [https://es01:9200]
     user: elastic
-    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
+    api_key: dkkydFJKTUJwX2lhNXdlY3pUNkU6RGVVT1Bqb0VUbnV2NldkTHkybW9HUQ==
     traces_index: otel_trace_index
     tls:
       insecure_skip_verify: true
   elasticsearch/log:
-    endpoints: [https://host.docker.internal:9200]
+    endpoints: [https://es01:9200]
     user: elastic
-    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
+    api_key: dkkydFJKTUJwX2lhNXdlY3pUNkU6RGVVT1Bqb0VUbnV2NldkTHkybW9HUQ==
     logs_index: otel_log_index
     tls:
       insecure_skip_verify: true
   elasticsearch/metric:
-    endpoints: [https://host.docker.internal:9200]
+    endpoints: [https://es01:9200]
     user: elastic
-    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
+    api_key: dkkydFJKTUJwX2lhNXdlY3pUNkU6RGVVT1Bqb0VUbnV2NldkTHkybW9HUQ==
     index: otel_metric_index
     tls:
       insecure_skip_verify: true

@@ -22,4 +22,8 @@ public class PaginResult<T> {
      * 总页数
      */
     private long pageCount;
+
+    public static <T> PaginResult<T> empty() {
+        return PaginResult.<T>builder().recordsCount(0).pageCount(1).build();
+    }
 }

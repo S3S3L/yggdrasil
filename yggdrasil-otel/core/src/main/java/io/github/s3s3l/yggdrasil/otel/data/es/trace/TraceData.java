@@ -2,6 +2,7 @@ package io.github.s3s3l.yggdrasil.otel.data.es.trace;
 
 import java.time.ZonedDateTime;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.github.s3s3l.yggdrasil.otel.data.DataType;
@@ -20,18 +21,18 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TraceData extends DataPiece {
-    @JsonProperty("Duration")
+    @JsonAlias("Duration")
     private long duration;
-    @JsonProperty("EndTimestamp")
+    @JsonAlias("EndTimestamp")
     private ZonedDateTime endTimestamp;
     /**
      * @see SpanKind
      */
-    @JsonProperty("Kind")
+    @JsonAlias("Kind")
     private String kind;
-    @JsonProperty("Link")
+    @JsonAlias("Link")
     private String link;
-    @JsonProperty("Name")
+    @JsonAlias("Name")
     private String name;
     /**
      * @see StatusCode

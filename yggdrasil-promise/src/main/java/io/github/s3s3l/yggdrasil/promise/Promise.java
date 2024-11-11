@@ -34,24 +34,21 @@ public class Promise<V> {
         return promise;
     }
 
-    public static Promise<Object[]> all(Supplier<?>... suppliers)
-            throws InterruptedException, ExecutionException {
+    public static Promise<Object[]> all(Supplier<?>... suppliers) {
         return all(DEFAULT_EXECUTOR_SERVICE, suppliers);
     }
 
-    public static Promise<Object[]> all(ExecutorService executorService, Supplier<?>... suppliers)
-            throws InterruptedException, ExecutionException {
-        return all(executorService, Arrays.stream(suppliers).map(supplier -> Promise.async(supplier, executorService))
-                .toArray(size -> new Promise<?>[size]));
+    public static Promise<Object[]> all(ExecutorService executorService, Supplier<?>... suppliers) {
+        Promise<?>[] promises = Arrays.stream(suppliers).map(supplier -> Promise.async(supplier, executorService))
+                .toArray(size -> new Promise<?>[size]);
+        return all(executorService, promises);
     }
 
-    public static Promise<Object[]> all(Promise<?>... promises)
-            throws InterruptedException, ExecutionException {
+    public static Promise<Object[]> all(Promise<?>... promises) {
         return all(DEFAULT_EXECUTOR_SERVICE, promises);
     }
 
-    public static Promise<Object[]> all(ExecutorService executorService, Promise<?>... promises)
-            throws InterruptedException, ExecutionException {
+    public static Promise<Object[]> all(ExecutorService executorService, Promise<?>... promises) {
 
         Promise<Object[]> resPromise = new Promise<>(executorService);
         resPromise.start(() -> {
@@ -91,7 +88,7 @@ public class Promise<V> {
     }
 
     public Promise<Void> then(Consumer<V> then) {
-        Promise<Void> dest = new Promise<Void>(this.executorService);
+        Promise<Void> dest = new Promise<>(this.executorService);
         dest.start(() -> {
             then.accept(support.get());
             return null;
@@ -100,11 +97,9 @@ public class Promise<V> {
     }
 
     public <R> Promise<R> then(Function<V, R> then) {
-        Promise<R> dest = new Promise<R>(this.executorService);
+        Promise<R> dest = new Promise<>(this.executorService);
 
-        dest.start(() -> {
-            return then.apply(support.get());
-        });
+        dest.start(() -> then.apply(support.get()));
         return dest;
     }
 

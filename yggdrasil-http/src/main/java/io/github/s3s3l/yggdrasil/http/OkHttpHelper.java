@@ -191,6 +191,9 @@ public class OkHttpHelper implements HttpHelper {
         }
         if (headers != null) {
             for (Entry<String, String> entry : headers.entrySet()) {
+                if(entry.getValue() == null) {
+                    continue;
+                }
                 builder.addHeader(entry.getKey(), entry.getValue()
                         .replaceAll("[\n\r]", ""));
             }

@@ -1,6 +1,6 @@
 package io.github.s3s3l.yggdrasil.otel.data.es.log;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import io.github.s3s3l.yggdrasil.otel.data.DataType;
 import io.github.s3s3l.yggdrasil.otel.data.es.DataPiece;
@@ -16,13 +16,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class LogData extends DataPiece {
-    @JsonProperty("Body")
+    @JsonAlias("Body")
     private String body;
-    @JsonProperty("SeverityNumber")
+    @JsonAlias("SeverityNumber")
     private int severityNumber;
-    @JsonProperty("SeverityText")
+    @JsonAlias("SeverityText")
     private String serverityText;
-    @JsonProperty("TraceFlags")
+    @JsonAlias("TraceFlags")
     private int traceFlags;
 
     @Override

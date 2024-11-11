@@ -5,7 +5,7 @@ server:
   port: 20080
 es:
   endpoint: https://localhost:9200
-  api-key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+  api-key: dkkydFJKTUJwX2lhNXdlY3pUNkU6RGVVT1Bqb0VUbnV2NldkTHkybW9HUQ==
   trace-index: otel_trace_index
   log-index: otel_log_index
   otel-indexes: otel_*
@@ -18,3 +18,5 @@ management:
     health: 
       show: 
         details: always
+otel: 
+  collector-end-point: http://localhost:4317

@@ -757,6 +757,13 @@ public abstract class Verify {
                 String.format("[Verify failed] - provided number must be larger than %s, but it is %s", compare, src));
     }
 
+    public static void notLargerThan(Object src, Number compare, String message) {
+        if (!(src instanceof Number)) {
+            throw new VerifyException(message);
+        }
+        notLargerThan((Number) src, compare, message);
+    }
+
     public static void notLargerThan(Number src, Number compare, String message) {
         if (src.doubleValue() > compare.doubleValue()) {
             throw new VerifyException(message);
@@ -784,6 +791,13 @@ public abstract class Verify {
     public static void lessThan(Number src, Number compare) {
         lessThan(src.doubleValue(), compare.doubleValue(),
                 String.format("[Verify failed] - provided number must be less than %s, but it is %s", compare, src));
+    }
+
+    public static void notLessThan(Object src, Number compare, String message) {
+        if (!(src instanceof Number)) {
+            throw new VerifyException(message);
+        }
+        notLessThan((Number) src, compare, message);
     }
 
     public static void notLessThan(Number src, Number compare, String message) {

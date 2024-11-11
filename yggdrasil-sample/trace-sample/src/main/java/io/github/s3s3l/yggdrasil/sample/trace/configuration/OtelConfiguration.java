@@ -27,7 +27,7 @@ import io.opentelemetry.semconv.ServiceAttributes;
 public class OtelConfiguration {
 
     @Bean
-    OpenTelemetry openTelemetry() {
+    OpenTelemetry openTelemetry(OtelConfig config) {
         Resource resource = Resource.getDefault()
                 .toBuilder()
                 .put(ServiceAttributes.SERVICE_NAME, "dice-server")
@@ -36,7 +36,7 @@ public class OtelConfiguration {
 
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder()
-                        .setEndpoint("http://192.168.3.22/:4317")
+                        .setEndpoint(config.getCollectorEndPoint())
                         .build())
                         .build())
                 .setResource(resource)
@@ -48,16 +48,17 @@ public class OtelConfiguration {
 
         SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                 .registerMetricReader(PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder()
-                        .setEndpoint("http://192.168.3.22:4317")
+                        .setEndpoint(config.getCollectorEndPoint())
                         .build())
                         .build())
                 .setResource(resource)
                 .build();
 
         SdkLoggerProvider sdkLoggerProvider = SdkLoggerProvider.builder()
-                .addLogRecordProcessor(BatchLogRecordProcessor.builder(OtlpGrpcLogRecordExporter.builder()
-                        .setEndpoint("http://192.168.3.22:4317")
-                        .build())
+                .addLogRecordProcessor(BatchLogRecordProcessor
+                        .builder(OtlpGrpcLogRecordExporter.builder()
+                                .setEndpoint(config.getCollectorEndPoint())
+                                .build())
                         .build())
                 .setResource(resource)
                 .build();

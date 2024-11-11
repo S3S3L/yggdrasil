@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Dice {
 
@@ -21,25 +22,23 @@ public class Dice {
     }
 
     public List<Integer> rollTheDice(int rolls) {
-        List<Integer> results = new ArrayList<Integer>();
-        List<Callable<Boolean>> tasks = new ArrayList<>(rolls);
+        List<Callable<Integer>> tasks = new ArrayList<>(rolls);
         for (int i = 0; i < rolls; i++) {
-            tasks.add(() -> results.add(rollOnce()));
+            tasks.add(() -> rollOnce());
         }
 
         try {
-            executorService.invokeAll(tasks)
-                    .forEach(t -> {
+            return executorService.invokeAll(tasks)
+                    .stream().map(t -> {
                         try {
-                            t.get();
+                            return t.get();
                         } catch (InterruptedException | ExecutionException e) {
                             throw new RuntimeException(e);
                         }
-                    });
+                    }).collect(Collectors.toList());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return results;
     }
 
     private int rollOnce() {

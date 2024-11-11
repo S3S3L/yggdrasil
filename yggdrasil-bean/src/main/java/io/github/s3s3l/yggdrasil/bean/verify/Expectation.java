@@ -23,5 +23,7 @@ public enum Expectation {
     EXAMINED,
     LARGER_THAN,
     LESS_THAN,
+    NOT_LESS_THAN,
+    NOT_LARGER_THAN,
     MATCH;
 }

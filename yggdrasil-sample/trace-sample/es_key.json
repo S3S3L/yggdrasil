@@ -12,5 +12,12 @@
     "api_key": "UNj_eI-SRT243EqYV87eRw",
     "encoded": "UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw==",
     "beats_logstash_format": "QxL2FpMBY9rFDo287eg5:UNj_eI-SRT243EqYV87eRw"
+  },
+  {
+    "id": "vI2tRJMBp_ia5weczT6E",
+    "name": "TraceSample",
+    "api_key": "DeUOPjoETnuv6WdLy2moGQ",
+    "encoded": "dkkydFJKTUJwX2lhNXdlY3pUNkU6RGVVT1Bqb0VUbnV2NldkTHkybW9HUQ==",
+    "beats_logstash_format": "vI2tRJMBp_ia5weczT6E:DeUOPjoETnuv6WdLy2moGQ"
   }
 ]

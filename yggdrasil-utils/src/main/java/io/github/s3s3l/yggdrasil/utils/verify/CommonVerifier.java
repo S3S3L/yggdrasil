@@ -13,7 +13,6 @@ import io.github.s3s3l.yggdrasil.utils.common.StringUtils;
 import io.github.s3s3l.yggdrasil.utils.reflect.PropertyDescriptorReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionBean;
 import io.github.s3s3l.yggdrasil.utils.reflect.ReflectionUtils;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -178,6 +177,12 @@ public class CommonVerifier implements Verifier {
                 break;
             case LESS_THAN:
                 Verify.lessThan(value, examine.standard(), examine.msg());
+                break;
+            case NOT_LESS_THAN:
+                Verify.notLessThan(value, examine.standard(), examine.msg());
+                break;
+            case NOT_LARGER_THAN:
+                Verify.notLargerThan(value, examine.standard(), examine.msg());
                 break;
             default:
                 break;
