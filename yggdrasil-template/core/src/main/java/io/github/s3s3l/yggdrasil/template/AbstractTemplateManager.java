@@ -79,14 +79,6 @@ public abstract class AbstractTemplateManager implements TemplateManager {
                 String.join("", Arrays.copyOfRange(parts, 1, parts.length)));
     }
 
-    public static void main(String[] args) throws IOException {
-        String basePath = FileUtils.getFirstExistResourcePath("classpath:.");
-        String realFilePatternTest = buildRealFilePatternTest(basePath, "glob:**/*.ftl");
-        System.out
-                .println(realFilePatternTest);
-        FileUtils.findMatchedFiles(Path.of(basePath), realFilePatternTest).forEach(System.out::println);
-    }
-
     protected static String buildRealFilePatternTest(String basePath, String filePattern) {
         String[] parts = filePattern.split(":");
         if (parts.length == 1) {
@@ -111,7 +103,8 @@ public abstract class AbstractTemplateManager implements TemplateManager {
     }
 
     @Override
-    public <T> String compile(T data, Class<T> type) {
+    public <T> String compile(T data) {
+        Class<?> type = data.getClass();
         String templateName = typeToNameMap.computeIfAbsent(type, k -> {
             TemplateMeta templateMeta = findTemplate(k);
             if (templateMeta == null) {

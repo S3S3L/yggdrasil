@@ -7,6 +7,7 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import io.github.s3s3l.yggdrasil.sample.trace.es.EsClientHelper;
+import io.github.s3s3l.yggdrasil.template.TemplateManager;
 
 @Configuration
 public class EsConfiguration {
@@ -34,7 +37,14 @@ public class EsConfiguration {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         return new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(objectMapper)));
     }
+
+    @Bean
+    EsClientHelper esClientHelper(ElasticsearchClient esClient, TemplateManager templateManager) {
+        return new EsClientHelper(esClient, templateManager);
+    }
+
 }

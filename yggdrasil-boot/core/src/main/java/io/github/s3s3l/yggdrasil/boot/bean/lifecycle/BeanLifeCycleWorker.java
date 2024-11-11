@@ -15,6 +15,6 @@ public interface BeanLifeCycleWorker extends Sortable, Comparable<BeanLifeCycleW
             return -1;
         }
 
-        return this.getPriority() - o.getPriority();
+        return this.getPriority() - o.getPriority() > 0 ? 1 : -1;
     }
 }

@@ -440,11 +440,6 @@
             </dependency>
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
-                <artifactId>yggdrasil-otel</artifactId>
-                <version>${yggdrasil.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-promise</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
@@ -456,6 +451,22 @@
             <dependency>
                 <groupId>io.github.s3s3l</groupId>
                 <artifactId>yggdrasil-boot-spring-adapter</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <!-- yggdrasil-otel -->
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-otel-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-otel-okhttp3</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-otel-pool</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
             <!-- yggdrasil-spring -->

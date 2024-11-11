@@ -1,6 +1,13 @@
 {
     "bool": {
         "must": [],
+        "must_not": [
+            {
+                "match_phrase": {
+                    "TraceFlags": "0"
+                }
+            }
+        ],
         "filter": [
             {
                 "range": {
@@ -10,14 +17,15 @@
                         "lte": "${end}"
                     }
                 }
-            },
+            }
+            <#if body?has_content>
+            ,
             {
                 "match_phrase": {
                     "Body": "${body}"
                 }
             }
-        ],
-        "should": [],
-        "must_not": []
+            </#if>
+        ]
     }
 }

@@ -6,7 +6,7 @@ import io.github.s3s3l.yggdrasil.boot.bean.BeanLifecycle;
 import io.github.s3s3l.yggdrasil.boot.exception.BeanCreationException;
 
 public class BuildInstanceByMethod implements BeanLifeCycleWorker {
-    public static final int PRIORITY = BuildInstanceByDefaultConstructor.PRIORITY + 1;
+    public static final long PRIORITY = BuildInstanceByDefaultConstructor.PRIORITY + 1;
 
     @SuppressWarnings({ "unchecked" })
     @Override
@@ -27,7 +27,7 @@ public class BuildInstanceByMethod implements BeanLifeCycleWorker {
     }
 
     @Override
-    public int getPriority() {
+    public long getPriority() {
         return PRIORITY;
     }
 

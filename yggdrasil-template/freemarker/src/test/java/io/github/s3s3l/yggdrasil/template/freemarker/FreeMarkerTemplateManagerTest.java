@@ -73,7 +73,7 @@ public class FreeMarkerTemplateManagerTest {
     public void testCompile() {
         FreeMarkerTemplateManager manager = new FreeMarkerTemplateManager();
         manager.registerResources(new TemplateResource(0, FileUtils.getFirstExistResourcePath("classpath:.")));
-        String result = manager.compile(TestModule.builder().name("compile").build(), TestModule.class);
+        String result = manager.compile(TestModule.builder().name("compile").build());
 
         Assertions.assertEquals("test for compile", result.trim());
     }
@@ -85,12 +85,12 @@ public class FreeMarkerTemplateManagerTest {
                 new TemplateResource(-1, FileUtils.getFirstExistResourcePath("classpath:low")));
 
         Assertions.assertEquals("test for compile",
-                manager.compile(TestModule.builder().name("compile").build(), TestModule.class).trim());
+                manager.compile(TestModule.builder().name("compile").build()).trim());
 
         manager.registerResources(new TemplateResource(1, FileUtils.getFirstExistResourcePath("classpath:high")));
 
         Assertions.assertEquals("test for compile high priority",
-                manager.compile(TestModule.builder().name("compile").build(), TestModule.class).trim());
+                manager.compile(TestModule.builder().name("compile").build()).trim());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FreeMarkerTemplateManagerTest {
 
         Assertions.assertThrows(
                 TemplateNotFoundException.class, () -> manager
-                        .compile(TestModule.builder().name("compile").build(), TestModule.class));
+                        .compile(TestModule.builder().name("compile").build()));
     }
 
     @Test
@@ -109,7 +109,6 @@ public class FreeMarkerTemplateManagerTest {
 
         Assertions.assertThrows(
                 TemplateNotFoundException.class, () -> manager
-                        .compile(TestModuleNoAnnotation.builder().name("compile").build(),
-                                TestModuleNoAnnotation.class));
+                        .compile(TestModuleNoAnnotation.builder().name("compile").build()));
     }
 }

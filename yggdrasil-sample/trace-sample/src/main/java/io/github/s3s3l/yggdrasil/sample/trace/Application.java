@@ -21,7 +21,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import io.github.s3s3l.yggdrasil.otel.data.es.trace.LogData;
+import io.github.s3s3l.yggdrasil.otel.data.es.log.LogData;
 import io.github.s3s3l.yggdrasil.sample.trace.es.query.LogQuery;
 import io.github.s3s3l.yggdrasil.template.TemplateManager;
 import io.github.s3s3l.yggdrasil.utils.stuctural.jackson.JacksonUtils;
@@ -62,8 +62,7 @@ public class Application {
                 .start(ZonedDateTime.parse("2024-10-10T06:53:27.441Z"))
                 .end(ZonedDateTime.parse("2024-10-10T19:13:40.125Z"))
                 .body("request log")
-                .build(),
-                LogQuery.class);
+                .build());
 
         String base64Query = Base64.getEncoder().encodeToString(query.getBytes());
         // Use the client...

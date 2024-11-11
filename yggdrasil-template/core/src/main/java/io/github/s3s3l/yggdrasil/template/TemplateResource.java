@@ -15,7 +15,7 @@ public class TemplateResource implements Comparable<TemplateResource>, Sortable 
      * 数值较大的优先级较高
      */
     @Builder.Default
-    private int priority = 0;
+    private long priority = 0;
     /**
      * The path of the template resource.<br />
      * 模板资源的路径
@@ -27,6 +27,6 @@ public class TemplateResource implements Comparable<TemplateResource>, Sortable 
         if (o == null) {
             return 1;
         }
-        return o.priority - this.priority;
+        return Long.compare(o.priority, this.priority);
     }
 }

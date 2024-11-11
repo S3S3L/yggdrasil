@@ -1,7 +1,16 @@
-{
-  "id": "4upBdJIBPNKDWCi-cJcD",
-  "name": "tracing_test",
-  "api_key": "2UMShbCFRtC1Mm0aoU5-Ew",
-  "encoded": "NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==",
-  "beats_logstash_format": "4upBdJIBPNKDWCi-cJcD:2UMShbCFRtC1Mm0aoU5-Ew"
-}
+[
+  {
+    "id": "4upBdJIBPNKDWCi-cJcD",
+    "name": "tracing_test",
+    "api_key": "2UMShbCFRtC1Mm0aoU5-Ew",
+    "encoded": "NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==",
+    "beats_logstash_format": "4upBdJIBPNKDWCi-cJcD:2UMShbCFRtC1Mm0aoU5-Ew"
+  },
+  {
+    "id": "QxL2FpMBY9rFDo287eg5",
+    "name": "wsl",
+    "api_key": "UNj_eI-SRT243EqYV87eRw",
+    "encoded": "UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw==",
+    "beats_logstash_format": "QxL2FpMBY9rFDo287eg5:UNj_eI-SRT243EqYV87eRw"
+  }
+]

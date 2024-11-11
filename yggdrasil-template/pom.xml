@@ -32,7 +32,6 @@
         <groupId>io.github.s3s3l</groupId>
         <artifactId>yggdrasil-parent</artifactId>
         <version>3.7.0-RELEASE</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modules>

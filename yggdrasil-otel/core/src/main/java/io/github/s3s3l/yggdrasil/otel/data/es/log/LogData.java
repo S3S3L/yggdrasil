@@ -1,7 +1,8 @@
-package io.github.s3s3l.yggdrasil.otel.data.es.trace;
+package io.github.s3s3l.yggdrasil.otel.data.es.log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.github.s3s3l.yggdrasil.otel.data.DataType;
 import io.github.s3s3l.yggdrasil.otel.data.es.DataPiece;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,4 +24,9 @@ public class LogData extends DataPiece {
     private String serverityText;
     @JsonProperty("TraceFlags")
     private int traceFlags;
+
+    @Override
+    public DataType getType() {
+        return DataType.LOG;
+    }
 }

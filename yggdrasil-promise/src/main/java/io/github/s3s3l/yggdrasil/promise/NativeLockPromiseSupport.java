@@ -96,7 +96,6 @@ class NativeLockPromiseSupport<T> extends PromiseSupport<T> {
             try {
                 lock.wait(unit.toMillis(timeout));
             } catch (InterruptedException e) {
-                System.out.println("excetpion");
                 Thread.currentThread()
                         .interrupt();
             }

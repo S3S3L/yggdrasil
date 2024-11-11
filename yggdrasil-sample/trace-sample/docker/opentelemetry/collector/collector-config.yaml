@@ -12,21 +12,21 @@ exporters:
   elasticsearch/trace:
     endpoints: [https://host.docker.internal:9200]
     user: elastic
-    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
     traces_index: otel_trace_index
     tls:
       insecure_skip_verify: true
   elasticsearch/log:
     endpoints: [https://host.docker.internal:9200]
     user: elastic
-    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
     logs_index: otel_log_index
     tls:
       insecure_skip_verify: true
   elasticsearch/metric:
     endpoints: [https://host.docker.internal:9200]
     user: elastic
-    api_key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+    api_key: UXhMMkZwTUJZOXJGRG8yODdlZzU6VU5qX2VJLVNSVDI0M0VxWVY4N2VSdw== 
     index: otel_metric_index
     tls:
       insecure_skip_verify: true

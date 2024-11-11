@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.s3s3l.yggdrasil.otel.pool.OtelDelagateExecutorService;
 import io.github.s3s3l.yggdrasil.promise.Promise;
 import io.github.s3s3l.yggdrasil.sample.trace.utils.Dice;
+import io.opentelemetry.api.OpenTelemetry;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,6 +35,12 @@ import okhttp3.Response;
 public class RollController {
     private static final Logger logger = LoggerFactory.getLogger(RollController.class);
 
+    @Autowired
+    OpenTelemetry openTelemetry;
+
+    @Autowired
+    OtelDelagateExecutorService executorService;
+
     @GetMapping("/rolldice")
     public List<Integer> index(@RequestParam("player") Optional<String> player,
             @RequestParam("rolls") Optional<Integer> rolls) {
@@ -40,7 +49,7 @@ public class RollController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing rolls parameter", null);
         }
 
-        List<Integer> result = new Dice(1, 6).rollTheDice(rolls.get());
+        List<Integer> result = new Dice(1, 6, executorService).rollTheDice(rolls.get());
 
         if (player.isPresent()) {
             logger.info("{} is rolling the dice: {}", player.get(), result);

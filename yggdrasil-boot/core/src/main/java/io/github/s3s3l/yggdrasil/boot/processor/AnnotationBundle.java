@@ -17,7 +17,7 @@ class AnnotationBundle<T extends Annotation> implements Sortable {
     private AnnotationProcessor<T> processor;
 
     @Override
-    public int getPriority() {
+    public long getPriority() {
         return processor == null ? 0 : processor.getPriority();
     }
 }

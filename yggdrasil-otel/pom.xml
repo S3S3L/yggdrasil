@@ -3,6 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yggdrasil-otel</artifactId>
+    <packaging>pom</packaging>
 
     <licenses>
         <license>
@@ -33,29 +34,10 @@
         <version>3.7.0-RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <dependencies>
-        <!-- Yggdrasil -->
-        <dependency>
-            <groupId>io.github.s3s3l</groupId>
-            <artifactId>yggdrasil-utils</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
-        </dependency>
-        <!-- Compile -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Test -->
-        <dependency>
-            <groupId>io.github.s3s3l</groupId>
-            <artifactId>yggdrasil-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    
+    <modules>
+        <module>core</module>
+        <module>okhttp3</module>
+        <module>pool</module>
+    </modules>
 </project>

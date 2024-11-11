@@ -19,7 +19,7 @@ public class TemplateMeta implements Sortable {
      * 数值较大的优先级较高
      */
     @Builder.Default
-    private int priority = 0;
+    private long priority = 0;
     /**
      * mark if the content of the template has been loaded.<br />
      * 标识模板内容是否已经加载

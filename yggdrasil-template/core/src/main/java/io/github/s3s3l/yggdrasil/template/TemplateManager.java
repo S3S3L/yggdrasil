@@ -4,5 +4,5 @@ public interface TemplateManager {
 
     void registerResources(TemplateResource... resources);
 
-    <T> String compile(T data, Class<T> type);
+    <T> String compile(T data);
 }

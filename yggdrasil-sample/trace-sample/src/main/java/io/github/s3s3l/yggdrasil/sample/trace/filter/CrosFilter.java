@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import io.github.s3s3l.yggdrasil.sample.trace.controller.RollController;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -33,7 +32,7 @@ public class CrosFilter implements Filter {
         ContentCachingResponseWrapper response = new ContentCachingResponseWrapper((HttpServletResponse) res);
         HttpServletRequest request = new HttpServletRequestWrapper((HttpServletRequest) req);
 
-        Tracer tracer = openTelemetry.getTracer(RollController.class.getName(), "0.1.0");
+        Tracer tracer = openTelemetry.getTracer(CrosFilter.class.getName(), "0.1.0");
         Span span = tracer.spanBuilder("request").startSpan();
 
         log.info("request log out span. path: {}", request.getRequestURI());

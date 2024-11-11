@@ -2,6 +2,9 @@ package io.github.s3s3l.yggdrasil.sample.trace.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Dice {
@@ -9,21 +12,39 @@ public class Dice {
     private int min;
     private int max;
 
-    public Dice(int min, int max) {
+    private final ExecutorService executorService;
+
+    public Dice(int min, int max, ExecutorService executorService) {
         this.min = min;
         this.max = max;
+        this.executorService = executorService;
     }
 
     public List<Integer> rollTheDice(int rolls) {
         List<Integer> results = new ArrayList<Integer>();
+        List<Callable<Boolean>> tasks = new ArrayList<>(rolls);
         for (int i = 0; i < rolls; i++) {
-            results.add(this.rollOnce());
+            tasks.add(() -> results.add(rollOnce()));
+        }
+
+        try {
+            executorService.invokeAll(tasks)
+                    .forEach(t -> {
+                        try {
+                            t.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         return results;
     }
 
     private int rollOnce() {
-        return ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
+        return ThreadLocalRandom.current()
+                .nextInt(this.min, this.max + 1);
     }
 
     public static class DBHost {

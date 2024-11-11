@@ -11,4 +11,8 @@ import lombok.Data;
 public class EsClientConfig {
     private String endpoint;
     private String apiKey;
+
+    private String traceIndex;
+    private String logIndex;
+    private String otelIndexes;
 }

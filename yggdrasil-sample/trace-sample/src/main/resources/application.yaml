@@ -6,6 +6,9 @@ server:
 es:
   endpoint: https://localhost:9200
   api-key: NHVwQmRKSUJQTktEV0NpLWNKY0Q6MlVNU2hiQ0ZSdEMxTW0wYW9VNS1Fdw==
+  trace-index: otel_trace_index
+  log-index: otel_log_index
+  otel-indexes: otel_*
 management:
   endpoints:
     web: 

@@ -16,7 +16,7 @@ public class QualifierAnnotationProcessor extends SpringAnnotationProcessor<Qual
     }
 
     @Override
-    public int getPriority() {
+    public long getPriority() {
         return SpringAnnotationProcessor.PRIORITY + 1;
     }
 

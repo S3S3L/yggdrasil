@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yggdrasil-otel-pool</artifactId>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:S3S3L/yggdrasil.git</connection>
+        <developerConnection>scm:git:git@github.com:S3S3L/yggdrasil.git</developerConnection>
+        <url>https://github.com/S3S3L/yggdrasil</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Kehw.Zwei</name>
+            <email>kehw.zwei@gmail.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
+
+    <parent>
+        <groupId>io.github.s3s3l</groupId>
+        <artifactId>yggdrasil-parent</artifactId>
+        <version>3.7.0-RELEASE</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <!-- Yggdrasil -->
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-otel-core</artifactId>
+        </dependency>
+        <!-- Compile -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Test -->
+        <dependency>
+            <groupId>io.github.s3s3l</groupId>
+            <artifactId>yggdrasil-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

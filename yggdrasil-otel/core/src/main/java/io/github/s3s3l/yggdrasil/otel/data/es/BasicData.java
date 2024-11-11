@@ -3,7 +3,7 @@ package io.github.s3s3l.yggdrasil.otel.data.es;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import io.github.s3s3l.yggdrasil.otel.data.Resource;
 import io.github.s3s3l.yggdrasil.otel.data.Scope;
@@ -16,18 +16,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataPiece {
-    @JsonProperty("@timestamp")
+public class BasicData {
+    @JsonAlias("@timestamp")
     private ZonedDateTime timestamp;
-    @JsonProperty("SpanId")
+    @JsonAlias("ParentSpanId")
+    private String parentSpanId;
+    @JsonAlias("SpanId")
     private String spanId;
-    @JsonProperty("TraceId")
+    @JsonAlias("TraceId")
     private String traceId;
-    @JsonProperty("Attributes")
+    @JsonAlias("Attributes")
     private Map<String, Object> attributes;
-    @JsonProperty("Resource")
+    @JsonAlias("Resource")
     private Resource resource;
-    @JsonProperty("Scope")
+    @JsonAlias("Scope")
     private Scope scope;
     
 }

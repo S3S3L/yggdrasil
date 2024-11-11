@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.github.s3s3l.yggdrasil.otel.data.DataType;
 import io.github.s3s3l.yggdrasil.otel.data.es.DataPiece;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
@@ -37,4 +38,9 @@ public class TraceData extends DataPiece {
      */
     @JsonProperty("TraceStatus")
     private int traceStatus;
+
+    @Override
+    public DataType getType() {
+        return DataType.TRACE;
+    }
 }

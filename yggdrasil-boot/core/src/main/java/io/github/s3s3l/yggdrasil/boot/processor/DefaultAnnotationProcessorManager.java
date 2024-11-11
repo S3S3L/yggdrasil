@@ -44,7 +44,7 @@ public class DefaultAnnotationProcessorManager implements AnnotationProcessorMan
                                 .annotation(annotation)
                                 .processor(process)
                                 .build()))
-                .sorted(Comparator.comparingInt(AnnotationBundle::getPriority))
+                .sorted(Comparator.comparingLong(AnnotationBundle::getPriority))
                 .collect(Collectors.toList());
         AnnotationMeta meta = new AnnotationMeta();
 
