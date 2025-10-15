@@ -18,6 +18,8 @@ public interface ReflectionBean {
 
     boolean hasField(String fieldName);
 
+    Class<?> getFieldType(String fieldName);
+
     /**
      * 利用反射获取指定对象的指定属性
      * 

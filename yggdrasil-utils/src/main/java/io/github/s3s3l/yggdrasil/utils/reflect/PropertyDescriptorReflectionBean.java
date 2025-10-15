@@ -62,6 +62,11 @@ public class PropertyDescriptorReflectionBean implements ReflectionBean {
     }
 
     @Override
+    public Class<?> getFieldType(String fieldName) {
+        return findField(fieldName).getPropertyType();
+    }
+
+    @Override
     public Object getFieldValue(String fieldName) {
         PropertyDescriptor pd = findField(fieldName);
 

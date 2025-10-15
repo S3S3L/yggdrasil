@@ -26,6 +26,7 @@ module.exports = {
     { name: 'document' },
     { name: 'es' },
     { name: 'fsm' },
+    { name: 'game' },
     { name: 'http' },
     { name: 'mybatis' },
     { name: 'orm' },

@@ -53,9 +53,9 @@ public abstract class ReflectionUtils {
      * {@code src}中需要有对应的{@code getter}方法，{@code target}中需要有对应的{@code setter}方法
      *
      * @param src
-     *            原对象
+     *               原对象
      * @param target
-     *            目标对象
+     *               目标对象
      */
     public static void copyProperties(Object src, Object target) {
         try {
@@ -182,6 +182,43 @@ public abstract class ReflectionUtils {
         }
     }
 
+    public static <T> T deepClone(Object src, Class<T> type) {
+        if (isSampleType(type)) {
+            return type.cast(src);
+        }
+
+        try {
+            ReflectionBean srcReflection = new PropertyDescriptorReflectionBean(src);
+            T result = type.getConstructor()
+                    .newInstance();
+            ReflectionBean targetReflection = new PropertyDescriptorReflectionBean(result);
+            for (String field : srcReflection.getFields()) {
+                var fieldType = srcReflection.getFieldType(field);
+                Object fieldValue = srcReflection.getFieldValue(field);
+                if (fieldValue == null) {
+                    continue;
+                }
+
+                if (isSampleType(fieldType)) {
+                    targetReflection.setFieldValue(field, fieldValue);
+                } else {
+                    targetReflection.setFieldValue(field, deepClone(fieldValue, fieldType));
+                }
+            }
+
+            return result;
+        } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException e) {
+            throw new ReflectException(e);
+        }
+    }
+
+    private static boolean isSampleType(Class<?> cls) {
+        return cls.isPrimitive() || cls == String.class || Number.class.isAssignableFrom(cls)
+                || Boolean.class.isAssignableFrom(cls) || Character.class.isAssignableFrom(cls)
+                || Enum.class.isAssignableFrom(cls);
+    }
+
     public static boolean isAnnotationedWith(Class<?> cls, Class<? extends Annotation> annotationClass) {
         return isAnnotationedWiths(cls, annotationClass);
     }
@@ -191,9 +228,9 @@ public abstract class ReflectionUtils {
      * 判断类型是否有指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *            类型
+     *                          类型
      * @param annotationClasses
-     *            注解类型
+     *                          注解类型
      * @return true：类型有指定注解；false：类型没有指定注解
      * @since JDK 1.8
      */
@@ -229,11 +266,11 @@ public abstract class ReflectionUtils {
      * 获取类型上的指定注解（会深入注解中的注解进行判断）
      * 
      * @param cls
-     *            类型
+     *                        类型
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @param <T>
-     *            注解类型
+     *                        注解类型
      * @return 类型有指定注解：返回该注解；类型没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -259,9 +296,9 @@ public abstract class ReflectionUtils {
      * 判断方法是否有指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *            方法
+     *                        方法
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @return true：方法有指定注解；false：方法没有指定注解
      * @since JDK 1.8
      */
@@ -285,11 +322,11 @@ public abstract class ReflectionUtils {
      * 获取方法上的指定注解（会深入注解中的注解进行判断，并且会判断定义类上的注解）
      * 
      * @param method
-     *            方法
+     *                        方法
      * @param annotationClass
-     *            注解类型
+     *                        注解类型
      * @param <T>
-     *            注解类型
+     *                        注解类型
      * @return 方法有指定注解：返回该注解；方法没有指定注解：返回null
      * @since JDK 1.8
      */
@@ -354,9 +391,9 @@ public abstract class ReflectionUtils {
      * 
      * @author kehw_zwei
      * @param type
-     *            泛型
+     *             泛型
      * @param i
-     *            泛型类型的位置
+     *             泛型类型的位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */
@@ -376,9 +413,9 @@ public abstract class ReflectionUtils {
      * 
      * @author kehw_zwei
      * @param parameterizedType
-     *            参数类型
+     *                          参数类型
      * @param i
-     *            泛型类型位置
+     *                          泛型类型位置
      * @return 泛型的Class对象
      * @since JDK 1.8
      */
@@ -487,9 +524,9 @@ public abstract class ReflectionUtils {
      * 获取实现了指定接口的集合
      * 
      * @param interfaceClass
-     *            接口类型
+     *                       接口类型
      * @param classes
-     *            类型列表
+     *                       类型列表
      * @return 实现了指定接口的类型列表
      * @since JDK 1.8
      */

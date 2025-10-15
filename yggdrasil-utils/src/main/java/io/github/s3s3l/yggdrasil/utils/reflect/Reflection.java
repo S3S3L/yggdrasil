@@ -146,7 +146,7 @@ public class Reflection<T> implements ReflectionBean {
      * 利用反射获取指定对象里面的指定属性
      * 
      * @param fieldName
-     *            目标属性
+     *                  目标属性
      * @return 目标字段值，字段不存在则返回null
      */
     private Field getField(String fieldName) {
@@ -160,5 +160,15 @@ public class Reflection<T> implements ReflectionBean {
             }
         }
         return field;
+    }
+
+    @Override
+    public Class<?> getFieldType(String fieldName) {
+        var field = getField(fieldName);
+        if (field != null) {
+            return field.getType();
+        }
+
+        return null;
     }
 }

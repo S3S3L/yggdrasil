@@ -37,6 +37,7 @@
     <modules>
         <module>datasource-starter-sample</module>
         <module>cache-starter-sample</module>
+        <module>game-sample</module>
         <module>orm-sample</module>
         <module>register-sample</module>
         <module>trace-sample</module>

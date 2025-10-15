@@ -66,6 +66,7 @@
 
         <module>yggdrasil-register</module>
         <module>yggdrasil-rpc</module>
+        <module>yggdrasil-game</module>
         <module>yggdrasil-sample</module>
 
         <module>yggdrasil-spring-pack</module>
@@ -263,6 +264,9 @@
         <curator.version>5.4.0</curator.version>
         <nacos.version>2.2.0</nacos.version>
         <etcd.version>0.7.5</etcd.version>
+        <gdx.version>1.12.1</gdx.version>
+        <gdx.platform>natives-desktop</gdx.platform>
+        <rxjava.version>3.1.12</rxjava.version>
 
         <testcontainers.version>1.17.6</testcontainers.version>
         <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
@@ -564,6 +568,22 @@
                 <artifactId>yggdrasil-rpc-grpc</artifactId>
                 <version>${yggdrasil.version}</version>
             </dependency>
+            <!-- yggdrasil-game -->
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-game-core</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-game-2d</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.s3s3l</groupId>
+                <artifactId>yggdrasil-game-gdx</artifactId>
+                <version>${yggdrasil.version}</version>
+            </dependency>
             <!-- Kotlin -->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -800,6 +820,29 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
                 <version>${javafx.version}</version>
+            </dependency>
+            <!-- GDX -->
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx</artifactId>
+                <version>${gdx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx-backend-lwjgl3</artifactId>
+                <version>${gdx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx-platform</artifactId>
+                <version>${gdx.version}</version>
+                <classifier>${gdx.platform}</classifier>
+            </dependency>
+            <!-- RXJava -->
+            <dependency>
+                <groupId>io.reactivex.rxjava3</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>${rxjava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
