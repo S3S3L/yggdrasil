@@ -91,3 +91,5 @@ node_modules/
 build
 *.dep
 .VSCodeCounter
+
+yggdrasil-sample/worker/
