@@ -1,16 +1,20 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Polygon2D extends AbstractShape2D {
 
-    @Getter
-    private final Vector2D[] vertices;
-
-    public Polygon2D(Vector2D[] vertices) {
-        this.vertices = vertices;
-    }
+    private Vector2D[] vertices;
 
     @Override
     public boolean contains(Vector2D point) {

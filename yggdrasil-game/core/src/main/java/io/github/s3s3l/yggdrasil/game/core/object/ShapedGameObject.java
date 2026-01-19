@@ -21,4 +21,9 @@ public abstract class ShapedGameObject<T, S extends Shape<T>> extends AbstractGa
     public void setShape(S shape) {
         this.shape.update(s -> shape);
     }
+
+    public boolean hitTest(T point) {
+        S currentShape = this.shape == null ? null : this.shape.getClone();
+        return currentShape != null && currentShape.contains(point);
+    }
 }

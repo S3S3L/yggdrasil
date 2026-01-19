@@ -1,6 +1,7 @@
 package io.github.s3s3l.yggdrasil.game.core.object;
 
 import java.lang.ref.SoftReference;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import io.github.s3s3l.yggdrasil.game.core.event.EventCenter;
+import io.github.s3s3l.yggdrasil.game.core.event.EventDispatcher;
 import io.github.s3s3l.yggdrasil.game.core.object.props.Visible;
 import lombok.NonNull;
 
@@ -37,6 +40,7 @@ public class GameObjectManager {
     private final Map<Long, GameObject> activeObjs = new HashMap<>();
     private final Map<Long, SoftReference<GameObject>> releasedObjs = new HashMap<>();
     private final Set<GameObject> dirtyRoots = new HashSet<>();
+    private final EventDispatcher eventDispatcher = EventCenter.get();
 
     public synchronized <T extends GameObject> T create(@NonNull GameObjectConfig config, @NonNull Class<T> type) {
         if (config.getType() != null && !config.getType().isAssignableFrom(type)) {
@@ -222,5 +226,13 @@ public class GameObjectManager {
         doCalculate(delta);
         doPreRender();
         doRender();
+    }
+
+    public synchronized Collection<GameObject> activeObjects() {
+        return java.util.List.copyOf(activeObjs.values());
+    }
+
+    public EventDispatcher events() {
+        return eventDispatcher;
     }
 }

@@ -1,18 +1,20 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Ray2D extends AbstractShape2D {
-    @Getter
-    private final Vector2D origin;
-    @Getter
-    private final Vector2D direction;
-
-    public Ray2D(Vector2D origin, Vector2D direction) {
-        this.origin = origin;
-        this.direction = direction;
-    }
+    private Vector2D origin;
+    private Vector2D direction;
 
     @Override
     public boolean contains(Vector2D point) {

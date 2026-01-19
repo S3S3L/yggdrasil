@@ -3,13 +3,17 @@ package io.github.s3s3l.yggdrasil.game._2d.shape;
 import io.github.s3s3l.yggdrasil.game._2d.shape.handler.ShapeHandlerManager2D;
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
 import io.github.s3s3l.yggdrasil.game.core.shape.Shape;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class AbstractShape2D implements Shape2D {
 
-    @Getter
-    @Setter
     protected int zIndex;
 
     @Override

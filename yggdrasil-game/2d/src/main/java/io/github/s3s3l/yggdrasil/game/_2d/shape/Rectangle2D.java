@@ -1,23 +1,23 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Rectangle2D extends AbstractShape2D {
 
-    @Getter
-    private final Vector2D topLeft;
-    @Getter
-    private final float width;
-    @Getter
-    private final float height;
+    private Vector2D topLeft;
+    private float width;
+    private float height;
     
-    public Rectangle2D(Vector2D topLeft, float width, float height) {
-        this.topLeft = topLeft;
-        this.width = width;
-        this.height = height;
-    }
-
     @Override
     public boolean contains(Vector2D point) {
         return point.getX() >= topLeft.getX() && point.getX() <= topLeft.getX() + width

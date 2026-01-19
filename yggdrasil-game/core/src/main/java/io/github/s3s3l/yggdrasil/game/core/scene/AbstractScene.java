@@ -18,6 +18,7 @@ public abstract class AbstractScene extends AbstractGameAtom<SceneConfig> implem
 
     @Override
     protected void doRender() {
+        gameObjectManager.events().flush();
         gameObjectManager.doRender();
     }
 

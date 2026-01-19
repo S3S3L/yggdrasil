@@ -1,19 +1,21 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Line2D extends AbstractShape2D {
     
-    @Getter
-    private final Vector2D point;
-    @Getter
-    private final Vector2D direction;
-
-    public Line2D(Vector2D point, Vector2D direction) {
-        this.point = point;
-        this.direction = direction;
-    }
+    private Vector2D point;
+    private Vector2D direction;
 
     @Override
     public boolean contains(Vector2D point) {

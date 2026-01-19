@@ -1,25 +1,27 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Circle2D extends AbstractShape2D {
 
     /**
      * 圆心
      */
-    @Getter
-    private final Vector2D center;
+    private Vector2D center;
     /**
      * 半径
      */
-    @Getter
-    private final float radius;
-
-    public Circle2D(Vector2D center, float radius) {
-        this.center = center;
-        this.radius = radius;
-    }
+    private float radius;
 
     @Override
     public boolean contains(Vector2D point) {

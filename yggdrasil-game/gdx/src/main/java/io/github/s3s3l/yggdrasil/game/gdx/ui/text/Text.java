@@ -18,7 +18,7 @@ public class Text extends GameObject2D<Rectangle2D> {
      */
     // private final State<Vector2D> location = createState("location", new
     // Vector2D(0f, 0f), Vector2D.class);
-    private final State<String> content = createState("content", "Start", String.class);
+    private final State<String> content = createState("content", "", String.class);
     private final TextProps textProps = new TextProps();
 
     private BitmapFont font;

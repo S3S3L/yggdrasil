@@ -1,19 +1,21 @@
 package io.github.s3s3l.yggdrasil.game._2d.shape;
 
 import io.github.s3s3l.yggdrasil.game._2d.vector.Vector2D;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Segment2D extends AbstractShape2D {
     
-    @Getter
-    private final Vector2D start;
-    @Getter
-    private final Vector2D end;
-
-    public Segment2D(Vector2D start, Vector2D end) {
-        this.start = start;
-        this.end = end;
-    }
+    private Vector2D start;
+    private Vector2D end;
 
     @Override
     public boolean contains(Vector2D point) {
