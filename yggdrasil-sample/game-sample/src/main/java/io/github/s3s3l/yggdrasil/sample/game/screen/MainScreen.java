@@ -14,6 +14,7 @@ import io.github.s3s3l.yggdrasil.game.core.event.input.HitTester;
 import io.github.s3s3l.yggdrasil.game.core.object.GameObjectConfig;
 import io.github.s3s3l.yggdrasil.game.core.scene.SceneConfig;
 import io.github.s3s3l.yggdrasil.game.core.snapshot.ObjectSnapshot;
+import io.github.s3s3l.yggdrasil.game.gdx.game.GdxGame;
 import io.github.s3s3l.yggdrasil.game.gdx.input.GdxEventInputProcessor;
 import io.github.s3s3l.yggdrasil.game.gdx.input.Vector2DHitTester;
 import io.github.s3s3l.yggdrasil.game.gdx.scene.GdxScene;
@@ -34,10 +35,13 @@ public class MainScreen extends GdxScene {
                         .addProps("content", "Start")
                         .addProps("color", "255,255,255,1"))
                 .build(), Text.class);
+
         text.on(EventType.POINTER_UP, new EventListener<ClickEvent<?>>() {
             @Override
             public EventResult handle(EventContext<ClickEvent<?>> context) {
                 System.out.println("Clicked");
+                GdxGame.get().createAndSet(GamePlayScreen.class,
+                        SceneConfig.builder().type(GamePlayScreen.class).build());
                 return EventResult.CONTINUE;
             }
         }, opts -> {
