@@ -6,6 +6,9 @@ import io.github.s3s3l.yggdrasil.game.core.ui.animation.UIAction;
 import io.github.s3s3l.yggdrasil.game.core.ui.binding.*;
 import io.github.s3s3l.yggdrasil.game.core.ui.layout.ILayout;
 import io.github.s3s3l.yggdrasil.game.core.ui.layout.LayoutParams;
+import io.github.s3s3l.yggdrasil.game.core.ui.theme.UITheme;
+import io.github.s3s3l.yggdrasil.game.core.ui.theme.UIStyle;
+import io.github.s3s3l.yggdrasil.game.core.ui.theme.UIStyleManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,8 @@ public abstract class UIComponent implements ID {
     private AnimationManager animationManager;
     private ILayout layout;
     private LayoutParams layoutParams;
+    private UIStyle style;
+    private String styleName;
 
     protected UIComponent() {
         this.bounds = new UIRect();
@@ -50,6 +55,7 @@ public abstract class UIComponent implements ID {
         this.opacity = 1f;
         this.animationManager = new AnimationManager(this);
         this.layoutParams = new LayoutParams();
+        this.style = new UIStyle();
     }
 
     protected UIComponent(String name) {
@@ -647,6 +653,103 @@ public abstract class UIComponent implements ID {
      */
     public void onBlur() {
         // 子类可以重写
+    }
+
+    // ==================== 主题相关方法 ====================
+
+    /**
+     * 获取组件样式
+     *
+     * @return 组件样式
+     */
+    public UIStyle getStyle() {
+        return style;
+    }
+
+    /**
+     * 设置组件样式
+     *
+     * @param style 样式
+     */
+    public void setStyle(UIStyle style) {
+        if (style != null) {
+            this.style = style.copy();
+            applyStyleToComponent();
+        }
+    }
+
+    /**
+     * 获取样式名称
+     *
+     * @return 样式名称
+     */
+    public String getStyleName() {
+        return styleName;
+    }
+
+    /**
+     * 设置样式名称（从主题中获取）
+     *
+     * @param styleName 样式名称
+     */
+    public void setStyleName(String styleName) {
+        this.styleName = styleName;
+        applyCurrentTheme();
+    }
+
+    /**
+     * 应用当前主题到组件
+     */
+    public void applyCurrentTheme() {
+        UIStyleManager styleManager = UIStyleManager.getInstance();
+        UITheme theme = styleManager.getCurrentTheme();
+        if (theme != null && styleName != null) {
+            UIStyle themeStyle = theme.getStyle(styleName);
+            if (themeStyle != null) {
+                this.style = themeStyle.copy();
+                applyStyleToComponent();
+            }
+        }
+    }
+
+    /**
+     * 应用主题
+     *
+     * @param theme 主题
+     */
+    public void applyTheme(UITheme theme) {
+        if (theme != null && styleName != null) {
+            UIStyle themeStyle = theme.getStyle(styleName);
+            if (themeStyle != null) {
+                this.style = themeStyle.copy();
+                applyStyleToComponent();
+            }
+        }
+    }
+
+    /**
+     * 将样式应用到组件属性
+     * 子类可以重写以应用特定样式
+     */
+    protected void applyStyleToComponent() {
+        if (style != null) {
+            if (style.getBackgroundColor() != null) {
+                this.backgroundColor = style.getBackgroundColor();
+            }
+            if (style.getPadding() != null) {
+                this.padding.setX(style.getPadding().getX());
+                this.padding.setY(style.getPadding().getY());
+                this.padding.setWidth(style.getPadding().getWidth());
+                this.padding.setHeight(style.getPadding().getHeight());
+            }
+            if (style.getMargin() != null) {
+                this.margin.setX(style.getMargin().getX());
+                this.margin.setY(style.getMargin().getY());
+                this.margin.setWidth(style.getMargin().getWidth());
+                this.margin.setHeight(style.getMargin().getHeight());
+            }
+            this.opacity = style.getOpacity();
+        }
     }
 
     @Override

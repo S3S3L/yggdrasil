@@ -21,7 +21,7 @@ class UILoadingIndicatorTest {
     @Test
     void testLoadingIndicatorCreation() {
         assertNotNull(indicator);
-        assertEquals(UILoadingIndicator.LoadingStyle.SPINNER, indicator.getStyle());
+        assertEquals(UILoadingIndicator.LoadingStyle.SPINNER, indicator.getLoadingStyle());
         assertEquals(UIColor.BLUE, indicator.getColor());
         assertEquals(1.0f, indicator.getAnimationSpeed(), 0.01f);
         assertTrue(indicator.isAutoStart());
@@ -32,19 +32,19 @@ class UILoadingIndicatorTest {
     void testDefaultConstructor() {
         UILoadingIndicator i = new UILoadingIndicator();
         assertNotNull(i);
-        assertEquals(UILoadingIndicator.LoadingStyle.SPINNER, i.getStyle());
+        assertEquals(UILoadingIndicator.LoadingStyle.SPINNER, i.getLoadingStyle());
     }
 
     @Test
     void testConstructorWithStyle() {
         UILoadingIndicator i = new UILoadingIndicator(UILoadingIndicator.LoadingStyle.PULSE);
-        assertEquals(UILoadingIndicator.LoadingStyle.PULSE, i.getStyle());
+        assertEquals(UILoadingIndicator.LoadingStyle.PULSE, i.getLoadingStyle());
     }
 
     @Test
     void testSetStyle() {
-        indicator.setStyle(UILoadingIndicator.LoadingStyle.PULSE);
-        assertEquals(UILoadingIndicator.LoadingStyle.PULSE, indicator.getStyle());
+        indicator.setLoadingStyle(UILoadingIndicator.LoadingStyle.PULSE);
+        assertEquals(UILoadingIndicator.LoadingStyle.PULSE, indicator.getLoadingStyle());
     }
 
     @Test
@@ -200,7 +200,7 @@ class UILoadingIndicatorTest {
     @Test
     void testRenderAllStyles() {
         for (UILoadingIndicator.LoadingStyle style : UILoadingIndicator.LoadingStyle.values()) {
-            indicator.setStyle(style);
+            indicator.setLoadingStyle(style);
             assertDoesNotThrow(() -> indicator.render());
         }
     }

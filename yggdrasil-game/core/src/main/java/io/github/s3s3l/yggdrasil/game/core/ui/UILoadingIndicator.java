@@ -50,11 +50,11 @@ public class UILoadingIndicator extends UIComponent {
         this.fontSize = 14;
     }
 
-    public LoadingStyle getStyle() {
+    public LoadingStyle getLoadingStyle() {
         return style;
     }
 
-    public void setStyle(LoadingStyle style) {
+    public void setLoadingStyle(LoadingStyle style) {
         this.style = style;
     }
 
