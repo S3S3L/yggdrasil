@@ -3,6 +3,7 @@ package io.github.s3s3l.yggdrasil.game.core.ui;
 import io.github.s3s3l.yggdrasil.game.core.basic.ID;
 import io.github.s3s3l.yggdrasil.game.core.ui.animation.AnimationManager;
 import io.github.s3s3l.yggdrasil.game.core.ui.animation.UIAction;
+import io.github.s3s3l.yggdrasil.game.core.ui.binding.*;
 import io.github.s3s3l.yggdrasil.game.core.ui.layout.ILayout;
 import io.github.s3s3l.yggdrasil.game.core.ui.layout.LayoutParams;
 
@@ -72,6 +73,9 @@ public abstract class UIComponent implements ID {
 
     public void setName(String name) {
         this.name = name;
+        if (nameProperty != null) {
+            nameProperty.setValue(name);
+        }
     }
 
     public String getTag() {
@@ -201,6 +205,9 @@ public abstract class UIComponent implements ID {
 
     public void setVisibility(UIVisibility visibility) {
         this.visibility = visibility;
+        if (visibleProperty != null) {
+            visibleProperty.setValue(visibility == UIVisibility.VISIBLE);
+        }
     }
 
     public boolean isVisible() {
@@ -213,6 +220,9 @@ public abstract class UIComponent implements ID {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+        if (enabledProperty != null) {
+            enabledProperty.setValue(enabled);
+        }
     }
 
     public boolean isInteractable() {
@@ -529,6 +539,88 @@ public abstract class UIComponent implements ID {
         for (UIComponent child : children) {
             child.update(deltaTime);
         }
+    }
+
+    // ==================== 数据绑定相关方法 ====================
+
+    private final StringProperty nameProperty = new StringProperty();
+    private final BooleanProperty enabledProperty = new BooleanProperty(true);
+    private final BooleanProperty visibleProperty = new BooleanProperty(true);
+    private boolean namePropertyInitialized = false;
+    private boolean enabledPropertyInitialized = false;
+    private boolean visiblePropertyInitialized = false;
+
+    /**
+     * 获取名称属性
+     */
+    public StringProperty nameProperty() {
+        if (!namePropertyInitialized) {
+            namePropertyInitialized = true;
+            nameProperty.setValue(name);
+            nameProperty.addListener((ov, oldVal, newVal) -> name = newVal);
+        }
+        return nameProperty;
+    }
+
+    /**
+     * 获取启用状态属性
+     */
+    public BooleanProperty enabledProperty() {
+        if (!enabledPropertyInitialized) {
+            enabledPropertyInitialized = true;
+            enabledProperty.setValue(enabled);
+            enabledProperty.addListener((ov, oldVal, newVal) -> enabled = newVal);
+        }
+        return enabledProperty;
+    }
+
+    /**
+     * 获取可见性属性
+     */
+    public BooleanProperty visibleProperty() {
+        if (!visiblePropertyInitialized) {
+            visiblePropertyInitialized = true;
+            visibleProperty.setValue(isVisible());
+            visibleProperty.addListener((ov, oldVal, newVal) -> {
+                setVisibility(newVal ? UIVisibility.VISIBLE : UIVisibility.HIDDEN);
+            });
+        }
+        return visibleProperty;
+    }
+
+    /**
+     * 绑定名称
+     */
+    public void bindName(ObservableValue<String> observable) {
+        nameProperty().bind(observable);
+    }
+
+    /**
+     * 绑定启用状态
+     */
+    public void bindEnabled(ObservableValue<Boolean> observable) {
+        enabledProperty().bind(observable);
+    }
+
+    /**
+     * 绑定可见性
+     */
+    public void bindVisible(ObservableValue<Boolean> observable) {
+        visibleProperty().bind(observable);
+    }
+
+    /**
+     * 绑定双向名称
+     */
+    public void bindNameBidirectional(Property<String> property) {
+        nameProperty().bindBidirectional(property);
+    }
+
+    /**
+     * 绑定双向启用状态
+     */
+    public void bindEnabledBidirectional(Property<Boolean> property) {
+        enabledProperty().bindBidirectional(property);
     }
 
     /**
