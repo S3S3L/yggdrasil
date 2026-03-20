@@ -1,6 +1,8 @@
 package io.github.s3s3l.yggdrasil.game.core.ui;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.ID;
+import io.github.s3s3l.yggdrasil.game.core.ui.animation.AnimationManager;
+import io.github.s3s3l.yggdrasil.game.core.ui.animation.UIAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public abstract class UIComponent implements ID {
     private boolean interactable;
     private UIColor backgroundColor;
     private float opacity;
+    private AnimationManager animationManager;
 
     protected UIComponent() {
         this.bounds = new UIRect();
@@ -40,6 +43,7 @@ public abstract class UIComponent implements ID {
         this.interactable = true;
         this.backgroundColor = UIColor.TRANSPARENT;
         this.opacity = 1f;
+        this.animationManager = new AnimationManager(this);
     }
 
     protected UIComponent(String name) {
@@ -319,8 +323,80 @@ public abstract class UIComponent implements ID {
      * @param deltaTime 时间增量
      */
     public void update(float deltaTime) {
+        if (animationManager != null) {
+            animationManager.update(deltaTime);
+        }
         for (UIComponent child : children) {
             child.update(deltaTime);
+        }
+    }
+
+    // ==================== 动画相关方法 ====================
+
+    /**
+     * 添加动画
+     *
+     * @param action 动画动作
+     */
+    public void addAction(UIAction action) {
+        if (animationManager != null) {
+            animationManager.addAction(action);
+        }
+    }
+
+    /**
+     * 移除动画
+     *
+     * @param action 动画动作
+     */
+    public void removeAction(UIAction action) {
+        if (animationManager != null) {
+            animationManager.removeAction(action);
+        }
+    }
+
+    /**
+     * 清除所有动画
+     */
+    public void clearActions() {
+        if (animationManager != null) {
+            animationManager.clearActions();
+        }
+    }
+
+    /**
+     * 检查是否有任何动画在运行
+     *
+     * @return true 如果有动画在运行
+     */
+    public boolean hasRunningActions() {
+        return animationManager != null && animationManager.hasRunningActions();
+    }
+
+    /**
+     * 获取动画管理器
+     *
+     * @return 动画管理器
+     */
+    public AnimationManager getAnimationManager() {
+        return animationManager;
+    }
+
+    /**
+     * 运行动画
+     *
+     * @param action 动画动作
+     */
+    public void runAction(UIAction action) {
+        addAction(action);
+    }
+
+    /**
+     * 停止所有动画
+     */
+    public void stopAllActions() {
+        if (animationManager != null) {
+            clearActions();
         }
     }
 
