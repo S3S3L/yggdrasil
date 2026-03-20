@@ -139,14 +139,14 @@ List<CollisionInfo> collisions = world.checkCollisions();
 
 ## 测试结果
 
-- 总测试数：待补充
-- 新增测试：待补充
+- 总测试数：1887
+- 新增测试：65 (全部通过)
 - 失败：0
-- 跳过：待补充
+- 跳过：1
 
 ## Git 提交
 
-- Commit: 待补充
+- Commit: `bebba2b`
 - Message: `feat(core): Iteration 26 - 实现物理世界管理（物理碰撞系统二）`
 
 ## 后续工作
