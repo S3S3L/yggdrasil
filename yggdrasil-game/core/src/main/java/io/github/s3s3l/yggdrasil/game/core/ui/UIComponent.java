@@ -3,6 +3,8 @@ package io.github.s3s3l.yggdrasil.game.core.ui;
 import io.github.s3s3l.yggdrasil.game.core.basic.ID;
 import io.github.s3s3l.yggdrasil.game.core.ui.animation.AnimationManager;
 import io.github.s3s3l.yggdrasil.game.core.ui.animation.UIAction;
+import io.github.s3s3l.yggdrasil.game.core.ui.layout.ILayout;
+import io.github.s3s3l.yggdrasil.game.core.ui.layout.LayoutParams;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,8 @@ public abstract class UIComponent implements ID {
     private UIColor backgroundColor;
     private float opacity;
     private AnimationManager animationManager;
+    private ILayout layout;
+    private LayoutParams layoutParams;
 
     protected UIComponent() {
         this.bounds = new UIRect();
@@ -44,6 +48,7 @@ public abstract class UIComponent implements ID {
         this.backgroundColor = UIColor.TRANSPARENT;
         this.opacity = 1f;
         this.animationManager = new AnimationManager(this);
+        this.layoutParams = new LayoutParams();
     }
 
     protected UIComponent(String name) {
@@ -397,6 +402,132 @@ public abstract class UIComponent implements ID {
     public void stopAllActions() {
         if (animationManager != null) {
             clearActions();
+        }
+    }
+
+    // ==================== 布局系统相关方法 ====================
+
+    /**
+     * 获取子组件的布局参数
+     *
+     * @param child 子组件
+     * @return 布局参数
+     */
+    protected LayoutParams getChildLayoutParams(UIComponent child) {
+        if (child == null) {
+            return new LayoutParams();
+        }
+        return child.getLayoutParams();
+    }
+
+    /**
+     * 设置布局管理器
+     *
+     * @param layout 布局管理器
+     */
+    public void setLayout(ILayout layout) {
+        this.layout = layout;
+        requestLayout();
+    }
+
+    /**
+     * 获取布局管理器
+     *
+     * @return 布局管理器
+     */
+    public ILayout getLayout() {
+        return layout;
+    }
+
+    /**
+     * 获取布局参数
+     *
+     * @return 布局参数
+     */
+    public LayoutParams getLayoutParams() {
+        return layoutParams;
+    }
+
+    /**
+     * 设置布局参数
+     *
+     * @param layoutParams 布局参数
+     */
+    public void setLayoutParams(LayoutParams layoutParams) {
+        this.layoutParams = layoutParams;
+        if (parent != null && parent.layout != null) {
+            parent.requestLayout();
+        }
+    }
+
+    /**
+     * 请求重新布局
+     */
+    public void requestLayout() {
+        if (layout != null) {
+            layout.layout(this, getWidth(), getHeight());
+        }
+        for (UIComponent child : children) {
+            child.requestLayout();
+        }
+    }
+
+    /**
+     * 使布局失效，标记需要重新布局
+     */
+    public void invalidateLayout() {
+        requestLayout();
+    }
+
+    /**
+     * 添加子组件并应用布局
+     */
+    public void addChildWithLayout(UIComponent child) {
+        children.add(child);
+        child.setParent(this);
+        if (layout != null) {
+            requestLayout();
+        }
+    }
+
+    /**
+     * 移除子组件并重新布局
+     */
+    public void removeChildWithLayout(UIComponent child) {
+        children.remove(child);
+        child.setParent(null);
+        if (layout != null) {
+            requestLayout();
+        }
+    }
+
+    /**
+     * 清除所有子组件并重新布局
+     */
+    public void clearAllChildren() {
+        for (UIComponent child : children) {
+            child.setParent(null);
+        }
+        children.clear();
+        if (layout != null) {
+            requestLayout();
+        }
+    }
+
+    /**
+     * 更新组件，包含布局更新
+     *
+     * @param deltaTime 时间增量
+     */
+    public void updateWithLayout(float deltaTime) {
+        if (layout != null) {
+            layout.layout(this, getWidth(), getHeight());
+        }
+        if (animationManager != null) {
+            animationManager.update(deltaTime);
+        }
+        for (UIComponent child : children) {
+            child.update(deltaTime);
         }
     }
 
