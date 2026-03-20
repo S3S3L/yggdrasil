@@ -62,6 +62,15 @@ import io.github.s3s3l.yggdrasil.game.core.ui.UIGrid;
 import io.github.s3s3l.yggdrasil.game.core.ui.UIGridCell;
 import io.github.s3s3l.yggdrasil.game.core.ui.UISplitPanel;
 import io.github.s3s3l.yggdrasil.game.core.ui.UIModalDialog;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIComboBox;
+import io.github.s3s3l.yggdrasil.game.core.ui.UINumberPicker;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIColorPicker;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIMenuBar;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIMenuItem;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIContextMenu;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIStatusBar;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIStatusBarLayer;
+import io.github.s3s3l.yggdrasil.game.core.ui.UIVirtualJoystick;
 
 /**
  * UI 组件同步器
@@ -727,6 +736,249 @@ public class UIComponentSync {
     }
 
     /**
+     * 同步组合下拉框
+     *
+     * @param comboBox 核心 UI 组合下拉框
+     * @return Scene2D Actor
+     */
+    public static Actor syncComboBox(UIComboBox comboBox) {
+        Table table = new Table();
+
+        if (comboBox.isEditable()) {
+            // 可编辑模式：使用 TextField
+            TextFieldStyle style = new TextFieldStyle();
+            style.font = new BitmapFont();
+            style.fontColor = GdxUIRenderer.getColor(comboBox.getTextColor());
+            TextField textField = new TextField(comboBox.getText(), style);
+            table.add(textField).width(comboBox.getWidth());
+        } else {
+            // 只读模式：使用 Label 显示当前值
+            LabelStyle style = new LabelStyle();
+            style.font = new BitmapFont();
+            style.fontColor = GdxUIRenderer.getColor(comboBox.getTextColor());
+            Label label = new Label(comboBox.getDisplayText(), style);
+            table.add(label).width(comboBox.getWidth());
+        }
+
+        table.setSize(comboBox.getWidth(), comboBox.getHeight());
+        return table;
+    }
+
+    /**
+     * 同步数字选择器
+     *
+     * @param picker 核心 UI 数字选择器
+     * @return Scene2D Actor
+     */
+    public static Actor syncNumberPicker(UINumberPicker picker) {
+        Table table = new Table();
+
+        TextFieldStyle style = new TextFieldStyle();
+        style.font = new BitmapFont();
+        style.fontColor = GdxUIRenderer.getColor(picker.getTextColor());
+
+        TextField textField = new TextField(picker.getDisplayText(), style);
+        table.add(textField).width(100);
+
+        if (picker.isShowButtons()) {
+            TextButtonStyle btnStyle = new TextButtonStyle();
+            btnStyle.font = new BitmapFont();
+
+            TextButton minusBtn = new TextButton("-", btnStyle);
+            TextButton plusBtn = new TextButton("+", btnStyle);
+
+            minusBtn.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    picker.stepDown();
+                    textField.setText(picker.getDisplayText());
+                }
+            });
+
+            plusBtn.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    picker.stepUp();
+                    textField.setText(picker.getDisplayText());
+                }
+            });
+
+            table.add(minusBtn).width(40);
+            table.add(plusBtn).width(40);
+        }
+
+        table.setSize(picker.getWidth(), picker.getHeight());
+        return table;
+    }
+
+    /**
+     * 同步颜色选择器
+     *
+     * @param picker 核心 UI 颜色选择器
+     * @return Scene2D Actor
+     */
+    public static Actor syncColorPicker(UIColorPicker picker) {
+        Table table = new Table();
+
+        // 颜色预览
+        Image colorPreview = new Image(createDrawable(picker.getSelectedColor()));
+        table.add(colorPreview).size(50, 50);
+
+        // RGB 滑块
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = createDrawable(new UIColor(0.3f, 0.3f, 0.3f, 1f));
+        sliderStyle.knob = createDrawable(UIColor.WHITE);
+
+        Slider redSlider = new Slider(0, 1, 0.01f, false, sliderStyle);
+        redSlider.setValue(picker.getSelectedColor().getR());
+        table.row();
+        table.add(redSlider).width(150);
+
+        Slider greenSlider = new Slider(0, 1, 0.01f, false, sliderStyle);
+        greenSlider.setValue(picker.getSelectedColor().getG());
+        table.row();
+        table.add(greenSlider).width(150);
+
+        Slider blueSlider = new Slider(0, 1, 0.01f, false, sliderStyle);
+        blueSlider.setValue(picker.getSelectedColor().getB());
+        table.row();
+        table.add(blueSlider).width(150);
+
+        table.setSize(picker.getWidth(), picker.getHeight());
+        return table;
+    }
+
+    /**
+     * 同步菜单栏
+     *
+     * @param menuBar 核心 UI 菜单栏
+     * @return Scene2D Actor
+     */
+    public static Actor syncMenuBar(UIMenuBar menuBar) {
+        Table table = new Table();
+        table.defaults().pad(0);
+
+        for (UIMenuItem item : menuBar.getItems()) {
+            TextButtonStyle style = new TextButtonStyle();
+            style.font = new BitmapFont();
+            style.fontColor = GdxUIRenderer.getColor(menuBar.getTextColor());
+
+            TextButton btn = new TextButton(item.getText(), style);
+            table.add(btn).padRight(menuBar.getItemSpacing());
+        }
+
+        table.setSize(menuBar.getWidth(), menuBar.getItemHeight());
+        return table;
+    }
+
+    /**
+     * 同步上下文菜单
+     *
+     * @param menu 核心 UI 上下文菜单
+     * @return Scene2D Actor
+     */
+    public static Actor syncContextMenu(UIContextMenu menu) {
+        Table table = new Table();
+        table.defaults().pad(2).fillX();
+
+        for (UIMenuItem item : menu.getItems()) {
+            if (item.isSeparator()) {
+                Image sep = new Image(createDrawable(menu.getSeparatorColor()));
+                table.add(sep).colspan(1).height(1).padLeft(20).padRight(5);
+                table.row();
+            } else {
+                TextButtonStyle style = new TextButtonStyle();
+                style.font = new BitmapFont();
+                style.fontColor = GdxUIRenderer.getColor(menu.getTextColor());
+
+                TextButton btn = new TextButton(item.getText(), style);
+                table.add(btn);
+                table.row();
+            }
+        }
+
+        table.setPosition(menu.getX(), menu.getY());
+        return table;
+    }
+
+    /**
+     * 同步状态条
+     *
+     * @param statusBar 核心 UI 状态条
+     * @return Scene2D Actor
+     */
+    public static Actor syncStatusBar(UIStatusBar statusBar) {
+        Stack stack = new Stack();
+
+        // 背景
+        Image bg = new Image(createDrawable(statusBar.getBackgroundColor()));
+        bg.setSize(statusBar.getWidth(), statusBar.getHeight());
+        stack.add(bg);
+
+        // 各层进度条
+        Table layersTable = new Table();
+        layersTable.setSize(statusBar.getWidth(), statusBar.getHeight());
+
+        for (UIStatusBarLayer layer : statusBar.getLayers()) {
+            if (layer.isVisible()) {
+                Image layerImg = new Image(createDrawable(layer.getColor()));
+                layerImg.setWidth(statusBar.getWidth() * layer.getProgressPercent());
+                layerImg.setHeight(statusBar.getHeight());
+                layersTable.add(layerImg);
+            }
+        }
+
+        stack.add(layersTable);
+
+        // 文本
+        if (statusBar.isShowText()) {
+            LabelStyle labelStyle = new LabelStyle();
+            labelStyle.font = new BitmapFont();
+            labelStyle.fontColor = GdxUIRenderer.getColor(statusBar.getTextColor());
+            Label textLabel = new Label(statusBar.getComputedDisplayText(), labelStyle);
+            stack.add(textLabel);
+        }
+
+        stack.setSize(statusBar.getWidth(), statusBar.getHeight());
+        return stack;
+    }
+
+    /**
+     * 同步虚拟摇杆
+     *
+     * @param joystick 核心 UI 虚拟摇杆
+     * @return Scene2D Actor
+     */
+    public static Actor syncVirtualJoystick(UIVirtualJoystick joystick) {
+        TouchpadStyle style = new TouchpadStyle();
+        style.background = createDrawable(joystick.getStickColor());
+        style.knob = createDrawable(joystick.getKnobColor());
+
+        Touchpad touchpad = new Touchpad(joystick.getRadius(), style);
+        touchpad.setSize(joystick.getTotalSize(), joystick.getTotalSize());
+
+        touchpad.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                joystick.handleTouchStart(x, y);
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                joystick.handleTouchDrag(x, y);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                joystick.handleTouchEnd(x, y);
+            }
+        });
+
+        return touchpad;
+    }
+
+    /**
      * 同步标签页容器组件
      *
      * @param tabContainer 核心 UI 标签页容器组件
@@ -869,6 +1121,20 @@ public class UIComponentSync {
             return syncSplitPanel((UISplitPanel) component);
         } else if (component instanceof UIModalDialog) {
             return syncModalDialog((UIModalDialog) component);
+        } else if (component instanceof UIComboBox) {
+            return syncComboBox((UIComboBox) component);
+        } else if (component instanceof UINumberPicker) {
+            return syncNumberPicker((UINumberPicker) component);
+        } else if (component instanceof UIColorPicker) {
+            return syncColorPicker((UIColorPicker) component);
+        } else if (component instanceof UIMenuBar) {
+            return syncMenuBar((UIMenuBar) component);
+        } else if (component instanceof UIContextMenu) {
+            return syncContextMenu((UIContextMenu) component);
+        } else if (component instanceof UIStatusBar) {
+            return syncStatusBar((UIStatusBar) component);
+        } else if (component instanceof UIVirtualJoystick) {
+            return syncVirtualJoystick((UIVirtualJoystick) component);
         } else {
             return syncGenericComponent(component);
         }
