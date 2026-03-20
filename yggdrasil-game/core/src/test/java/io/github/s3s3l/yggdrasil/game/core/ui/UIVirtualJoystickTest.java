@@ -1,5 +1,6 @@
 package io.github.s3s3l.yggdrasil.game.core.ui;
 
+import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +65,7 @@ class UIVirtualJoystickTest {
 
     @Test
     void testGetDirection() {
-        UIVirtualJoystick.Vector2 dir = joystick.getDirection();
+        Vector2 dir = joystick.getDirection();
         assertNotNull(dir);
         assertEquals(0, dir.x, 0.01f);
         assertEquals(0, dir.y, 0.01f);
@@ -145,7 +146,7 @@ class UIVirtualJoystickTest {
 
     @Test
     void testGetNormalizedDirection() {
-        UIVirtualJoystick.Vector2 dir = joystick.getNormalizedDirection();
+        Vector2 dir = joystick.getNormalizedDirection();
         assertNotNull(dir);
         assertEquals(0, dir.x, 0.01f);
         assertEquals(0, dir.y, 0.01f);
@@ -153,26 +154,26 @@ class UIVirtualJoystickTest {
 
     @Test
     void testVector2Creation() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(3, 4);
+        Vector2 vec = new Vector2(3, 4);
         assertEquals(3, vec.x, 0.01f);
         assertEquals(4, vec.y, 0.01f);
     }
 
     @Test
     void testVector2Length() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(3, 4);
+        Vector2 vec = new Vector2(3, 4);
         assertEquals(5, vec.length(), 0.01f);
     }
 
     @Test
     void testVector2LengthSquared() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(3, 4);
+        Vector2 vec = new Vector2(3, 4);
         assertEquals(25, vec.lengthSquared(), 0.01f);
     }
 
     @Test
     void testVector2Normalize() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(3, 4);
+        Vector2 vec = new Vector2(3, 4);
         vec.normalize();
         assertEquals(0.6f, vec.x, 0.01f);
         assertEquals(0.8f, vec.y, 0.01f);
@@ -180,24 +181,23 @@ class UIVirtualJoystickTest {
 
     @Test
     void testVector2Scale() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(1, 1);
-        vec.scale(2);
-        assertEquals(2, vec.x, 0.01f);
-        assertEquals(2, vec.y, 0.01f);
+        Vector2 vec = new Vector2(1, 1);
+        Vector2 scaled = vec.scale(2);
+        assertEquals(2, scaled.x, 0.01f);
+        assertEquals(2, scaled.y, 0.01f);
     }
 
     @Test
     void testVector2Copy() {
-        UIVirtualJoystick.Vector2 vec = new UIVirtualJoystick.Vector2(3, 4);
-        UIVirtualJoystick.Vector2 copy = vec.copy();
+        Vector2 vec = new Vector2(3, 4);
+        Vector2 copy = new Vector2(vec);
         assertEquals(vec, copy);
-        assertNotSame(vec, copy);
     }
 
     @Test
     void testVector2Equals() {
-        UIVirtualJoystick.Vector2 vec1 = new UIVirtualJoystick.Vector2(3, 4);
-        UIVirtualJoystick.Vector2 vec2 = new UIVirtualJoystick.Vector2(3, 4);
+        Vector2 vec1 = new Vector2(3, 4);
+        Vector2 vec2 = new Vector2(3, 4);
         assertEquals(vec1, vec2);
     }
 
@@ -206,7 +206,7 @@ class UIVirtualJoystickTest {
         final boolean[] touchStarted = {false};
         joystick.setListener(new UIVirtualJoystick.JoystickListener() {
             @Override
-            public void onDirectionChanged(UIVirtualJoystick j, UIVirtualJoystick.Vector2 dir, float angle, float intensity) {}
+            public void onDirectionChanged(UIVirtualJoystick j, Vector2 dir, float angle, float intensity) {}
 
             @Override
             public void onTouchStart(UIVirtualJoystick j, float x, float y) {
@@ -240,7 +240,7 @@ class UIVirtualJoystickTest {
         final boolean[] touchEnded = {false};
         joystick.setListener(new UIVirtualJoystick.JoystickListener() {
             @Override
-            public void onDirectionChanged(UIVirtualJoystick j, UIVirtualJoystick.Vector2 dir, float angle, float intensity) {}
+            public void onDirectionChanged(UIVirtualJoystick j, Vector2 dir, float angle, float intensity) {}
 
             @Override
             public void onTouchStart(UIVirtualJoystick j, float x, float y) {}
@@ -362,7 +362,7 @@ class UIVirtualJoystickTest {
         final float[] capturedAngle = {-1};
         joystick.setListener(new UIVirtualJoystick.JoystickListener() {
             @Override
-            public void onDirectionChanged(UIVirtualJoystick j, UIVirtualJoystick.Vector2 dir, float angle, float intensity) {
+            public void onDirectionChanged(UIVirtualJoystick j, Vector2 dir, float angle, float intensity) {
                 capturedAngle[0] = angle;
             }
 
@@ -396,7 +396,7 @@ class UIVirtualJoystickTest {
         joystick.handleTouchDrag(110, 100); // 小幅度拖动
 
         // 在死区内，方向应该为 0
-        UIVirtualJoystick.Vector2 dir = joystick.getDirection();
+        Vector2 dir = joystick.getDirection();
         assertEquals(0, dir.x, 0.01f);
         assertEquals(0, dir.y, 0.01f);
     }

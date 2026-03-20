@@ -1,6 +1,6 @@
 package io.github.s3s3l.yggdrasil.game.core.ui;
 
-import java.util.Objects;
+import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
 
 /**
  * UI 虚拟摇杆组件
@@ -25,75 +25,6 @@ public class UIVirtualJoystick extends UIComponent {
     private float centerX, centerY;                  // 中心点位置
     private boolean snapBack;                        // 自动回弹
     private float snapBackSpeed;                     // 回弹速度
-
-    /**
-     * 2D 向量类
-     */
-    public static class Vector2 {
-        public float x;
-        public float y;
-
-        public Vector2() {
-            this(0, 0);
-        }
-
-        public Vector2(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public Vector2 set(float x, float y) {
-            this.x = x;
-            this.y = y;
-            return this;
-        }
-
-        public Vector2 set(Vector2 other) {
-            this.x = other.x;
-            this.y = other.y;
-            return this;
-        }
-
-        public float length() {
-            return (float) Math.sqrt(x * x + y * y);
-        }
-
-        public float lengthSquared() {
-            return x * x + y * y;
-        }
-
-        public Vector2 normalize() {
-            float len = length();
-            if (len > 0) {
-                x /= len;
-                y /= len;
-            }
-            return this;
-        }
-
-        public Vector2 scale(float scale) {
-            x *= scale;
-            y *= scale;
-            return this;
-        }
-
-        public Vector2 copy() {
-            return new Vector2(x, y);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Vector2 vector2 = (Vector2) o;
-            return Float.compare(vector2.x, x) == 0 && Float.compare(vector2.y, y) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
-    }
 
     /**
      * 摇杆模式枚举
@@ -186,7 +117,7 @@ public class UIVirtualJoystick extends UIComponent {
     }
 
     public Vector2 getDirection() {
-        return direction.copy();
+        return new Vector2(direction);
     }
 
     public float getAngle() {
@@ -284,13 +215,7 @@ public class UIVirtualJoystick extends UIComponent {
      * @return 归一化方向向量
      */
     public Vector2 getNormalizedDirection() {
-        Vector2 normalized = direction.copy();
-        float len = normalized.length();
-        if (len > 0) {
-            normalized.x /= len;
-            normalized.y /= len;
-        }
-        return normalized;
+        return direction.normalized();
     }
 
     /**
@@ -436,7 +361,7 @@ public class UIVirtualJoystick extends UIComponent {
         // 通知监听器
         if (listener != null && angle != newAngle) {
             angle = newAngle;
-            listener.onDirectionChanged(this, direction.copy(), angle, getIntensity());
+            listener.onDirectionChanged(this, new Vector2(direction), angle, getIntensity());
         }
     }
 
