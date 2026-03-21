@@ -1,12 +1,14 @@
 package io.github.s3s3l.yggdrasil.game.core.physics.collider;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
+import io.github.s3s3l.yggdrasil.game.core.pool.PoolableObject;
 
 /**
  * 矩形碰撞体
  * 使用 AABB（轴对齐包围盒）进行碰撞检测
+ * 支持对象池化
  */
-public class BoxCollider implements Collider {
+public class BoxCollider implements Collider, PoolableObject<BoxCollider> {
 
     private float centerX;
     private float centerY;
@@ -241,5 +243,42 @@ public class BoxCollider implements Collider {
     public String toString() {
         return String.format("BoxCollider[center=(%.2f, %.2f), size=%.2fx%.2f]",
                 centerX, centerY, width, height);
+    }
+
+    @Override
+    public void reset() {
+        this.centerX = 0;
+        this.centerY = 0;
+        this.width = 0;
+        this.height = 0;
+        this.halfWidth = 0;
+        this.halfHeight = 0;
+        this.isTrigger = false;
+    }
+
+    @Override
+    public void onReturn() {
+        // 清理状态，帮助 GC
+        reset();
+    }
+
+    @Override
+    public boolean isValid() {
+        // 碰撞体总是有效的
+        return true;
+    }
+
+    /**
+     * 设置碰撞体数据（用于从池中借出后初始化）
+     *
+     * @param centerX 中心 X 坐标
+     * @param centerY 中心 Y 坐标
+     * @param width   宽度
+     * @param height  高度
+     */
+    public void set(float centerX, float centerY, float width, float height) {
+        this.centerX = centerX;
+        this.centerY = centerY;
+        setSize(width, height);
     }
 }

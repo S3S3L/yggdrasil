@@ -1,6 +1,7 @@
 package io.github.s3s3l.yggdrasil.game.core.physics.collider;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
+import io.github.s3s3l.yggdrasil.game.core.pool.PoolableObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +10,9 @@ import java.util.List;
  * 多边形碰撞体
  * 使用 SAT（分离轴定理）进行碰撞检测
  * 支持凸多边形
+ * 支持对象池化
  */
-public class PolygonCollider implements Collider {
+public class PolygonCollider implements Collider, PoolableObject<PolygonCollider> {
 
     private float centerX;
     private float centerY;
@@ -85,6 +87,17 @@ public class PolygonCollider implements Collider {
      */
     public int getVertexCount() {
         return vertices.size();
+    }
+
+    /**
+     * 清空顶点列表并设置新的顶点
+     *
+     * @param vertices 新的顶点列表
+     */
+    public void setVertices(List<Vector2> vertices) {
+        this.vertices.clear();
+        this.vertices.addAll(vertices);
+        updateTransformedVertices();
     }
 
     /**
@@ -390,5 +403,43 @@ public class PolygonCollider implements Collider {
     public String toString() {
         return String.format("PolygonCollider[center=(%.2f, %.2f), vertices=%d, rotation=%.2f]",
                 centerX, centerY, vertices.size(), rotation);
+    }
+
+    @Override
+    public void reset() {
+        this.centerX = 0;
+        this.centerY = 0;
+        this.rotation = 0;
+        this.vertices.clear();
+        this.transformedVertices.clear();
+        this.isTrigger = false;
+    }
+
+    @Override
+    public void onReturn() {
+        reset();
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    /**
+     * 设置碰撞体数据（用于从池中借出后初始化）
+     *
+     * @param centerX 中心 X 坐标
+     * @param centerY 中心 Y 坐标
+     * @param vertices 顶点列表
+     */
+    public void set(float centerX, float centerY, List<Vector2> vertices) {
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.vertices.clear();
+        this.vertices.addAll(vertices);
+        this.transformedVertices.clear();
+        this.transformedVertices.addAll(vertices);
+        this.rotation = 0;
+        updateTransformedVertices();
     }
 }

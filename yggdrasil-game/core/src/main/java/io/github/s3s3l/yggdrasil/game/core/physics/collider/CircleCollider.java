@@ -1,12 +1,14 @@
 package io.github.s3s3l.yggdrasil.game.core.physics.collider;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
+import io.github.s3s3l.yggdrasil.game.core.pool.PoolableObject;
 
 /**
  * 圆形碰撞体
  * 使用圆心和半径定义，支持圆 - 圆、圆 - 矩形碰撞检测
+ * 支持对象池化
  */
-public class CircleCollider implements Collider {
+public class CircleCollider implements Collider, PoolableObject<CircleCollider> {
 
     private float centerX;
     private float centerY;
@@ -205,5 +207,37 @@ public class CircleCollider implements Collider {
     public String toString() {
         return String.format("CircleCollider[center=(%.2f, %.2f), radius=%.2f]",
                 centerX, centerY, radius);
+    }
+
+    @Override
+    public void reset() {
+        this.centerX = 0;
+        this.centerY = 0;
+        this.radius = 0;
+        this.radiusSquared = 0;
+        this.isTrigger = false;
+    }
+
+    @Override
+    public void onReturn() {
+        reset();
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    /**
+     * 设置碰撞体数据（用于从池中借出后初始化）
+     *
+     * @param centerX 中心 X 坐标
+     * @param centerY 中心 Y 坐标
+     * @param radius 半径
+     */
+    public void set(float centerX, float centerY, float radius) {
+        this.centerX = centerX;
+        this.centerY = centerY;
+        setRadius(radius);
     }
 }

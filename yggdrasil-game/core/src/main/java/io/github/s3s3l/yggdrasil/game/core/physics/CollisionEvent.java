@@ -1,13 +1,16 @@
 package io.github.s3s3l.yggdrasil.game.core.physics;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Vector2;
+import io.github.s3s3l.yggdrasil.game.core.event.Event;
 import io.github.s3s3l.yggdrasil.game.core.physics.collider.Collider;
+import io.github.s3s3l.yggdrasil.game.core.pool.PoolableObject;
 
 /**
  * 碰撞事件数据类
  * 用于传递碰撞相关信息
+ * 支持对象池化
  */
-public class CollisionEvent {
+public class CollisionEvent implements Event, PoolableObject<CollisionEvent> {
 
     /**
      * 碰撞类型枚举
@@ -228,5 +231,28 @@ public class CollisionEvent {
     @Override
     public String toString() {
         return String.format("CollisionEvent{type=%s, A=%s, B=%s}", type, colliderA, colliderB);
+    }
+
+    @Override
+    public void reset() {
+        this.colliderA = null;
+        this.colliderB = null;
+        this.contactPoint = null;
+        this.normal = null;
+        this.penetrationDepth = 0;
+        this.type = null;
+        this.isTrigger = false;
+    }
+
+    @Override
+    public void onReturn() {
+        // 清理引用，帮助 GC
+        reset();
+    }
+
+    @Override
+    public boolean isValid() {
+        // 碰撞事件总是有效的，只要对象不为 null
+        return true;
     }
 }
