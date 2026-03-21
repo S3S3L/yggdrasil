@@ -5,13 +5,20 @@ import io.github.s3s3l.yggdrasil.game.core.demo.entity.EnemyEntity;
 import io.github.s3s3l.yggdrasil.game.core.demo.entity.PlayerEntity;
 import io.github.s3s3l.yggdrasil.game.core.demo.input.DefaultInputConfig;
 import io.github.s3s3l.yggdrasil.game.core.demo.input.GameInputProcessor;
+import io.github.s3s3l.yggdrasil.game.core.demo.ui.EnemyHealthBar;
+import io.github.s3s3l.yggdrasil.game.core.demo.ui.GameOverDialog;
+import io.github.s3s3l.yggdrasil.game.core.demo.ui.HealthBar;
+import io.github.s3s3l.yggdrasil.game.core.demo.ui.ScoreDisplay;
+import io.github.s3s3l.yggdrasil.game.core.demo.ui.TimerDisplay;
 import io.github.s3s3l.yggdrasil.game.core.flow.GameManager;
 import io.github.s3s3l.yggdrasil.game.core.flow.scene.GameScene;
 import io.github.s3s3l.yggdrasil.game.core.scene.SceneManager;
 import io.github.s3s3l.yggdrasil.game.core.ui.scene.UIScene;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Demo 游戏场景
@@ -60,6 +67,31 @@ public class DemoGameScene extends GameScene {
     private final float survivalGoalTime;
 
     /**
+     * 玩家血条 UI
+     */
+    private HealthBar playerHealthBar;
+
+    /**
+     * 分数显示 UI
+     */
+    private ScoreDisplay scoreDisplay;
+
+    /**
+     * 计时器显示 UI
+     */
+    private TimerDisplay timerDisplay;
+
+    /**
+     * 游戏结束对话框
+     */
+    private GameOverDialog gameOverDialog;
+
+    /**
+     * 敌人血条映射
+     */
+    private final Map<EnemyEntity, EnemyHealthBar> enemyHealthBars;
+
+    /**
      * 创建 Demo 游戏场景
      */
     public DemoGameScene() {
@@ -79,6 +111,7 @@ public class DemoGameScene extends GameScene {
         this.gameOver = false;
         this.isVictory = false;
         this.survivalGoalTime = survivalTime;
+        this.enemyHealthBars = new HashMap<>();
     }
 
     @Override
@@ -97,11 +130,86 @@ public class DemoGameScene extends GameScene {
 
         // 清空敌人列表
         enemies.clear();
+        enemyHealthBars.clear();
         enemySpawnTimer = 0;
         gameTimer = 0;
         gameOver = false;
+        isVictory = false;
+
+        // 初始化 UI
+        initializeUI();
 
         onGameStart();
+    }
+
+    /**
+     * 初始化 UI 组件
+     */
+    private void initializeUI() {
+        // 玩家血条（左上角）
+        playerHealthBar = new HealthBar(200, 20);
+        playerHealthBar.setPosition(-550, 320);
+        playerHealthBar.setHealth(player.getHealthComponent().getCurrentHealth(),
+                                   player.getHealthComponent().getMaxHealth());
+        addComponent(playerHealthBar);
+
+        // 分数显示（右上角）
+        scoreDisplay = new ScoreDisplay(550, 320);
+        scoreDisplay.setScore(0);
+        addComponent(scoreDisplay);
+
+        // 计时器显示（顶部中央）
+        timerDisplay = new TimerDisplay(0, 320, survivalGoalTime);
+        timerDisplay.setTime(0);
+        addComponent(timerDisplay);
+
+        // 游戏结束对话框
+        gameOverDialog = new GameOverDialog();
+        gameOverDialog.setOnRestartClickListener(this::restartGame);
+        gameOverDialog.setOnMenuClickListener(this::returnToMenu);
+        addComponent(gameOverDialog);
+    }
+
+    /**
+     * 重新开始游戏
+     */
+    private void restartGame() {
+        // 重置游戏状态
+        player.getHealthComponent().reset();
+        player.setLevel(1);
+        player.addScore(-player.getScore()); // 重置分数
+
+        // 清除所有敌人
+        for (EnemyEntity enemy : new ArrayList<>(enemies)) {
+            enemy.destroy();
+        }
+        enemies.clear();
+        enemyHealthBars.clear();
+
+        // 重置计时器
+        gameTimer = 0;
+        enemySpawnTimer = 0;
+        gameOver = false;
+        isVictory = false;
+
+        // 重置玩家位置
+        player.setPosition(0, 0);
+
+        // 隐藏对话框
+        gameOverDialog.hide();
+
+        // 更新 UI
+        updateUI();
+
+        onGameStart();
+    }
+
+    /**
+     * 返回主菜单
+     */
+    private void returnToMenu() {
+        StartMenuScene menuScene = new StartMenuScene();
+        SceneManager.get().replaceScene((io.github.s3s3l.yggdrasil.game.core.scene.Scene) menuScene);
     }
 
     /**
@@ -195,7 +303,44 @@ public class DemoGameScene extends GameScene {
         // 检查游戏结束条件
         checkGameOver();
 
+        // 更新 UI
+        updateUI();
+
         super.update(deltaTime);
+    }
+
+    /**
+     * 更新 UI 显示
+     */
+    protected void updateUI() {
+        if (playerHealthBar != null && player != null) {
+            playerHealthBar.setHealth(
+                player.getHealthComponent().getCurrentHealth(),
+                player.getHealthComponent().getMaxHealth()
+            );
+        }
+
+        if (scoreDisplay != null && player != null) {
+            scoreDisplay.setScore(player.getScore());
+            scoreDisplay.setLevel(player.getLevel());
+        }
+
+        if (timerDisplay != null) {
+            timerDisplay.setTime(gameTimer);
+        }
+
+        // 更新敌人血条
+        for (EnemyEntity enemy : enemies) {
+            EnemyHealthBar bar = enemyHealthBars.get(enemy);
+            if (bar != null && enemy.isActive() && !enemy.isDead()) {
+                bar.setHealth(
+                    enemy.getHealthComponent().getCurrentHealth(),
+                    enemy.getHealthComponent().getMaxHealth()
+                );
+                // 血条跟随敌人位置
+                bar.setPosition(enemy.getX() - 40, enemy.getY() + 30);
+            }
+        }
     }
 
     /**
@@ -340,6 +485,17 @@ public class DemoGameScene extends GameScene {
         enemy.setPosition(x, y);
 
         enemies.add(enemy);
+
+        // 创建敌人血条
+        EnemyHealthBar healthBar = new EnemyHealthBar(80, 8);
+        healthBar.setEnemyName(enemy.getType().name());
+        healthBar.setPosition(x - 40, y + 30);
+        healthBar.setHealth(
+            enemy.getHealthComponent().getCurrentHealth(),
+            enemy.getHealthComponent().getMaxHealth()
+        );
+        enemyHealthBars.put(enemy, healthBar);
+        addComponent(healthBar);
     }
 
     /**
@@ -479,6 +635,13 @@ public class DemoGameScene extends GameScene {
         if (player != null) {
             player.addScore(enemy.getBounty());
         }
+
+        // 移除敌人血条
+        EnemyHealthBar bar = enemyHealthBars.get(enemy);
+        if (bar != null) {
+            removeComponent(bar);
+            enemyHealthBars.remove(enemy);
+        }
     }
 
     /**
@@ -504,6 +667,9 @@ public class DemoGameScene extends GameScene {
      * 游戏胜利回调
      */
     protected void onGameVictory() {
+        if (gameOverDialog != null) {
+            gameOverDialog.show(true, player != null ? player.getScore() : 0);
+        }
         victory();
     }
 
@@ -511,6 +677,9 @@ public class DemoGameScene extends GameScene {
      * 游戏失败回调
      */
     protected void onGameLost() {
+        if (gameOverDialog != null) {
+            gameOverDialog.show(false, player != null ? player.getScore() : 0);
+        }
         defeat();
     }
 
