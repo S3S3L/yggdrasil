@@ -36,6 +36,11 @@ public class SceneManager {
      */
     private SceneTransition transition;
 
+    /**
+     * 场景是否暂停
+     */
+    private boolean paused;
+
     private SceneManager() {
     }
 
@@ -109,6 +114,9 @@ public class SceneManager {
         // 切换场景
         Scene oldScene = currentScene;
         currentScene = newScene;
+
+        // 重置暂停状态
+        paused = false;
 
         // 恢复新场景快照
         ObjectSnapshot latestSnapshot = SnapshotManager.get().getLatestSnapshot(newScene);
@@ -220,6 +228,46 @@ public class SceneManager {
      */
     public int getStackDepth() {
         return sceneStack.size();
+    }
+
+    /**
+     * 暂停当前场景
+     */
+    public synchronized void pause() {
+        if (currentScene != null && !paused) {
+            paused = true;
+            currentScene.pause();
+        }
+    }
+
+    /**
+     * 恢复当前场景
+     */
+    public synchronized void resume() {
+        if (currentScene != null && paused) {
+            paused = false;
+            currentScene.resume();
+        }
+    }
+
+    /**
+     * 检查场景是否暂停
+     *
+     * @return true 如果场景已暂停
+     */
+    public synchronized boolean isPaused() {
+        return paused;
+    }
+
+    /**
+     * 更新场景（支持暂停）
+     *
+     * @param delta 时间增量
+     */
+    public synchronized void update(float delta) {
+        if (currentScene != null && !paused) {
+            currentScene.update(delta);
+        }
     }
 
     /**

@@ -187,6 +187,16 @@ public class InputManagerEx {
     }
 
     /**
+     * 检查按键是否未按下
+     *
+     * @param keyCode 按键代码
+     * @return true 如果未按下
+     */
+    public boolean isKeyUp(int keyCode) {
+        return keyboardState.isKeyUp(keyCode);
+    }
+
+    /**
      * 获取按键按下的持续时间
      *
      * @param keyCode 按键代码

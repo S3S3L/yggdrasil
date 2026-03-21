@@ -50,6 +50,15 @@ public class SceneState {
     }
 
     /**
+     * 设置时间戳
+     *
+     * @param timestamp 时间戳
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
      * 保存数据
      *
      * @param key   键
