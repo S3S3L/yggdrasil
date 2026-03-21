@@ -211,14 +211,14 @@
 - [x] 资源预加载
 
 #### Iteration 38: 本地化系统
-- [ ] 多语言文本资源
-- [ ] 运行时语言切换
-- [ ] 本地化 UI 适配
-- [ ] 默认语言配置
+- [x] 多语言文本资源
+- [x] 运行时语言切换
+- [x] 本地化 UI 适配
+- [x] 默认语言配置
 
 **里程碑回顾任务**:
-- [ ] 更新记忆文件（ITERATIONS/iteration-36/37/38.md）
-- [ ] 更新 PROJECT_OVERVIEW.md 资源和本地化章节
+- [x] 更新记忆文件（ITERATIONS/iteration-36/37/38.md）
+- [x] 更新 PROJECT_OVERVIEW.md 资源和本地化章节
 - [ ] 更新 DECISION_LOG.md 记录资源管理设计
 - [ ] 更新 TODO_BACKLOG.md 标记完成项
 
