@@ -1,8 +1,8 @@
 # Yggdrasil 项目工作计划
 
 > 最后更新：2026-03-21
-> 当前迭代：Iteration 26 - 物理世界管理（物理碰撞系统二）
-> 下次里程碑回顾：Iteration 29 完成后
+> 当前迭代：Iteration 33 - Demo 基础架构（已完成）
+> 下次里程碑回顾：Iteration 35 完成后
 
 ---
 
@@ -85,6 +85,13 @@
 | 24 | 增强输入系统 | 89 | ✅ |
 | 25 | 物理碰撞系统（一） | 103 | ✅ |
 | 26 | 物理世界管理 | 65 | ✅ |
+| 27 | 刚体物理基础 | - | ✅ |
+| 28 | 碰撞响应系统 | 49 | ✅ |
+| 29 | 触发器系统 | 50 | ✅ |
+| 30 | 输入系统完善 | 36 | ✅ |
+| 31 | 场景系统完善 | 28 | ✅ |
+| 32 | 游戏流程管理 | 20 | ✅ |
+| 33 | Demo 基础架构 | 82 | ✅ |
 
 ---
 
@@ -155,10 +162,11 @@
 **目标**: 整合所有系统，实现一个完整的游戏演示 Demo，验证框架功能。
 
 #### Iteration 33: Demo 基础架构
-- [ ] Demo 游戏对象定义
-- [ ] Demo 场景配置
-- [ ] 基础 UI 界面
-- [ ] 输入到游戏动作映射
+- [x] Demo 游戏对象定义（PlayerEntity, EnemyEntity, GameAction, EntityType）
+- [x] 基础 UI 界面组件（HealthBar, ScoreDisplay, GameOverDialog, EnemyHealthBar）
+- [x] Demo 场景配置（DemoGameScene, DemoConfig）
+- [x] 输入到游戏动作映射（InputActionMap, GameInputProcessor, DefaultInputConfig）
+- [x] 单元测试（82 个测试用例，覆盖组件、实体、输入系统）
 
 #### Iteration 34: 游戏逻辑实现
 - [ ] 玩家控制
