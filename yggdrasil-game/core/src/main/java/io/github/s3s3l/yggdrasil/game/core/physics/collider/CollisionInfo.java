@@ -39,6 +39,11 @@ public class CollisionInfo {
     public Collider colliderB;
 
     /**
+     * 是否是触发器碰撞（至少有一个碰撞体是触发器）
+     */
+    public boolean isTrigger;
+
+    /**
      * 创建空的碰撞信息
      */
     public CollisionInfo() {
@@ -60,6 +65,22 @@ public class CollisionInfo {
      */
     public void set(boolean collided, Vector2 contactPoint, Vector2 normal,
                     float penetrationDepth, Collider colliderA, Collider colliderB) {
+        set(collided, contactPoint, normal, penetrationDepth, colliderA, colliderB, false);
+    }
+
+    /**
+     * 设置碰撞信息
+     *
+     * @param collided          是否碰撞
+     * @param contactPoint      碰撞点
+     * @param normal            法线
+     * @param penetrationDepth  穿透深度
+     * @param colliderA         第一个碰撞体
+     * @param colliderB         第二个碰撞体
+     * @param isTrigger         是否是触发器碰撞
+     */
+    public void set(boolean collided, Vector2 contactPoint, Vector2 normal,
+                    float penetrationDepth, Collider colliderA, Collider colliderB, boolean isTrigger) {
         this.collided = collided;
         if (contactPoint != null) {
             this.contactPoint.set(contactPoint);
@@ -70,6 +91,7 @@ public class CollisionInfo {
         this.penetrationDepth = penetrationDepth;
         this.colliderA = colliderA;
         this.colliderB = colliderB;
+        this.isTrigger = isTrigger;
     }
 
     /**
@@ -82,6 +104,7 @@ public class CollisionInfo {
         this.penetrationDepth = 0;
         this.colliderA = null;
         this.colliderB = null;
+        this.isTrigger = false;
     }
 
     /**
@@ -97,6 +120,7 @@ public class CollisionInfo {
         copy.penetrationDepth = this.penetrationDepth;
         copy.colliderA = this.colliderA;
         copy.colliderB = this.colliderB;
+        copy.isTrigger = this.isTrigger;
         return copy;
     }
 

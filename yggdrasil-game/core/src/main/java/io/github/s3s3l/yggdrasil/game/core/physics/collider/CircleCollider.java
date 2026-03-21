@@ -12,6 +12,7 @@ public class CircleCollider implements Collider {
     private float centerY;
     private float radius;
     private float radiusSquared;
+    private boolean isTrigger;  // 是否是触发器
 
     /**
      * 创建圆形碰撞体
@@ -159,8 +160,20 @@ public class CircleCollider implements Collider {
     }
 
     @Override
+    public boolean isTrigger() {
+        return isTrigger;
+    }
+
+    @Override
+    public void setTrigger(boolean isTrigger) {
+        this.isTrigger = isTrigger;
+    }
+
+    @Override
     public CircleCollider copy() {
-        return new CircleCollider(centerX, centerY, radius);
+        CircleCollider copy = new CircleCollider(centerX, centerY, radius);
+        copy.isTrigger = this.isTrigger;
+        return copy;
     }
 
     /**

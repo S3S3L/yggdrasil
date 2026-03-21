@@ -24,25 +24,7 @@ public class CollisionEvent {
     private Vector2 normal;
     private float penetrationDepth;
     private CollisionEventType type;
-
-    /**
-     * 创建碰撞事件
-     */
-    public CollisionEvent() {
-    }
-
-    /**
-     * 创建碰撞事件
-     *
-     * @param colliderA 碰撞体 A
-     * @param colliderB 碰撞体 B
-     * @param type 碰撞类型
-     */
-    public CollisionEvent(Collider colliderA, Collider colliderB, CollisionEventType type) {
-        this.colliderA = colliderA;
-        this.colliderB = colliderB;
-        this.type = type;
-    }
+    private boolean isTrigger;  // 是否是触发器事件
 
     /**
      * 创建碰撞事件
@@ -53,15 +35,62 @@ public class CollisionEvent {
      * @param normal 法线
      * @param penetrationDepth 穿透深度
      * @param type 碰撞类型
+     * @param isTrigger 是否是触发器事件
      */
     public CollisionEvent(Collider colliderA, Collider colliderB, Vector2 contactPoint,
-                          Vector2 normal, float penetrationDepth, CollisionEventType type) {
+                          Vector2 normal, float penetrationDepth, CollisionEventType type, boolean isTrigger) {
         this.colliderA = colliderA;
         this.colliderB = colliderB;
         this.contactPoint = contactPoint;
         this.normal = normal;
         this.penetrationDepth = penetrationDepth;
         this.type = type;
+        this.isTrigger = isTrigger;
+    }
+
+    /**
+     * 创建碰撞事件（默认非触发器）
+     *
+     * @param colliderA 碰撞体 A
+     * @param colliderB 碰撞体 B
+     * @param contactPoint 碰撞点
+     * @param normal 法线
+     * @param penetrationDepth 穿透深度
+     * @param type 碰撞类型
+     */
+    public CollisionEvent(Collider colliderA, Collider colliderB, Vector2 contactPoint,
+                          Vector2 normal, float penetrationDepth, CollisionEventType type) {
+        this(colliderA, colliderB, contactPoint, normal, penetrationDepth, type, false);
+    }
+
+    /**
+     * 创建碰撞事件（无参构造）
+     */
+    public CollisionEvent() {
+        this.isTrigger = false;
+    }
+
+    /**
+     * 创建碰撞事件
+     *
+     * @param colliderA 碰撞体 A
+     * @param colliderB 碰撞体 B
+     * @param type 碰撞类型
+     */
+    public CollisionEvent(Collider colliderA, Collider colliderB, CollisionEventType type) {
+        this(colliderA, colliderB, null, null, 0, type, false);
+    }
+
+    /**
+     * 创建碰撞事件（简化版，支持触发器）
+     *
+     * @param colliderA 碰撞体 A
+     * @param colliderB 碰撞体 B
+     * @param type 碰撞类型
+     * @param isTrigger 是否是触发器事件
+     */
+    public CollisionEvent(Collider colliderA, Collider colliderB, CollisionEventType type, boolean isTrigger) {
+        this(colliderA, colliderB, null, null, 0, type, isTrigger);
     }
 
     /**
@@ -160,6 +189,24 @@ public class CollisionEvent {
      */
     public void setType(CollisionEventType type) {
         this.type = type;
+    }
+
+    /**
+     * 检查是否是触发器事件
+     *
+     * @return 是否是触发器
+     */
+    public boolean isTrigger() {
+        return isTrigger;
+    }
+
+    /**
+     * 设置是否是触发器
+     *
+     * @param trigger 是否是触发器
+     */
+    public void setTrigger(boolean trigger) {
+        isTrigger = trigger;
     }
 
     @Override

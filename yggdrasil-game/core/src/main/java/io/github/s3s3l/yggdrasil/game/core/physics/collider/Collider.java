@@ -79,6 +79,26 @@ public interface Collider {
     Collider copy();
 
     /**
+     * 检查是否是触发器
+     * <p>
+     * 触发器不会产生物理碰撞响应，只会触发事件
+     *
+     * @return 是否是触发器
+     */
+    default boolean isTrigger() {
+        return false;
+    }
+
+    /**
+     * 设置是否是触发器
+     *
+     * @param isTrigger 是否是触发器
+     */
+    default void setTrigger(boolean isTrigger) {
+        // 默认不支持设置
+    }
+
+    /**
      * 碰撞体类型枚举
      */
     enum ColliderType {

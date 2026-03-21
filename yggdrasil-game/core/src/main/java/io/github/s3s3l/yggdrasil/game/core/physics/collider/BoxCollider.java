@@ -14,6 +14,7 @@ public class BoxCollider implements Collider {
     private float height;
     private float halfWidth;
     private float halfHeight;
+    private boolean isTrigger;  // 是否是触发器
 
     /**
      * 创建矩形碰撞体
@@ -193,8 +194,20 @@ public class BoxCollider implements Collider {
     }
 
     @Override
+    public boolean isTrigger() {
+        return isTrigger;
+    }
+
+    @Override
+    public void setTrigger(boolean isTrigger) {
+        this.isTrigger = isTrigger;
+    }
+
+    @Override
     public BoxCollider copy() {
-        return new BoxCollider(centerX, centerY, width, height);
+        BoxCollider copy = new BoxCollider(centerX, centerY, width, height);
+        copy.isTrigger = this.isTrigger;
+        return copy;
     }
 
     /**

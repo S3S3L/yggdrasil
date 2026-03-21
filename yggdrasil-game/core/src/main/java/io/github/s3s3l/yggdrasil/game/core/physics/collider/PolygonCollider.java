@@ -17,6 +17,7 @@ public class PolygonCollider implements Collider {
     private final List<Vector2> vertices;
     private final List<Vector2> transformedVertices;
     private float rotation;
+    private boolean isTrigger;  // 是否是触发器
 
     /**
      * 创建多边形碰撞体
@@ -351,7 +352,18 @@ public class PolygonCollider implements Collider {
         }
         PolygonCollider copy = new PolygonCollider(centerX, centerY, newVertices);
         copy.setRotation(rotation);
+        copy.isTrigger = this.isTrigger;
         return copy;
+    }
+
+    @Override
+    public boolean isTrigger() {
+        return isTrigger;
+    }
+
+    @Override
+    public void setTrigger(boolean isTrigger) {
+        this.isTrigger = isTrigger;
     }
 
     @Override

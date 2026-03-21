@@ -155,6 +155,8 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
 
                 if (CollisionDetector.checkCollision(a, b)) {
                     CollisionInfo info = CollisionDetector.getCollisionInfo(a, b);
+                    // 设置触发器标志
+                    info.isTrigger = a.isTrigger() || b.isTrigger();
                     collisions.add(info);
 
                     ColliderPair pair = new ColliderPair(a, b);
@@ -163,19 +165,19 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
                     RigidbodyComponent rb1 = rigidbodies.get(a);
                     RigidbodyComponent rb2 = rigidbodies.get(b);
 
-                    // 如果是新碰撞，应用冲量响应
+                    // 如果是新碰撞，应用冲量响应（非触发器）
                     if (!previousCollisions.containsKey(pair)) {
                         fireCollisionStart(info, pair);
 
-                        // 应用碰撞响应
-                        if (rb1 != null && rb2 != null) {
+                        // 触发器不应用物理响应
+                        if (!info.isTrigger && rb1 != null && rb2 != null) {
                             resolveCollision(info, rb1, rb2);
                         }
                     } else {
                         fireCollisionStay(info, pair);
 
-                        // 持续碰撞：应用位置修正
-                        if (positionCorrectionEnabled && rb1 != null && rb2 != null) {
+                        // 持续碰撞：触发器不应用位置修正
+                        if (!info.isTrigger && positionCorrectionEnabled && rb1 != null && rb2 != null) {
                             CollisionResponse.positionCorrection(info, rb1, rb2, positionSlop);
                         }
                     }
@@ -186,7 +188,8 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
         // 检查结束的碰撞
         for (ColliderPair pair : previousCollisions.keySet()) {
             if (!currentCollisions.containsKey(pair)) {
-                fireCollisionEnd(pair);
+                // 获取之前的 isTrigger 状态（简化处理，设为 false）
+                fireCollisionEnd(pair, false);
             }
         }
 
@@ -312,7 +315,8 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
         CollisionEvent event = new CollisionEvent(
                 pair.a, pair.b,
                 info.contactPoint, info.normal, info.penetrationDepth,
-                CollisionEvent.CollisionEventType.START
+                CollisionEvent.CollisionEventType.START,
+                info.isTrigger
         );
         for (CollisionListener listener : listeners) {
             try {
@@ -327,7 +331,8 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
         CollisionEvent event = new CollisionEvent(
                 pair.a, pair.b,
                 info.contactPoint, info.normal, info.penetrationDepth,
-                CollisionEvent.CollisionEventType.STAY
+                CollisionEvent.CollisionEventType.STAY,
+                info.isTrigger
         );
         for (CollisionListener listener : listeners) {
             try {
@@ -338,11 +343,12 @@ public class PhysicsWorldWithResponse implements PhysicsWorld {
         }
     }
 
-    private void fireCollisionEnd(ColliderPair pair) {
+    private void fireCollisionEnd(ColliderPair pair, boolean isTrigger) {
         CollisionEvent event = new CollisionEvent(
                 pair.a, pair.b,
                 null, null, 0,
-                CollisionEvent.CollisionEventType.END
+                CollisionEvent.CollisionEventType.END,
+                isTrigger
         );
         for (CollisionListener listener : listeners) {
             try {
