@@ -77,6 +77,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok-maven-plugin</artifactId>
+                    <version>${lombok.maven.plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>${plugin.staging.version}</version>
@@ -267,6 +272,9 @@
         <gdx.version>1.12.1</gdx.version>
         <gdx.platform>natives-desktop</gdx.platform>
         <rxjava.version>3.1.12</rxjava.version>
+
+        <lombok.version>1.18.34</lombok.version>
+        <lombok.maven.plugin.version>1.18.20.0</lombok.maven.plugin.version>
 
         <testcontainers.version>1.17.6</testcontainers.version>
         <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
@@ -843,6 +851,12 @@
                 <groupId>io.reactivex.rxjava3</groupId>
                 <artifactId>rxjava</artifactId>
                 <version>${rxjava.version}</version>
+            </dependency>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

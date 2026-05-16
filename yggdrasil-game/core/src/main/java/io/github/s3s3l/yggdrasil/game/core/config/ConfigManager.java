@@ -3,10 +3,13 @@ package io.github.s3s3l.yggdrasil.game.core.config;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 配置管理器
  * 管理游戏配置的加载、保存和热重载
  */
+@Slf4j
 public class ConfigManager {
 
     private static ConfigManager instance;
@@ -243,8 +246,7 @@ public class ConfigManager {
                 }
             }
         } catch (Exception e) {
-            // 记录错误但不抛出
-            e.printStackTrace();
+            log.warn("Failed to reload config: {}", path, e);
         }
 
         return false;
@@ -275,7 +277,7 @@ public class ConfigManager {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Failed to reload config: {}", path, e);
             }
         }
         return count;

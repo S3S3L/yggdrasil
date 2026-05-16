@@ -94,3 +94,18 @@ build
 
 # claude
 analyze-results/
+
+# IDEA run configurations
+.run/
+
+# PID files
+*.pid
+
+# GWT temp directories
+.gwt-tmp/
+.generated/
+
+# Game temp test files
+test_config_*
+test_settings*
+test_save_*.json

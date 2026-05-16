@@ -4,6 +4,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 通用对象池
  * 支持对象的借用、归还、自动扩容和最大容量限制
@@ -11,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <T> 池化对象类型
  */
+@Slf4j
 public class ObjectPool<T extends PoolableObject<T>> {
 
     /**
@@ -99,7 +102,7 @@ public class ObjectPool<T extends PoolableObject<T>> {
                 currentPoolSize.incrementAndGet();
             } catch (Exception e) {
                 // 记录创建失败，继续创建其他对象
-                e.printStackTrace();
+                log.warn("Failed to create pooled object", e);
             }
         }
     }
@@ -134,7 +137,7 @@ public class ObjectPool<T extends PoolableObject<T>> {
                 } catch (Exception e) {
                     currentPoolSize.decrementAndGet();
                     stats.recordCreateFailure();
-                    e.printStackTrace();
+                    log.warn("Failed to create new pooled object", e);
                     return null;
                 }
             }
@@ -180,7 +183,7 @@ public class ObjectPool<T extends PoolableObject<T>> {
         try {
             factory.destroy(obj);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Failed to destroy pooled object", e);
         }
         stats.recordDiscard();
         return true;
@@ -265,7 +268,7 @@ public class ObjectPool<T extends PoolableObject<T>> {
                 factory.destroy(obj);
                 currentPoolSize.decrementAndGet();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Failed to destroy object during clear", e);
             }
         }
         borrowedCount.set(0);

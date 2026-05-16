@@ -10,10 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 场景状态序列化器
  * 用于将 SceneState 序列化为 JSON 格式或从 JSON 格式反序列化
  */
+@Slf4j
 public class SceneStateSerializer {
 
     private final ObjectMapper objectMapper;
@@ -77,7 +80,7 @@ public class SceneStateSerializer {
 
             return objectMapper.writeValueAsString(node);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.warn("Failed to serialize scene state", e);
             return null;
         }
     }
@@ -128,7 +131,7 @@ public class SceneStateSerializer {
 
             return state;
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.warn("Failed to deserialize scene state from JSON", e);
             return null;
         }
     }
@@ -150,7 +153,7 @@ public class SceneStateSerializer {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, json);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Failed to save scene state to file: {}", file.getName(), e);
             return false;
         }
     }
@@ -170,7 +173,7 @@ public class SceneStateSerializer {
             String json = objectMapper.readValue(file, String.class);
             return deserialize(json);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Failed to load scene state from file: {}", file.getName(), e);
             return null;
         }
     }

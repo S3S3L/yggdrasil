@@ -1,9 +1,12 @@
 package io.github.s3s3l.yggdrasil.game.core.scene;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 淡入淡出过渡效果
  * 简单的场景过渡效果实现
  */
+@Slf4j
 public class FadeTransition implements SceneTransition {
 
     /**
@@ -21,15 +24,12 @@ public class FadeTransition implements SceneTransition {
 
     @Override
     public void onTransitionStart(Scene fromScene, Scene toScene) {
-        // 这里可以添加淡出动画逻辑
-        // 由于当前框架没有动画系统，暂时留空
-        System.out.println("FadeTransition: Starting fade effect (duration: " + duration + "ms)");
+        log.debug("FadeTransition: Starting fade effect (duration: {}ms)", duration);
     }
 
     @Override
     public void onTransitionEnd(Scene fromScene, Scene toScene) {
-        // 这里可以添加淡入动画逻辑
-        System.out.println("FadeTransition: Ending fade effect");
+        log.debug("FadeTransition: Ending fade effect");
     }
 
     /**
