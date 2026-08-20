@@ -14,10 +14,12 @@ import lombok.experimental.SuperBuilder;
 
 public class CopyPropertiesTest {
 
+    private static final int REPEAT_COUNT = 10;
+
     @RegisterExtension
     TimeCalExtension timeCalExtension = new TimeCalExtension();
 
-    private long loopTimes = 100_000L;
+    private long loopTimes = 1000_000L;
 
     @Data
     @SuperBuilder
@@ -42,7 +44,23 @@ public class CopyPropertiesTest {
         System.out.println("warmup finish");
     }
 
-    @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
+    @RepeatedTest(value = REPEAT_COUNT, name = RepeatedTest.LONG_DISPLAY_NAME)
+    public void getterSetterTest() throws InterruptedException {
+        Man man = Man.builder()
+                .name("name")
+                .age(18)
+                .alive(true)
+                .build();
+        Man man2 = new Man();
+
+        for (long i = 0; i < loopTimes; i++) {
+            man2.setAge(man.getAge());
+            man2.setName(man.getName());
+            man2.setAlive(man.isAlive());
+        }
+    }
+
+    @RepeatedTest(value = REPEAT_COUNT, name = RepeatedTest.LONG_DISPLAY_NAME)
     public void pdTest() throws InterruptedException {
         Man man = Man.builder()
                 .name("name")
@@ -56,7 +74,7 @@ public class CopyPropertiesTest {
         }
     }
 
-    @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
+    @RepeatedTest(value = REPEAT_COUNT, name = RepeatedTest.LONG_DISPLAY_NAME)
     public void springBeanUtilsTest() {
         Man man = Man.builder()
                 .name("name")

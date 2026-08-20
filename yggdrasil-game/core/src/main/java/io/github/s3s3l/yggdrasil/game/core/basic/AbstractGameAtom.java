@@ -133,6 +133,10 @@ public abstract class AbstractGameAtom<T extends GameObjectConfig> implements Ga
         dirty.compareAndSet(true, false);
     }
 
+    @Override
+    public void finalizeResource() {
+    }
+
     // protected methods
 
     protected <D> State<D> createState(String name, Object data, Class<D> clazz) {

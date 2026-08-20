@@ -1,34 +1,37 @@
 package io.github.s3s3l.yggdrasil.game.core.event;
 
-import io.github.s3s3l.yggdrasil.game.core.event.handler.EventHandler;
+import io.github.s3s3l.yggdrasil.game.core.object.GameObject;
 
 /**
- * 事件标记接口
- * 所有事件都应实现此接口
- *
- * @see EventContext
- * @see EventBus
- * @see EventHandler
+ * 基础事件接口，支持传播阶段与停止控制。
  */
 public interface Event {
 
-    /**
-     * 获取事件优先级
-     * 默认优先级为普通
-     *
-     * @return 事件优先级
-     */
-    default EventPriority getPriority() {
-        return EventPriority.NORMAL;
-    }
+	EventType getType();
 
-    /**
-     * 事件是否可取消
-     * 可取消的事件可以通过 EventContext.cancel() 取消
-     *
-     * @return true 如果事件可取消
-     */
-    default boolean isCancellable() {
-        return true;
-    }
+	EventPhase getPhase();
+
+	void setPhase(EventPhase phase);
+
+	long getTimestamp();
+
+	GameObject getSource();
+
+	void setSource(GameObject source);
+
+	GameObject getTarget();
+
+	void setTarget(GameObject target);
+
+	GameObject getCurrent();
+
+	void setCurrent(GameObject current);
+
+	boolean isPropagationStopped();
+
+	void stopPropagation();
+
+	boolean isDefaultPrevented();
+
+	void preventDefault();
 }

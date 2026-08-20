@@ -24,8 +24,8 @@ public class Timer implements AutoCloseable {
     private Thread worker;
 
     public Timer() {
-        this.handler = piece -> log.info("[{}] total cost: {}ms; delta cost: {}ms", piece.name,
-                piece.that - piece.start, piece.that - piece.pre);
+        this.handler = piece -> System.out.println(String.format("[%s] total cost: %dms; delta cost: %dms", piece.name,
+                piece.that - piece.start, piece.that - piece.pre));
     }
 
     public Timer(Consumer<TimePiece> handler) {
