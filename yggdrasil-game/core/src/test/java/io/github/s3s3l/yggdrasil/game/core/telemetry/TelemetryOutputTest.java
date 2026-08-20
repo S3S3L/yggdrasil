@@ -100,7 +100,8 @@ class TelemetryOutputTest {
         }
 
         String json = Files.readString(output).strip();
-        assertTrue(json.startsWith("{\"schemaVersion\":1,\"timestamp\":"));
+        assertTrue(json.startsWith("{\"schemaVersion\":2,\"timestamp\":"));
+        assertTrue(json.contains("\"endedFrames\":7"));
         assertTrue(json.contains("\"frame\":{\"number\":7"));
         assertTrue(json.contains("\"cumulative\":"));
         assertTrue(json.contains("\"gauges\":"));
@@ -142,7 +143,7 @@ class TelemetryOutputTest {
             first.publish(snapshotWithType("type"));
             await(() -> server.isRegistered(objectName));
             assertEquals(7L, server.getAttribute(objectName, "FrameNumber"));
-            assertEquals(1, server.getAttribute(objectName, "SchemaVersion"));
+            assertEquals(2, server.getAttribute(objectName, "SchemaVersion"));
 
             conflict.publish(TelemetrySnapshot.DISABLED);
             await(() -> conflict.outputFailures() == 1L);

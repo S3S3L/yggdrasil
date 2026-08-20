@@ -92,12 +92,13 @@ through its `ResourceScope`; repeated closes are safe. With telemetry off no
 writer or JVM sampler is created, and an enabled registry with `sink=none`
 still provides programmatic snapshots.
 
-JSON Lines uses schema version `1` with stable top-level `timestamp`, `frame`,
-`cumulative`, `gauges`, `types`, `jvm`, `droppedPublications`, and
-`outputFailures` fields. `frame` includes end-to-end duration, completed/slow
-state, callbacks/calculate/pre-render/before-render/render phase durations,
-and per-frame counters. JVM values unavailable from a VM are represented as
-JSON `null`, never as a misleading zero. The JMX sink registers the read-only
+JSON Lines uses schema version `2` with stable top-level `timestamp`,
+`endedFrames`, `frame`, `cumulative`, `gauges`, `types`, `jvm`,
+`droppedPublications`, and `outputFailures` fields. `frame` includes
+end-to-end duration, completed/slow state,
+callbacks/calculate/pre-render/before-render/render phase durations, and
+per-frame counters. JVM values unavailable from a VM are represented as JSON
+`null`, never as a misleading zero. The JMX sink registers the read-only
 `io.github.s3s3l.yggdrasil.game.core.telemetry:type=RuntimeTelemetry` MXBean;
 it exposes aggregate fields only, never per-object IDs, and safely unregisters
 only the bean it registered.
@@ -142,6 +143,17 @@ java -cp core/target/test-classes:core/target/classes \
 Use `-Dygg.telemetry.benchmark.warmup`, `.frames`, and `.repetitions` to set
 the amount of work. The harness intentionally does not include `TRACE` in its
 comparison because type tracing is an opt-in diagnostic path.
+
+Pass `-Dygg.telemetry.benchmark.snapshotOutput=path/to/snapshot.json` to also
+write one complete Schema v2 JSON snapshot. The benchmark writes it
+synchronously after all timed `OFF`/`BASIC`/`DETAILED` work, creating parent
+directories and failing explicitly on I/O errors; it does not reuse the
+asynchronous sink. The untimed deterministic diagnostic workload exercises
+GameObjectManager lifecycle/dirty work, retained UI build/skip work, frontend
+draw submission, and ResourceScope registration/close so the artifact
+demonstrates the telemetry path. Its object counts are diagnostic-only, not
+application production counts; soft-reference reclamation can remain zero
+because no garbage collection is requested.
 
 ## Publishing
 

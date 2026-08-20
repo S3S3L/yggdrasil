@@ -7,7 +7,7 @@ import java.util.OptionalLong;
  */
 final class TelemetryJson {
 
-    static final int SCHEMA_VERSION = 1;
+    static final int SCHEMA_VERSION = 2;
 
     private TelemetryJson() {
     }
@@ -18,6 +18,8 @@ final class TelemetryJson {
         field(json, "schemaVersion", SCHEMA_VERSION);
         json.append(',');
         stringField(json, "timestamp", timestamp);
+        json.append(',');
+        field(json, "endedFrames", snapshot.endedFrames());
         json.append(',');
         json.append("\"frame\":");
         frame(json, snapshot.frame(), snapshot.frameCounters());
