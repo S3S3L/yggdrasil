@@ -35,6 +35,31 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     private UiViewport viewport;
     private List<DrawCommand> drawCommands = List.of();
     private boolean dirty = true;
+    private boolean layoutDirty = true;
+    private long layoutFingerprint = Long.MIN_VALUE;
+    private long drawFingerprint = Long.MIN_VALUE;
+    private long layoutPasses;
+    private long commandSnapshotBuilds;
+    private long drawnNodeVisits;
+    private long hitTestCalls;
+    private long hitTestNodeVisits;
+    private long childOrderCacheBuilds;
+    private final UiNode.TraversalObserver traversalObserver = new UiNode.TraversalObserver() {
+        @Override
+        public void onDrawNodeVisit() {
+            drawnNodeVisits++;
+        }
+
+        @Override
+        public void onHitTestNodeVisit() {
+            hitTestNodeVisits++;
+        }
+
+        @Override
+        public void onChildOrderCacheBuild() {
+            childOrderCacheBuilds++;
+        }
+    };
 
     public UiScene(UiNode root, UiViewport viewport) {
         this(root, viewport, ignored -> {
@@ -60,12 +85,25 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     }
 
     public void setViewport(UiViewport viewport) {
-        this.viewport = Objects.requireNonNull(viewport, "viewport");
-        markDirty();
+        UiViewport next = Objects.requireNonNull(viewport, "viewport");
+        if (!next.equals(this.viewport)) {
+            this.viewport = next;
+            markDirty();
+        }
     }
 
     public List<DrawCommand> getDrawCommands() {
         return drawCommands;
+    }
+
+    /**
+     * Returns deterministic retained-scene work counters. A scene is
+     * thread-confined: read these on the same update/render thread that drives
+     * {@link #calculate(float)} and {@link #preRender()}.
+     */
+    public UiSceneMetrics metrics() {
+        return new UiSceneMetrics(layoutPasses, commandSnapshotBuilds, drawnNodeVisits,
+                hitTestCalls, hitTestNodeVisits, childOrderCacheBuilds, drawCommands.size());
     }
 
     public UiNode getActiveModal() {
@@ -120,12 +158,13 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     }
 
     public UiNode hitTest(float x, float y) {
+        hitTestCalls++;
         UiNode modal = getActiveModal();
         if (modal != null) {
-            UiNode hit = modal.hitTest(x, y);
+            UiNode hit = modal.hitTest(x, y, traversalObserver);
             return hit == null ? modal : hit;
         }
-        return root.hitTest(x, y);
+        return root.hitTest(x, y, traversalObserver);
     }
 
     @Override
@@ -158,22 +197,36 @@ public final class UiScene implements Renderable, UiInputDispatcher {
 
     @Override
     public void calculate(float delta) {
+        long nextLayoutFingerprint = root.layoutTreeFingerprint();
+        if (!layoutDirty && nextLayoutFingerprint == layoutFingerprint) {
+            return;
+        }
         LayoutEngine.layout(root, viewport.uiWidth(), viewport.uiHeight());
+        layoutFingerprint = root.layoutTreeFingerprint();
+        layoutDirty = false;
         dirty = true;
+        layoutPasses++;
     }
 
     @Override
     public void preRender() {
+        long nextDrawFingerprint = root.drawTreeFingerprint();
+        if (nextDrawFingerprint != drawFingerprint) {
+            dirty = true;
+        }
         if (!dirty) {
             return;
         }
         List<DrawCommand> commands = new ArrayList<>();
+        UiDrawContext context = new UiDrawContext(commands);
         Set<UiNode> modalNodes = new LinkedHashSet<>(modals);
-        root.collectDrawCommands(commands, modalNodes);
+        root.collectDrawCommands(context, modalNodes, traversalObserver);
         for (UiNode modal : modals) {
-            modal.collectDrawCommands(commands, Set.of());
+            modal.collectDrawCommands(context, Set.of(), traversalObserver);
         }
         drawCommands = List.copyOf(commands);
+        drawFingerprint = root.drawTreeFingerprint();
+        commandSnapshotBuilds++;
         clearDirty();
     }
 
@@ -189,6 +242,15 @@ public final class UiScene implements Renderable, UiInputDispatcher {
 
     @Override
     public void markDirty() {
+        dirty = true;
+        layoutDirty = true;
+    }
+
+    /**
+     * Invalidates retained commands without relaying out. Call this after a
+     * draw handler's captured state changes (for example, dynamic text).
+     */
+    public void invalidateDrawCommands() {
         dirty = true;
     }
 

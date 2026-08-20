@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.github.s3s3l.yggdrasil.game.core.layout.DisplayType;
+import io.github.s3s3l.yggdrasil.game.core.layout.Layout;
 import io.github.s3s3l.yggdrasil.game.core.layout.LayoutNode;
 import io.github.s3s3l.yggdrasil.game.core.layout.LayoutResult;
 import io.github.s3s3l.yggdrasil.game.core.layout.LayoutStyle;
@@ -35,6 +36,8 @@ public class UiNode extends LayoutNode {
     private boolean focusable;
     private boolean clipChildren;
     private UiNodeDrawHandler drawHandler;
+    private boolean childOrderDirty = true;
+    private List<UiNode> orderedChildren = List.of();
 
     public UiNode() {
         super();
@@ -44,12 +47,24 @@ public class UiNode extends LayoutNode {
         super(name, style);
     }
 
+    @Override
+    public void addChild(Layout child) {
+        super.addChild(child);
+        invalidateChildOrder();
+    }
+
     public void addChild(UiNode child) {
-        super.addChild(Objects.requireNonNull(child, "child"));
+        addChild((Layout) Objects.requireNonNull(child, "child"));
+    }
+
+    @Override
+    public void removeChild(Layout child) {
+        super.removeChild(child);
+        invalidateChildOrder();
     }
 
     public void removeChild(UiNode child) {
-        super.removeChild(Objects.requireNonNull(child, "child"));
+        removeChild((Layout) Objects.requireNonNull(child, "child"));
     }
 
     public List<UiNode> uiChildren() {
@@ -71,7 +86,14 @@ public class UiNode extends LayoutNode {
     }
 
     public void setZIndex(int zIndex) {
+        if (this.zIndex == zIndex) {
+            return;
+        }
         this.zIndex = zIndex;
+        UiNode parent = getUiParent();
+        if (parent != null) {
+            parent.invalidateChildOrder();
+        }
     }
 
     public boolean isEnabled() {
@@ -142,7 +164,7 @@ public class UiNode extends LayoutNode {
     }
 
     public UiNode hitTest(float x, float y) {
-        return hitTest(x, y, true);
+        return hitTest(x, y, true, null);
     }
 
     boolean isDescendantOf(UiNode ancestor) {
@@ -162,33 +184,93 @@ public class UiNode extends LayoutNode {
         return List.copyOf(byPhase.get(phase));
     }
 
-    void collectDrawCommands(List<DrawCommand> commands, Set<UiNode> omitted) {
+    void collectDrawCommands(UiDrawContext context, Set<UiNode> omitted, TraversalObserver observer) {
         if (!isVisible() || omitted.contains(this)) {
             return;
         }
-        UiDrawContext context = new UiDrawContext(commands);
+        if (observer != null) {
+            observer.onDrawNodeVisit();
+        }
         if (drawHandler != null) {
             drawHandler.draw(this, context);
         }
         boolean clipped = isClipChildren();
         if (clipped) {
-            commands.add(new PushClipCommand(getContentBounds()));
+            context.add(new PushClipCommand(getContentBounds()));
         }
-        for (UiNode child : orderedChildren()) {
-            child.collectDrawCommands(commands, omitted);
+        for (UiNode child : orderedChildren(observer)) {
+            child.collectDrawCommands(context, omitted, observer);
         }
         if (clipped) {
-            commands.add(PopClipCommand.INSTANCE);
+            context.add(PopClipCommand.INSTANCE);
         }
+    }
+
+    long layoutTreeFingerprint() {
+        long hash = mix(0xcbf29ce484222325L, getStyle().layoutFingerprint());
+        hash = mix(hash, childNodesInOrder().size());
+        for (LayoutNode child : childNodesInOrder()) {
+            if (child instanceof UiNode uiChild) {
+                hash = mix(hash, uiChild.layoutTreeFingerprint());
+            }
+        }
+        return hash;
+    }
+
+    long drawTreeFingerprint() {
+        long hash = mix(0xcbf29ce484222325L, getStyle().layoutFingerprint());
+        hash = mix(hash, childNodesInOrder().size());
+        hash = mix(hash, zIndex);
+        hash = mix(hash, clipChildren ? 1 : 0);
+        hash = mix(hash, System.identityHashCode(drawHandler));
+        LayoutResult result = getLayoutResult();
+        if (result != null) {
+            hash = mix(hash, Float.floatToIntBits(result.getX()));
+            hash = mix(hash, Float.floatToIntBits(result.getY()));
+            hash = mix(hash, Float.floatToIntBits(result.getWidth()));
+            hash = mix(hash, Float.floatToIntBits(result.getHeight()));
+            hash = mix(hash, Float.floatToIntBits(result.getContentWidth()));
+            hash = mix(hash, Float.floatToIntBits(result.getContentHeight()));
+        }
+        for (LayoutNode child : childNodesInOrder()) {
+            if (child instanceof UiNode uiChild) {
+                hash = mix(hash, uiChild.drawTreeFingerprint());
+            }
+        }
+        return hash;
+    }
+
+    UiNode hitTest(float x, float y, TraversalObserver observer) {
+        return hitTest(x, y, true, observer);
     }
 
     List<UiNode> orderedChildren() {
-        List<UiNode> children = new ArrayList<>(uiChildren());
-        children.sort(Comparator.comparingInt(UiNode::getZIndex));
-        return children;
+        return orderedChildren(null);
     }
 
-    private UiNode hitTest(float x, float y, boolean requireBounds) {
+    private List<UiNode> orderedChildren(TraversalObserver observer) {
+        if (!childOrderDirty) {
+            return orderedChildren;
+        }
+        List<UiNode> children = new ArrayList<>();
+        for (LayoutNode child : childNodesInOrder()) {
+            if (child instanceof UiNode uiChild) {
+                children.add(uiChild);
+            }
+        }
+        children.sort(Comparator.comparingInt(UiNode::getZIndex));
+        orderedChildren = List.copyOf(children);
+        childOrderDirty = false;
+        if (observer != null) {
+            observer.onChildOrderCacheBuild();
+        }
+        return orderedChildren;
+    }
+
+    private UiNode hitTest(float x, float y, boolean requireBounds, TraversalObserver observer) {
+        if (observer != null) {
+            observer.onHitTestNodeVisit();
+        }
         if (!enabled || !isVisible()) {
             return null;
         }
@@ -199,13 +281,30 @@ public class UiNode extends LayoutNode {
         if (isClipChildren() && !getContentBounds().contains(x, y)) {
             return inside ? this : null;
         }
-        List<UiNode> children = orderedChildren();
+        List<UiNode> children = orderedChildren(observer);
         for (int index = children.size() - 1; index >= 0; index--) {
-            UiNode hit = children.get(index).hitTest(x, y, false);
+            UiNode hit = children.get(index).hitTest(x, y, false, observer);
             if (hit != null) {
                 return hit;
             }
         }
         return inside ? this : null;
+    }
+
+    private void invalidateChildOrder() {
+        childOrderDirty = true;
+    }
+
+    private static long mix(long hash, long value) {
+        return (hash ^ value) * 0x100000001b3L;
+    }
+
+    interface TraversalObserver {
+
+        void onDrawNodeVisit();
+
+        void onHitTestNodeVisit();
+
+        void onChildOrderCacheBuild();
     }
 }

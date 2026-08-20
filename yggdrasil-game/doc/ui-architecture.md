@@ -43,6 +43,45 @@ UI 使用左上为原点、Y 向下的浮点坐标。`UiRect` 和 `UiViewport` �
 未来的 My-Term 或其他 frontend 应实现相同的 draw-command consumer 和输入 adapter，
 而不是将终端屏幕 cell/PTY 概念加入 `core/ui`。
 
+## Retained-scene performance contract
+
+`UiScene` is deliberately a thread-confined update/render-thread object; PTY
+or worker threads must publish state to that owner rather than call
+`calculate()`, `preRender()`, `metrics()`, or mutate the tree concurrently.
+Its draw-command list is an immutable snapshot, but the scene itself is not a
+locking or cross-thread hand-off abstraction.
+
+`calculate()` uses an allocation-free fingerprint over the whole mutable layout
+tree (including nested box, flex, grid, visibility, and child changes). It
+runs `LayoutEngine` only after that fingerprint, the viewport, or an explicit
+`markDirty()` changes. `preRender()` similarly retains commands until a
+layout/bounds/UI-property change is observed. A draw handler whose captured
+content changes in place, such as live text, must call
+`invalidateDrawCommands()`; it refreshes commands without causing a layout
+pass. Children cache their z-sorted order, invalidating that cache only for
+add/remove/reparent or z-index changes.
+
+`UiScene.metrics()` exposes cumulative deterministic counters, not timings:
+layout passes, command-snapshot builds, drawn-node and hit-test visits, and
+child-order cache builds. They are suitable for headless CI regression tests;
+wall-clock and allocation-profiler numbers are intentionally not used as
+acceptance criteria.
+
+The `UiScenePerformanceBaselineTest` fixture drives a root and one drawing
+child for 120 unchanged frames. Before retained invalidation it performed 480
+`LayoutResult` writes, 120 handler calls, and 120 immutable command snapshots.
+With this contract it performs 4 writes, 1 handler call, and 1 snapshot
+(99.2%, 99.2%, and 99.2% fewer deterministic operations). The initial build
+visits two nodes and builds two child-order caches; unchanged frames rebuild
+neither. `UiSceneDirtyStateTest` additionally covers style, direct bounds,
+children, visibility, dynamic text, resize, and cache-reusing hit tests.
+
+This makes small, retained, mostly-idle overlays, menus, modal chrome, and
+HUD controls good migration candidates. It is not a terminal-grid renderer:
+cell buffers, PTY output, cursor/selection updates, high-frequency scrolling,
+and other continuously changing dense surfaces should keep their specialized
+frontends rather than forcing per-cell draw commands through `core/ui`.
+
 ## 字体与图集
 
 `core/font` 定义了不依赖图形库的 `FontSource`、`FontRequest`、`FontStyle`、

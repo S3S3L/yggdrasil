@@ -343,4 +343,177 @@ public class LayoutStyle {
     public void setAspectRatio(float aspectRatio) {
         this.aspectRatio = aspectRatio;
     }
+
+    /**
+     * Returns an allocation-free fingerprint of every value the layout engine
+     * reads. It lets a retained UI scene detect mutations made through the
+     * existing mutable style API, including nested box, flex, and grid values.
+     */
+    public long layoutFingerprint() {
+        long hash = 0xcbf29ce484222325L;
+        hash = mixEnum(hash, display);
+        hash = mixEnum(hash, positionType);
+        hash = mixPosition(hash, position);
+        hash = mixEnum(hash, floatType);
+        hash = mixEnum(hash, clearType);
+        hash = mixBoxModel(hash, boxModel);
+        hash = mixEnum(hash, overflow);
+        hash = mixEnum(hash, overflowX);
+        hash = mixEnum(hash, overflowY);
+        hash = mixFlexContainer(hash, flexContainer);
+        hash = mixFlexItem(hash, flexItem);
+        hash = mixGridContainer(hash, gridContainer);
+        hash = mixGridItem(hash, gridItem);
+        hash = mixEnum(hash, verticalAlign);
+        hash = mixEnum(hash, visibility);
+        hash = mixEnum(hash, objectFit);
+        return mix(hash, Float.floatToIntBits(aspectRatio));
+    }
+
+    private static long mixBoxModel(long hash, BoxModel value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixSize(hash, value.getSize());
+        hash = mixSpacing(hash, value.getMargin());
+        hash = mixSpacing(hash, value.getPadding());
+        return mixEnum(hash, value.getBoxSizing());
+    }
+
+    private static long mixPosition(long hash, Position value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixLength(hash, value.getTop());
+        hash = mixLength(hash, value.getRight());
+        hash = mixLength(hash, value.getBottom());
+        hash = mixLength(hash, value.getLeft());
+        return mix(hash, value.getZIndex());
+    }
+
+    private static long mixSize(long hash, Size value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixLength(hash, value.getWidth());
+        hash = mixLength(hash, value.getHeight());
+        hash = mixLength(hash, value.getMinWidth());
+        hash = mixLength(hash, value.getMinHeight());
+        hash = mixLength(hash, value.getMaxWidth());
+        return mixLength(hash, value.getMaxHeight());
+    }
+
+    private static long mixSpacing(long hash, Spacing value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixLength(hash, value.getTop());
+        hash = mixLength(hash, value.getRight());
+        hash = mixLength(hash, value.getBottom());
+        return mixLength(hash, value.getLeft());
+    }
+
+    private static long mixFlexContainer(long hash, FlexContainer value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixEnum(hash, value.getFlexDirection());
+        hash = mixEnum(hash, value.getFlexWrap());
+        hash = mixEnum(hash, value.getJustifyContent());
+        hash = mixEnum(hash, value.getAlignItems());
+        hash = mixEnum(hash, value.getAlignContent());
+        hash = mixLength(hash, value.getGap());
+        hash = mixLength(hash, value.getRowGap());
+        return mixLength(hash, value.getColumnGap());
+    }
+
+    private static long mixFlexItem(long hash, FlexItem value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mix(hash, Float.floatToIntBits(value.getFlexGrow()));
+        hash = mix(hash, Float.floatToIntBits(value.getFlexShrink()));
+        hash = mixLength(hash, value.getFlexBasis());
+        hash = mixEnum(hash, value.getAlignSelf());
+        return mix(hash, value.getOrder());
+    }
+
+    private static long mixGridContainer(long hash, GridContainer value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixGridTrack(hash, value.getTemplateColumns());
+        hash = mixGridTrack(hash, value.getTemplateRows());
+        for (var row : value.getTemplateAreas()) {
+            hash = mix(hash, row == null ? -1 : row.size());
+            if (row != null) {
+                for (GridArea area : row) {
+                    hash = mixString(hash, area == null ? null : area.getName());
+                }
+            }
+        }
+        hash = mixLength(hash, value.getAutoColumns());
+        hash = mixLength(hash, value.getAutoRows());
+        hash = mixEnum(hash, value.getAutoFlow());
+        hash = mixLength(hash, value.getGap());
+        hash = mixLength(hash, value.getRowGap());
+        hash = mixLength(hash, value.getColumnGap());
+        hash = mixEnum(hash, value.getJustifyContent());
+        hash = mixEnum(hash, value.getAlignContent());
+        hash = mixEnum(hash, value.getJustifyItems());
+        return mixEnum(hash, value.getAlignItems());
+    }
+
+    private static long mixGridItem(long hash, GridItem value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mixGridLine(hash, value.getColumnStart());
+        hash = mixGridLine(hash, value.getColumnEnd());
+        hash = mixGridLine(hash, value.getRowStart());
+        hash = mixGridLine(hash, value.getRowEnd());
+        hash = mixString(hash, value.getArea() == null ? null : value.getArea().getName());
+        hash = mixEnum(hash, value.getJustifySelf());
+        return mixEnum(hash, value.getAlignSelf());
+    }
+
+    private static long mixGridTrack(long hash, GridTrack value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mix(hash, value.getTrackCount());
+        for (LengthUnit track : value.getTracks()) {
+            hash = mixLength(hash, track);
+        }
+        return hash;
+    }
+
+    private static long mixGridLine(long hash, GridLine value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mix(hash, value.getLine());
+        hash = mixString(hash, value.getName());
+        return mix(hash, value.isSpan() ? 1 : 0);
+    }
+
+    private static long mixLength(long hash, LengthUnit value) {
+        if (value == null) {
+            return mix(hash, 0);
+        }
+        hash = mix(hash, Float.floatToIntBits(value.getValue()));
+        return mixEnum(hash, value.getUnit());
+    }
+
+    private static long mixEnum(long hash, Enum<?> value) {
+        return mix(hash, value == null ? -1 : value.ordinal());
+    }
+
+    private static long mixString(long hash, String value) {
+        return mix(hash, value == null ? 0 : value.hashCode());
+    }
+
+    private static long mix(long hash, long value) {
+        return (hash ^ value) * 0x100000001b3L;
+    }
 }

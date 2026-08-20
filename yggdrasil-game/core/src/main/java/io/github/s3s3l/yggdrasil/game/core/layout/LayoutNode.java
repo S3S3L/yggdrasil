@@ -12,6 +12,7 @@ public class LayoutNode extends AbstractLayout {
     private LayoutNode parent;
     /** 子节点集合，保序 */
     private final Set<LayoutNode> children = new LinkedHashSet<>();
+    private final Set<LayoutNode> childrenView = Collections.unmodifiableSet(children);
     /** 原始样式 */
     private LayoutStyle style = new LayoutStyle();
     /** 计算后的样式（像素值） */
@@ -101,7 +102,12 @@ public class LayoutNode extends AbstractLayout {
     }
 
     public Set<LayoutNode> childNodes() {
-        return Collections.unmodifiableSet(children);
+        return childrenView;
+    }
+
+    /** Ordered live child view for layout-node subclasses that avoid snapshot allocation during traversal. */
+    protected final Set<LayoutNode> childNodesInOrder() {
+        return childrenView;
     }
 
     public LayoutStyle getStyle() {
