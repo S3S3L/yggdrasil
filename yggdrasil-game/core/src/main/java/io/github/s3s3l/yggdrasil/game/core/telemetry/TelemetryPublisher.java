@@ -136,10 +136,11 @@ final class TelemetryPublisher implements AutoCloseable {
     }
 
     private void recordFailure(Throwable failure) {
-        outputFailures.incrementAndGet();
         try {
             errorHandler.onFailure(failure);
         } catch (Throwable ignored) {
+        } finally {
+            outputFailures.incrementAndGet();
         }
     }
 }

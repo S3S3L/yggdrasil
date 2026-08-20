@@ -86,6 +86,25 @@ class UiSceneTelemetryTest {
         assertEquals(1L, telemetry.snapshot().gauges().uiNodeCount());
     }
 
+    @Test
+    void distinguishesFrontendSubmissionFromRetainedCommandRebuilds() {
+        TelemetryRegistry telemetry = TelemetryRegistry.create(new TelemetryConfig(
+                TelemetryLevel.BASIC, 100L, "none", "", false, Set.of(), 10, 0L));
+        UiFrontendDrawTelemetry frontend = new UiFrontendDrawTelemetry(telemetry);
+
+        telemetry.beginFrame();
+        frontend.recordSubmittedDrawCommands(8L);
+        frontend.recordSubmittedDrawNodes(5L);
+        frontend.recordSubmittedDrawBatches(1L);
+        telemetry.endFrame(true);
+
+        var counters = telemetry.snapshot().frameCounters();
+        assertEquals(8L, counters.uiFrontendDrawCommandsSubmitted());
+        assertEquals(5L, counters.uiFrontendDrawNodesSubmitted());
+        assertEquals(1L, counters.uiFrontendDrawBatchesSubmitted());
+        assertEquals(0L, counters.uiDrawCommandsBuilt());
+    }
+
     private static UiNode fixedNode(float width, float height) {
         LayoutStyle style = new LayoutStyle();
         style.getBoxModel().getSize().setWidth(LengthUnit.px(width));

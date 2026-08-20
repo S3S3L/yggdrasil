@@ -184,7 +184,8 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     }
 
     public UiNode hitTest(float x, float y) {
-        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
+        long nodeVisitsBefore = telemetryEnabled ? hitTestNodeVisits : 0L;
+        long childOrderBuildsBefore = telemetryEnabled ? childOrderCacheBuilds : 0L;
         hitTestCalls++;
         UiNode modal = getActiveModal();
         UiNode result;
@@ -195,11 +196,10 @@ public final class UiScene implements Renderable, UiInputDispatcher {
             result = root.hitTest(x, y, traversalObserver);
         }
         if (telemetryEnabled) {
-            UiSceneMetrics after = metrics();
             record(TelemetryMetric.UI_HIT_TEST_NODE_VISITS,
-                    after.hitTestNodeVisits() - before.hitTestNodeVisits());
+                    hitTestNodeVisits - nodeVisitsBefore);
             record(TelemetryMetric.UI_CHILD_ORDER_CACHE_BUILDS,
-                    after.childOrderCacheBuilds() - before.childOrderCacheBuilds());
+                    childOrderCacheBuilds - childOrderBuildsBefore);
         }
         return result;
     }
@@ -234,7 +234,6 @@ public final class UiScene implements Renderable, UiInputDispatcher {
 
     @Override
     public void calculate(float delta) {
-        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
         long nextLayoutFingerprint = root.layoutTreeFingerprint();
         if (!layoutDirty && nextLayoutFingerprint == layoutFingerprint) {
             record(TelemetryMetric.UI_LAYOUT_SKIPS);
@@ -247,14 +246,15 @@ public final class UiScene implements Renderable, UiInputDispatcher {
         dirty = true;
         layoutPasses++;
         if (telemetryEnabled) {
-            record(TelemetryMetric.UI_LAYOUT_PASSES, metrics().layoutPasses() - before.layoutPasses());
+            record(TelemetryMetric.UI_LAYOUT_PASSES);
         }
         updateGauges();
     }
 
     @Override
     public void preRender() {
-        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
+        long nodeVisitsBefore = telemetryEnabled ? drawnNodeVisits : 0L;
+        long childOrderBuildsBefore = telemetryEnabled ? childOrderCacheBuilds : 0L;
         long nextDrawFingerprint = root.drawTreeFingerprint();
         if (nextDrawFingerprint != drawFingerprint) {
             dirty = true;
@@ -276,14 +276,12 @@ public final class UiScene implements Renderable, UiInputDispatcher {
         commandSnapshotBuilds++;
         clearDirty();
         if (telemetryEnabled) {
-            UiSceneMetrics after = metrics();
-            record(TelemetryMetric.UI_DRAW_SNAPSHOT_BUILDS,
-                    after.commandSnapshotBuilds() - before.commandSnapshotBuilds());
+            record(TelemetryMetric.UI_DRAW_SNAPSHOT_BUILDS);
             record(TelemetryMetric.UI_COMMAND_SNAPSHOT_NODE_VISITS,
-                    after.drawnNodeVisits() - before.drawnNodeVisits());
+                    drawnNodeVisits - nodeVisitsBefore);
             record(TelemetryMetric.UI_CHILD_ORDER_CACHE_BUILDS,
-                    after.childOrderCacheBuilds() - before.childOrderCacheBuilds());
-            record(TelemetryMetric.UI_DRAW_COMMANDS_BUILT, after.drawCommandCount());
+                    childOrderCacheBuilds - childOrderBuildsBefore);
+            record(TelemetryMetric.UI_DRAW_COMMANDS_BUILT, drawCommands.size());
         }
         updateGauges();
     }

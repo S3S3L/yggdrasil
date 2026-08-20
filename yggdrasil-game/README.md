@@ -76,6 +76,10 @@ fixed-schema frame collector at process startup with
 | `ygg.telemetry.topN` | `10` | Maximum accepted class IDs retained by bounded type counters |
 | `ygg.telemetry.slowFrameMs` | `0` | Marks frames at or over the positive threshold slow |
 
+`TelemetryBootstrap.fromSystemProperties()` is the explicit bootstrap used by
+the default `GameRuntime` constructor; it builds the registry, and when a sink
+is configured, its publisher and sinks. `GameRuntime` registers that registry
+with its `ResourceScope`, so `GameRuntime.close()` owns the output lifetime.
 `GameRuntime.telemetry()` exposes the frame-confined registry and
 `TelemetryCollector` SPI. A runtime owns one bounded asynchronous publisher:
 the render thread only copies a completed fixed-schema snapshot into a bounded
@@ -108,7 +112,7 @@ deltas.
 | Area | Counters | Gauges / notes |
 | --- | --- | --- |
 | Game objects | `objectsCreated`, `objectsActivated`, `objectsReleased`, `objectsReclaimed`, `objectsCalculated`, `objectsPreRendered`, `objectsRendered`, `objectsDirtyMarked`, `dirtyObjects`, `objectDirtyRoots`, `objectsDirtyPreRendered` | `activeObjectCount`, `releasedRetainedObjectCount`, `objectCount` (their sum), `dirtyObjectCount`, `dirtyRootCount`. `objectsDirtyMarked` is a clean-to-dirty transition observed around manager calculation. Calculate/pre-render/render count manager-dispatched candidates or roots; child recursion remains application behavior and is not counted a second time. |
-| Retained UI | `uiLayoutPasses` / `uiLayoutSkips`, `uiDrawSnapshotBuilds` / `uiDrawSnapshotSkips`, `uiCommandSnapshotNodeVisits`, `uiHitTestNodeVisits`, `uiDrawCommandsBuilt`, `uiChildOrderCacheBuilds` | `uiSceneCount`, `uiNodeCount`, `uiDirtySceneCount`, `uiDirtyNodeCount`. Dirty-node gauges express the scene's retained-snapshot invalidation scope. Command-snapshot visits and commands built are **not** frontend draw calls; frontends own actual command execution. |
+| Retained UI | `uiLayoutPasses` / `uiLayoutSkips`, `uiDrawSnapshotBuilds` / `uiDrawSnapshotSkips`, `uiCommandSnapshotNodeVisits`, `uiHitTestNodeVisits`, `uiDrawCommandsBuilt`, `uiChildOrderCacheBuilds` | `uiSceneCount`, `uiNodeCount`, `uiDirtySceneCount`, `uiDirtyNodeCount`. Dirty-node gauges express the scene's retained-snapshot invalidation scope. Command-snapshot visits and commands built are **not** frontend draw calls. Frontends report actual painter work with `UiFrontendDrawTelemetry`: `uiFrontendDrawCommandsSubmitted`, `uiFrontendDrawNodesSubmitted`, and `uiFrontendDrawBatchesSubmitted`. |
 | Resources | `resourcesRegistered`, `resourcesClosed`, `resourcesCloseFailed` | `resourceCount` is currently active registrations. The legacy `resourcesAcquired`/`resourcesReleased` fields mirror successful registrations/closes. Re-closing a scope does not increment counters. |
 
 Released game objects stay as soft references. A `ReferenceQueue` is polled on
@@ -122,6 +126,22 @@ Type counters are enabled only with `-Dygg.telemetry=detailed` (or `trace`) and
 `-Dygg.telemetry.types=true`. Class IDs are cached with `ClassValue`, and at
 most `topN` first-seen accepted types are retained; this bounded sink SPI is not
 a ranked top-N query and does not allocate a type-name map per frame.
+
+### Repeatable frame benchmark
+
+The core test harness runs the same retained 128-command scene with telemetry
+`OFF`, `BASIC`, and `DETAILED`; it reports median ns/frame over five measured
+samples (after warm-up):
+
+```sh
+mvn -pl core test-compile
+java -cp core/target/test-classes:core/target/classes \
+  io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryFrameBenchmark
+```
+
+Use `-Dygg.telemetry.benchmark.warmup`, `.frames`, and `.repetitions` to set
+the amount of work. The harness intentionally does not include `TRACE` in its
+comparison because type tracing is an opt-in diagnostic path.
 
 ## Publishing
 

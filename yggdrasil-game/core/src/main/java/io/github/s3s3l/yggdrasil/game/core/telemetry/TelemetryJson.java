@@ -139,6 +139,12 @@ final class TelemetryJson {
         json.append(',');
         field(json, "uiChildOrderCacheBuilds", value.uiChildOrderCacheBuilds());
         json.append(',');
+        field(json, "uiFrontendDrawCommandsSubmitted", value.uiFrontendDrawCommandsSubmitted());
+        json.append(',');
+        field(json, "uiFrontendDrawNodesSubmitted", value.uiFrontendDrawNodesSubmitted());
+        json.append(',');
+        field(json, "uiFrontendDrawBatchesSubmitted", value.uiFrontendDrawBatchesSubmitted());
+        json.append(',');
         field(json, "resourcesRegistered", value.resourcesRegistered());
         json.append(',');
         field(json, "resourcesClosed", value.resourcesClosed());

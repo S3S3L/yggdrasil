@@ -196,8 +196,8 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
         frameActive = false;
         endedFrames++;
 
-        TelemetrySnapshot snapshot = snapshot();
-        if (!collectors.isEmpty()) {
+        if (!collectors.isEmpty() || publisher != null) {
+            TelemetrySnapshot snapshot = snapshot();
             int count = collectors.size();
             for (int index = 0; index < count; index++) {
                 try {
@@ -205,9 +205,9 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
                 } catch (Throwable ignored) {
                 }
             }
-        }
-        if (publisher != null && publicationDue()) {
-            publisher.publish(snapshot);
+            if (publisher != null && publicationDue()) {
+                publisher.publish(snapshot);
+            }
         }
     }
 
@@ -290,6 +290,9 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
         private long uiHitTestNodeVisits;
         private long uiDrawCommandsBuilt;
         private long uiChildOrderCacheBuilds;
+        private long uiFrontendDrawCommandsSubmitted;
+        private long uiFrontendDrawNodesSubmitted;
+        private long uiFrontendDrawBatchesSubmitted;
         private long resourcesRegistered;
         private long resourcesClosed;
         private long resourcesCloseFailed;
@@ -320,6 +323,9 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
                 case UI_HIT_TEST_NODE_VISITS -> uiHitTestNodeVisits += amount;
                 case UI_DRAW_COMMANDS_BUILT -> uiDrawCommandsBuilt += amount;
                 case UI_CHILD_ORDER_CACHE_BUILDS -> uiChildOrderCacheBuilds += amount;
+                case UI_FRONTEND_DRAW_COMMANDS_SUBMITTED -> uiFrontendDrawCommandsSubmitted += amount;
+                case UI_FRONTEND_DRAW_NODES_SUBMITTED -> uiFrontendDrawNodesSubmitted += amount;
+                case UI_FRONTEND_DRAW_BATCHES_SUBMITTED -> uiFrontendDrawBatchesSubmitted += amount;
                 case RESOURCES_REGISTERED -> {
                     resourcesAcquired += amount;
                     resourcesRegistered += amount;
@@ -358,6 +364,9 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
             uiHitTestNodeVisits = 0L;
             uiDrawCommandsBuilt = 0L;
             uiChildOrderCacheBuilds = 0L;
+            uiFrontendDrawCommandsSubmitted = 0L;
+            uiFrontendDrawNodesSubmitted = 0L;
+            uiFrontendDrawBatchesSubmitted = 0L;
             resourcesRegistered = 0L;
             resourcesClosed = 0L;
             resourcesCloseFailed = 0L;
@@ -372,6 +381,8 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
                     uiLayoutPasses, uiLayoutSkips, uiDrawSnapshotBuilds,
                     uiDrawSnapshotSkips, uiCommandSnapshotNodeVisits,
                     uiHitTestNodeVisits, uiDrawCommandsBuilt, uiChildOrderCacheBuilds,
+                    uiFrontendDrawCommandsSubmitted, uiFrontendDrawNodesSubmitted,
+                    uiFrontendDrawBatchesSubmitted,
                     resourcesRegistered, resourcesClosed, resourcesCloseFailed);
         }
     }

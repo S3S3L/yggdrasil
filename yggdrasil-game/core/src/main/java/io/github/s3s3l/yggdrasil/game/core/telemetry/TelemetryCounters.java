@@ -29,6 +29,9 @@ public record TelemetryCounters(
         long uiHitTestNodeVisits,
         long uiDrawCommandsBuilt,
         long uiChildOrderCacheBuilds,
+        long uiFrontendDrawCommandsSubmitted,
+        long uiFrontendDrawNodesSubmitted,
+        long uiFrontendDrawBatchesSubmitted,
         long resourcesRegistered,
         long resourcesClosed,
         long resourcesCloseFailed) {
@@ -36,5 +39,5 @@ public record TelemetryCounters(
     public static final TelemetryCounters ZERO = new TelemetryCounters(
             0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L,
             0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L,
-            0L, 0L, 0L, 0L, 0L, 0L);
+            0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
 }
