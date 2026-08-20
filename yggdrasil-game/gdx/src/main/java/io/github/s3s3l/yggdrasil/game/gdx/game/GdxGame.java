@@ -6,18 +6,32 @@ import io.github.s3s3l.yggdrasil.game.core.scene.SceneConfig;
 import io.github.s3s3l.yggdrasil.game.core.scene.SceneManager;
 import io.github.s3s3l.yggdrasil.game.gdx.scene.GdxScene;
 import io.github.s3s3l.yggdrasil.game.gdx.scene.GdxSceneManager;
+import io.github.s3s3l.yggdrasil.game.gdx.runtime.GdxRuntime;
 
 public abstract class GdxGame extends Game implements SceneManager<GdxScene> {
-    protected static GdxGame CURRENT;
+    protected final GdxRuntime runtime;
+    protected final GdxSceneManager sceneManager;
 
-    protected final GdxSceneManager sceneManager = new GdxSceneManager(this);
-
+    /**
+     * @deprecated Global current-game lookup was removed. Keep the runtime and pass
+     *             it to the code that needs it instead.
+     */
+    @Deprecated
     public static GdxGame get() {
-        return CURRENT;
+        throw new UnsupportedOperationException("Global GdxGame lookup was removed; use an instance runtime instead");
     }
 
     public GdxGame() {
-        CURRENT = this;
+        this(new GdxRuntime());
+    }
+
+    protected GdxGame(GdxRuntime runtime) {
+        this.runtime = runtime;
+        this.sceneManager = new GdxSceneManager(this, runtime);
+    }
+
+    public GdxRuntime runtime() {
+        return runtime;
     }
 
     @Override
@@ -44,5 +58,17 @@ public abstract class GdxGame extends Game implements SceneManager<GdxScene> {
     public void destroyScene(long sceneId) {
         sceneManager.destroyScene(sceneId);
     }
-    
+
+    @Override
+    public void dispose() {
+        try {
+            sceneManager.close();
+        } finally {
+            try {
+                super.dispose();
+            } finally {
+                runtime.close();
+            }
+        }
+    }
 }

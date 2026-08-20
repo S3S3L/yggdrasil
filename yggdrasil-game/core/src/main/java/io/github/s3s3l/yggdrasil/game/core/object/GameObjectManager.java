@@ -4,45 +4,43 @@ import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import io.github.s3s3l.yggdrasil.game.core.event.EventCenter;
 import io.github.s3s3l.yggdrasil.game.core.event.EventDispatcher;
 import io.github.s3s3l.yggdrasil.game.core.object.props.Visible;
+import io.github.s3s3l.yggdrasil.game.core.runtime.GameTaskScheduler;
 import lombok.NonNull;
 
-public class GameObjectManager {
-
-    private static final ExecutorService calculateExecutor = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            r -> {
-                Thread t = new Thread(r);
-                t.setName("Calculate-Thread");
-                t.setDaemon(true);
-                return t;
-            });
-
-    private static final ExecutorService preRenderExecutor = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            r -> {
-                Thread t = new Thread(r);
-                t.setName("PreRender-Thread");
-                t.setDaemon(true);
-                return t;
-            });
+public class GameObjectManager implements AutoCloseable {
 
     private final Map<Long, GameObject> activeObjs = new HashMap<>();
     private final Map<Long, SoftReference<GameObject>> releasedObjs = new HashMap<>();
     private final Set<GameObject> dirtyRoots = new HashSet<>();
     private final EventDispatcher eventDispatcher = EventCenter.get();
+    private final GameTaskScheduler taskScheduler;
+    private boolean closed;
+
+    /**
+     * Creates a manager with deterministic, caller-thread scheduling.
+     */
+    public GameObjectManager() {
+        this(GameTaskScheduler.serial());
+    }
+
+    /**
+     * Creates a manager with an explicitly selected non-GL work scheduler.
+     */
+    public GameObjectManager(GameTaskScheduler taskScheduler) {
+        this.taskScheduler = java.util.Objects.requireNonNull(taskScheduler, "taskScheduler");
+    }
 
     public synchronized <T extends GameObject> T create(@NonNull GameObjectConfig config, @NonNull Class<T> type) {
+        if (closed) {
+            throw new IllegalStateException("Cannot create game objects after the manager is closed");
+        }
         if (config.getType() != null && !config.getType().isAssignableFrom(type)) {
             throw new IllegalArgumentException("Config type " + config.getType().getName()
                     + " does not match the requested type " + type.getName());
@@ -120,83 +118,52 @@ public class GameObjectManager {
     }
 
     /**
-     * Calculate all active game objects that are marked as enabled.
-     * The calculation process is performed in parallel using multiple threads to
-     * improve performance.
-     * The method also identifies dirty objects and tracks the root dirty objects to
-     * optimize subsequent pre-rendering.
-     * 
-     * @param delta the time elapsed since the last calculate call
+     * Calculates enabled objects using the configured non-GL scheduler.
      */
     public synchronized void doCalculate(float delta) {
-        try {
-            var dirtyObjects = calculateExecutor.invokeAll(activeObjs.values().stream()
-                    .filter(GameObject::isEnable)
-                    .map(obj -> (Callable<GameObject>) () -> {
-                        obj.calculate(delta);
-                        return obj;
-                    })
-                    .toList()).stream().map(t -> {
-                        try {
-                            return t.get();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            return null;
-                        } catch (ExecutionException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).filter(GameObject::isDirty).collect(Collectors.toSet());
+        if (closed) {
+            return;
+        }
+        var candidates = activeObjs.values().stream()
+                .filter(GameObject::isEnable)
+                .toList();
+        taskScheduler.execute(candidates.stream()
+                .<Runnable>map(obj -> () -> obj.calculate(delta))
+                .toList());
+        var dirtyObjects = candidates.stream()
+                .filter(GameObject::isDirty)
+                .collect(java.util.stream.Collectors.toSet());
 
-            // Find dirty roots
-            for (GameObject dirtyObject : dirtyObjects) {
-                var parent = dirtyObject.parent();
-                boolean isDirtyRoot = true;
-                while (parent != null) {
-                    if (dirtyRoots.contains(parent)) {
-                        isDirtyRoot = false;
-                        break;
-                    }
-
-                    parent = parent.parent();
+        for (GameObject dirtyObject : dirtyObjects) {
+            var parent = dirtyObject.parent();
+            boolean isDirtyRoot = true;
+            while (parent != null) {
+                if (dirtyRoots.contains(parent)) {
+                    isDirtyRoot = false;
+                    break;
                 }
 
-                if (isDirtyRoot) {
-                    dirtyRoots.add(dirtyObject);
-                }
+                parent = parent.parent();
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+
+            if (isDirtyRoot) {
+                dirtyRoots.add(dirtyObject);
+            }
         }
     }
 
     /**
-     * Pre-render all active game objects that are marked as dirty.
-     * The pre-rendering process is optimized to only pre-render the root dirty
-     * objects, avoiding redundant pre-rendering of child objects.
-     * This process is performed in parallel using multiple threads to improve
-     * performance.
+     * Pre-renders dirty visible objects using the configured non-GL scheduler.
      */
     public synchronized void doPreRender() {
-        try {
-            preRenderExecutor.invokeAll(dirtyRoots.stream()
-                    .filter(obj -> obj.isEnable() && obj.getVisible() == Visible.SHOW)
-                    .map(obj -> (Callable<Void>) () -> {
-                        obj.preRender();
-                        return null;
-                    })
-                    .toList()).forEach(t -> {
-                        try {
-                            t.get();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (ExecutionException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        if (closed) {
+            return;
         }
-
+        List<Runnable> tasks = dirtyRoots.stream()
+                .filter(obj -> obj.isEnable() && obj.getVisible() == Visible.SHOW)
+                .<Runnable>map(obj -> obj::preRender)
+                .toList();
+        taskScheduler.execute(tasks);
         dirtyRoots.clear();
     }
 
@@ -207,6 +174,9 @@ public class GameObjectManager {
      * This process is performed in a single thread to ensure rendering order.
      */
     public synchronized void doRender() {
+        if (closed) {
+            return;
+        }
 
         for (GameObject obj : activeObjs.values()) {
             if (obj.isEnable() && obj.getVisible() == Visible.SHOW && obj.parent() == null) {
@@ -234,5 +204,16 @@ public class GameObjectManager {
 
     public EventDispatcher events() {
         return eventDispatcher;
+    }
+
+    @Override
+    public synchronized void close() {
+        if (closed) {
+            return;
+        }
+        closed = true;
+        releaseAll();
+        dirtyRoots.clear();
+        taskScheduler.close();
     }
 }

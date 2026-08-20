@@ -7,7 +7,7 @@ import io.github.s3s3l.yggdrasil.game.core.utils.IdGenerator;
 
 /**
  * 
- * 场景管理器，单例
+ * Instance-owned scene manager.
  * 
  * @author s3s3l
  */
@@ -63,4 +63,13 @@ public abstract class AbstractSceneManager<T extends Scene> implements SceneMana
     }
 
     protected abstract void doSetScene(T scene);
+
+    @Override
+    public synchronized void close() {
+        for (T scene : scenes.values()) {
+            scene.finalizeResource();
+        }
+        scenes.clear();
+        currentSceneId = -1L;
+    }
 }

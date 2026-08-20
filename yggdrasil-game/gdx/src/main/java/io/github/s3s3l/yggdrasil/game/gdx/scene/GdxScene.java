@@ -12,11 +12,15 @@ import io.github.s3s3l.yggdrasil.game.core.scene.AbstractScene;
 import io.github.s3s3l.yggdrasil.game.core.scene.SceneConfig;
 import io.github.s3s3l.yggdrasil.game.core.snapshot.ObjectSnapshot;
 import io.github.s3s3l.yggdrasil.game.core.snapshot.SnapshotManager;
+import io.github.s3s3l.yggdrasil.game.gdx.runtime.GdxResources;
+import io.github.s3s3l.yggdrasil.game.gdx.runtime.GdxRuntime;
+import io.github.s3s3l.yggdrasil.game.gdx.runtime.GdxRuntimeAware;
 
-public abstract class GdxScene extends AbstractScene implements Screen {
+public abstract class GdxScene extends AbstractScene implements Screen, GdxRuntimeAware {
 
     protected final Camera camera;
     protected final Viewport viewport;
+    private GdxRuntime runtime;
 
     public GdxScene(SceneConfig config) {
         super(config);
@@ -38,10 +42,12 @@ public abstract class GdxScene extends AbstractScene implements Screen {
      */
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        calculate(delta);
-        render();
+        attachRuntimeToObjects();
+        runtime().runFrame(this, delta, () -> {
+            attachRuntimeToObjects();
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        });
     }
 
     /**
@@ -90,6 +96,34 @@ public abstract class GdxScene extends AbstractScene implements Screen {
      */
     @Override
     public void dispose() {
+        finalizeResource();
+    }
+
+    @Override
+    public void attachRuntime(GdxRuntime runtime) {
+        if (this.runtime != null && this.runtime != runtime) {
+            throw new IllegalStateException("A scene cannot be attached to more than one runtime");
+        }
+        this.runtime = runtime;
+    }
+
+    protected final GdxRuntime runtime() {
+        if (runtime == null) {
+            throw new IllegalStateException("Scene must be created by a GdxGame runtime");
+        }
+        return runtime;
+    }
+
+    protected final GdxResources resources() {
+        return runtime().resources();
+    }
+
+    private void attachRuntimeToObjects() {
+        for (var object : gameObjectManager.activeObjects()) {
+            if (object instanceof GdxRuntimeAware runtimeAware) {
+                runtimeAware.attachRuntime(runtime());
+            }
+        }
     }
 
 }

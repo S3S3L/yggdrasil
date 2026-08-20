@@ -22,4 +22,9 @@ public abstract class AbstractScene extends AbstractGameAtom<SceneConfig> implem
         gameObjectManager.doRender();
     }
 
+    @Override
+    public void finalizeResource() {
+        gameObjectManager.close();
+    }
+
 }
