@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Renderable;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryConfig;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryErrorHandler;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryFramePhase;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
 
@@ -38,10 +39,17 @@ public final class GameRuntime implements AutoCloseable {
     }
 
     public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryConfig telemetryConfig) {
+        this(callbackFailureHandler, telemetryConfig, TelemetryErrorHandler.stderr());
+    }
+
+    public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryConfig telemetryConfig,
+            TelemetryErrorHandler telemetryErrorHandler) {
         this.callbackFailureHandler = Objects.requireNonNull(callbackFailureHandler, "callbackFailureHandler");
         this.telemetryConfig = Objects.requireNonNull(telemetryConfig, "telemetryConfig");
-        this.telemetry = TelemetryRegistry.create(telemetryConfig);
+        this.telemetry = TelemetryRegistry.create(telemetryConfig,
+                Objects.requireNonNull(telemetryErrorHandler, "telemetryErrorHandler"));
         this.resources = new ResourceScope(telemetry);
+        this.resources.manage(telemetry);
     }
 
     public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryRegistry telemetry) {
@@ -49,6 +57,7 @@ public final class GameRuntime implements AutoCloseable {
         this.telemetry = Objects.requireNonNull(telemetry, "telemetry");
         this.telemetryConfig = telemetry.config();
         this.resources = new ResourceScope(telemetry);
+        this.resources.manage(telemetry);
     }
 
     public ResourceScope resources() {

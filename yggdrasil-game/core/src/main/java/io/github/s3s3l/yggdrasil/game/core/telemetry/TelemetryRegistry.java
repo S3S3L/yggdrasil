@@ -3,12 +3,16 @@ package io.github.s3s3l.yggdrasil.game.core.telemetry;
 /**
  * Frame-confined registry for runtime telemetry and collector SPI hooks.
  */
-public interface TelemetryRegistry {
+public interface TelemetryRegistry extends AutoCloseable {
 
     static TelemetryRegistry create(TelemetryConfig config) {
+        return create(config, TelemetryErrorHandler.stderr());
+    }
+
+    static TelemetryRegistry create(TelemetryConfig config, TelemetryErrorHandler errorHandler) {
         return config.level() == TelemetryLevel.OFF
                 ? new NoOpTelemetryRegistry(config)
-                : new DefaultTelemetryRegistry(config);
+                : new DefaultTelemetryRegistry(config, errorHandler);
     }
 
     TelemetryConfig config();
@@ -53,4 +57,11 @@ public interface TelemetryRegistry {
     void endFrame(boolean completed);
 
     TelemetrySnapshot snapshot();
+
+    /**
+     * Stops asynchronous telemetry output. Implementations must be idempotent.
+     */
+    @Override
+    default void close() {
+    }
 }

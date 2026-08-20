@@ -65,19 +65,38 @@ fixed-schema frame collector at process startup with
 `-Dygg.telemetry=basic` (or `detailed` / `trace`). An explicit
 `TelemetryConfig` constructor argument takes precedence over system properties.
 
-| Property | Default | Current effect |
+| Property | Default | Effect |
 | --- | --- | --- |
 | `ygg.telemetry` | `off` | Enables the in-memory frame registry |
-| `ygg.telemetry.interval` | `1000` | Parsed and retained for a future reporting scheduler |
-| `ygg.telemetry.sink` | `none` | Parsed and retained; no built-in sink is installed |
-| `ygg.telemetry.output` | empty | Parsed and retained; no output is written |
-| `ygg.telemetry.jvm` | `false` | Parsed and retained; JVM collection is not implemented |
+| `ygg.telemetry.interval` | `1000` | Milliseconds between completed-frame publications (not a frame count); the first completed frame is published immediately |
+| `ygg.telemetry.sink` | `none` | Comma-separated `log`, `json`, and/or `jmx` output sinks |
+| `ygg.telemetry.output` | empty | Required JSON Lines file path when `json` is selected; it is rejected for other sinks |
+| `ygg.telemetry.jvm` | `false` | Adds cached, low-frequency heap/GC/thread management-bean values |
 | `ygg.telemetry.types` | empty | Enables bounded class counters only as `true` at `detailed`/`trace`; `true,fully.qualified.Type` filters them |
 | `ygg.telemetry.topN` | `10` | Maximum accepted class IDs retained by bounded type counters |
-| `ygg.telemetry.slowFrameMs` | `0` | Marks completed frame snapshots slow when positive |
+| `ygg.telemetry.slowFrameMs` | `0` | Marks frames at or over the positive threshold slow |
 
 `GameRuntime.telemetry()` exposes the frame-confined registry and
-`TelemetryCollector` SPI. No log, JSON, JMX, or JVM sink is installed.
+`TelemetryCollector` SPI. A runtime owns one bounded asynchronous publisher:
+the render thread only copies a completed fixed-schema snapshot into a bounded
+queue. Its single writer thread performs logging, JSON formatting/file I/O, and
+JMX registration. A full queue drops that publication without blocking the
+frame and exposes `droppedPublications`; output failures are counted in
+`outputFailures` and sent to the configured `TelemetryErrorHandler` (stderr by
+default). Closing the runtime drains for a bounded time and closes that writer
+through its `ResourceScope`; repeated closes are safe. With telemetry off no
+writer or JVM sampler is created, and an enabled registry with `sink=none`
+still provides programmatic snapshots.
+
+JSON Lines uses schema version `1` with stable top-level `timestamp`, `frame`,
+`cumulative`, `gauges`, `types`, `jvm`, `droppedPublications`, and
+`outputFailures` fields. `frame` includes end-to-end duration, completed/slow
+state, callbacks/calculate/pre-render/before-render/render phase durations,
+and per-frame counters. JVM values unavailable from a VM are represented as
+JSON `null`, never as a misleading zero. The JMX sink registers the read-only
+`io.github.s3s3l.yggdrasil.game.core.telemetry:type=RuntimeTelemetry` MXBean;
+it exposes aggregate fields only, never per-object IDs, and safely unregisters
+only the bean it registered.
 
 ### Metric semantics
 

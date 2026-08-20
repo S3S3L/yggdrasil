@@ -14,9 +14,10 @@ import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
  */
 public final class ResourceScope implements AutoCloseable {
 
-    private final Deque<AutoCloseable> resources = new ArrayDeque<>();
+    private final Deque<ManagedResource> resources = new ArrayDeque<>();
     private final TelemetryRegistry telemetry;
     private final boolean telemetryEnabled;
+    private int registeredResourceCount;
     private boolean closed;
 
     /**
@@ -40,7 +41,8 @@ public final class ResourceScope implements AutoCloseable {
             closeResource(resource);
             return resource;
         }
-        resources.push(resource);
+        resources.push(new ManagedResource(resource, true));
+        registeredResourceCount++;
         record(TelemetryMetric.RESOURCES_REGISTERED);
         updateResourceGauge();
         return resource;
@@ -50,9 +52,22 @@ public final class ResourceScope implements AutoCloseable {
         return closed;
     }
 
+    /**
+     * Registers runtime infrastructure that shares this scope's lifetime but
+     * is intentionally excluded from application resource metrics.
+     */
+    synchronized void manage(AutoCloseable resource) {
+        Objects.requireNonNull(resource, "resource");
+        if (closed) {
+            closeUntracked(resource);
+            return;
+        }
+        resources.push(new ManagedResource(resource, false));
+    }
+
     @Override
     public void close() {
-        Deque<AutoCloseable> toClose;
+        Deque<ManagedResource> toClose;
         synchronized (this) {
             if (closed) {
                 return;
@@ -60,16 +75,22 @@ public final class ResourceScope implements AutoCloseable {
             closed = true;
             toClose = new ArrayDeque<>(resources);
             resources.clear();
+            registeredResourceCount = 0;
             updateResourceGauge();
         }
 
         RuntimeException failure = null;
         while (!toClose.isEmpty()) {
+            ManagedResource managed = toClose.pop();
             try {
-                toClose.pop().close();
-                record(TelemetryMetric.RESOURCES_CLOSED);
+                managed.resource().close();
+                if (managed.reportMetrics()) {
+                    record(TelemetryMetric.RESOURCES_CLOSED);
+                }
             } catch (Exception e) {
-                record(TelemetryMetric.RESOURCES_CLOSE_FAILED);
+                if (managed.reportMetrics()) {
+                    record(TelemetryMetric.RESOURCES_CLOSE_FAILED);
+                }
                 if (failure == null) {
                     failure = new IllegalStateException("Failed to close runtime resources", e);
                 } else {
@@ -92,6 +113,14 @@ public final class ResourceScope implements AutoCloseable {
         }
     }
 
+    private void closeUntracked(AutoCloseable resource) {
+        try {
+            resource.close();
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot manage a resource with a closed scope", e);
+        }
+    }
+
     private void record(TelemetryMetric metric) {
         if (telemetryEnabled) {
             telemetry.increment(metric);
@@ -100,7 +129,10 @@ public final class ResourceScope implements AutoCloseable {
 
     private void updateResourceGauge() {
         if (telemetryEnabled) {
-            telemetry.set(TelemetryGauge.RESOURCE_COUNT, resources.size());
+            telemetry.set(TelemetryGauge.RESOURCE_COUNT, registeredResourceCount);
         }
+    }
+
+    private record ManagedResource(AutoCloseable resource, boolean reportMetrics) {
     }
 }

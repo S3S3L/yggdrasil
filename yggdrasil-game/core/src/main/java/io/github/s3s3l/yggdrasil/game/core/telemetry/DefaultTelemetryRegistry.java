@@ -20,9 +20,13 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
     private final MutableCounters currentFrameCounters = new MutableCounters();
     private final MutableGauges gauges = new MutableGauges();
     private final TypeCounters typeCounters;
+    private final TelemetryPublisher publisher;
+    private final JvmSampler jvmSampler;
+    private final long publicationIntervalNanos;
 
     private long nextFrameNumber;
     private long endedFrames;
+    private long lastPublicationNanos = Long.MIN_VALUE;
     private boolean frameActive;
     private long frameStartedNanos;
     private TelemetryFramePhase activePhase;
@@ -36,16 +40,34 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
     private TelemetryCounters lastFrameCounters = TelemetryCounters.ZERO;
 
     public DefaultTelemetryRegistry(TelemetryConfig config) {
-        this(config, System::nanoTime);
+        this(config, System::nanoTime, TelemetryErrorHandler.stderr());
+    }
+
+    public DefaultTelemetryRegistry(TelemetryConfig config, TelemetryErrorHandler errorHandler) {
+        this(config, System::nanoTime, errorHandler);
     }
 
     DefaultTelemetryRegistry(TelemetryConfig config, LongSupplier nanoTime) {
+        this(config, nanoTime, TelemetryErrorHandler.stderr());
+    }
+
+    DefaultTelemetryRegistry(TelemetryConfig config, LongSupplier nanoTime,
+            TelemetryErrorHandler errorHandler) {
+        this(config, nanoTime, TelemetryPublisher.create(config, errorHandler),
+                config.jvm() ? new JvmSampler(nanoTime, config.intervalMillis()) : null);
+    }
+
+    DefaultTelemetryRegistry(TelemetryConfig config, LongSupplier nanoTime,
+            TelemetryPublisher publisher, JvmSampler jvmSampler) {
         this.config = Objects.requireNonNull(config, "config");
         if (config.level() == TelemetryLevel.OFF) {
             throw new IllegalArgumentException("DefaultTelemetryRegistry requires an enabled configuration");
         }
         this.nanoTime = Objects.requireNonNull(nanoTime, "nanoTime");
         this.typeCounters = config.typeMetricsEnabled() ? new TypeCounters(config.topN()) : null;
+        this.publisher = publisher;
+        this.jvmSampler = jvmSampler;
+        this.publicationIntervalNanos = millisecondsToNanos(config.intervalMillis());
     }
 
     @Override
@@ -174,8 +196,8 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
         frameActive = false;
         endedFrames++;
 
+        TelemetrySnapshot snapshot = snapshot();
         if (!collectors.isEmpty()) {
-            TelemetrySnapshot snapshot = snapshot();
             int count = collectors.size();
             for (int index = 0; index < count; index++) {
                 try {
@@ -183,6 +205,9 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
                 } catch (Throwable ignored) {
                 }
             }
+        }
+        if (publisher != null && publicationDue()) {
+            publisher.publish(snapshot);
         }
     }
 
@@ -197,8 +222,18 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
                 ? currentFrameCounters.snapshot()
                 : lastFrameCounters;
         return new TelemetrySnapshot(endedFrames, frame, cumulative.snapshot(), frameCounters,
-                gauges.snapshot(), Optional.empty(),
-                typeCounters == null ? List.of() : typeCounters.snapshot());
+                gauges.snapshot(), jvmSampler == null ? Optional.empty()
+                        : Optional.of(jvmSampler.snapshot()),
+                typeCounters == null ? List.of() : typeCounters.snapshot(),
+                publisher == null ? 0L : publisher.droppedPublications(),
+                publisher == null ? 0L : publisher.outputFailures());
+    }
+
+    @Override
+    public void close() {
+        if (publisher != null) {
+            publisher.close();
+        }
     }
 
     private void requireActiveFrame() {
@@ -209,6 +244,17 @@ public final class DefaultTelemetryRegistry implements TelemetryRegistry {
 
     private long elapsedSince(long startedNanos) {
         return Math.max(0L, nanoTime.getAsLong() - startedNanos);
+    }
+
+    private boolean publicationDue() {
+        long now = nanoTime.getAsLong();
+        if (lastPublicationNanos == Long.MIN_VALUE
+                || now < lastPublicationNanos
+                || now - lastPublicationNanos >= publicationIntervalNanos) {
+            lastPublicationNanos = now;
+            return true;
+        }
+        return false;
     }
 
     private static long millisecondsToNanos(long milliseconds) {

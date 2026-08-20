@@ -1,5 +1,6 @@
 package io.github.s3s3l.yggdrasil.game.core.telemetry;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Properties;
@@ -9,8 +10,8 @@ import java.util.function.Function;
 /**
  * Immutable runtime telemetry configuration.
  *
- * <p>Sink and JVM options are retained for forward compatibility. This version
- * does not install a built-in sink or collect JVM values.</p>
+ * <p>The interval is expressed in milliseconds. It controls completed-frame
+ * publication cadence; it is not a frame count.</p>
  */
 public record TelemetryConfig(
         TelemetryLevel level,
@@ -45,14 +46,19 @@ public record TelemetryConfig(
         if (intervalMillis <= 0L) {
             throw new IllegalArgumentException("intervalMillis must be positive");
         }
-        if (sink.isBlank()) {
-            throw new IllegalArgumentException("sink must not be blank");
-        }
         if (topN <= 0) {
             throw new IllegalArgumentException("topN must be positive");
         }
         if (slowFrameMillis < 0L) {
             throw new IllegalArgumentException("slowFrameMillis must not be negative");
+        }
+        sink = normalizeSinks(sink);
+        output = output.trim();
+        if (!output.isEmpty() && !hasSink(sink, "json")) {
+            throw new IllegalArgumentException("output is supported only by the json sink");
+        }
+        if (hasSink(sink, "json") && output.isEmpty()) {
+            throw new IllegalArgumentException("json sink requires a non-blank output path");
         }
         types = Set.copyOf(new LinkedHashSet<>(types));
     }
@@ -81,6 +87,20 @@ public record TelemetryConfig(
                 && types.contains("true");
     }
 
+    /**
+     * Returns the normalized built-in sink names in configuration order.
+     */
+    public Set<String> sinks() {
+        if ("none".equals(sink)) {
+            return Set.of();
+        }
+        Set<String> names = new LinkedHashSet<>();
+        for (String name : sink.split(",")) {
+            names.add(name);
+        }
+        return Collections.unmodifiableSet(names);
+    }
+
     boolean acceptsType(Class<?> type) {
         if (!typeMetricsEnabled()) {
             return false;
@@ -96,7 +116,7 @@ public record TelemetryConfig(
         return new TelemetryConfig(
                 TelemetryLevel.parse(property.apply(TELEMETRY_PROPERTY)).orElse(defaults.level()),
                 positiveLong(property.apply(INTERVAL_PROPERTY), defaults.intervalMillis()),
-                text(property.apply(SINK_PROPERTY), defaults.sink()),
+                sink(property.apply(SINK_PROPERTY), defaults.sink()),
                 text(property.apply(OUTPUT_PROPERTY), defaults.output()),
                 bool(property.apply(JVM_PROPERTY), defaults.jvm()),
                 types(property.apply(TYPES_PROPERTY)),
@@ -143,6 +163,44 @@ public record TelemetryConfig(
 
     private static String text(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value.trim();
+    }
+
+    private static String sink(String value, String fallback) {
+        if (value == null || value.isBlank()) {
+            return fallback;
+        }
+        try {
+            return normalizeSinks(value);
+        } catch (IllegalArgumentException ignored) {
+            return fallback;
+        }
+    }
+
+    private static String normalizeSinks(String value) {
+        Set<String> names = new LinkedHashSet<>();
+        for (String part : value.split(",")) {
+            String name = part.trim().toLowerCase(java.util.Locale.ROOT);
+            if (name.isEmpty()) {
+                continue;
+            }
+            if (!name.equals("none") && !name.equals("log")
+                    && !name.equals("json") && !name.equals("jmx")) {
+                throw new IllegalArgumentException("unsupported telemetry sink: " + name);
+            }
+            names.add(name);
+        }
+        if (names.isEmpty()) {
+            throw new IllegalArgumentException("sink must not be blank");
+        }
+        if (names.contains("none") && names.size() != 1) {
+            throw new IllegalArgumentException("none cannot be combined with telemetry sinks");
+        }
+        return String.join(",", names);
+    }
+
+    private static boolean hasSink(String sinks, String name) {
+        return sinks.equals(name) || sinks.startsWith(name + ",")
+                || sinks.endsWith("," + name) || sinks.contains("," + name + ",");
     }
 
     private static Set<String> types(String value) {

@@ -1,12 +1,33 @@
 package io.github.s3s3l.yggdrasil.game.core.telemetry;
 
+import java.util.Objects;
+import java.util.OptionalLong;
+
 /**
- * Reserved strongly typed JVM schema for a future JVM collector.
+ * Low-frequency JVM values. An empty field is explicitly unavailable from the
+ * current JVM rather than being indistinguishable from a zero value.
  */
 public record TelemetryJvmSnapshot(
-        long heapUsedBytes,
-        long heapCommittedBytes,
-        long heapMaxBytes,
-        long gcCount,
-        long gcTimeMillis) {
+        OptionalLong heapUsedBytes,
+        OptionalLong heapCommittedBytes,
+        OptionalLong heapMaxBytes,
+        OptionalLong gcCount,
+        OptionalLong gcTimeMillis,
+        OptionalLong liveThreadCount,
+        OptionalLong peakThreadCount) {
+
+    public static final TelemetryJvmSnapshot UNAVAILABLE = new TelemetryJvmSnapshot(
+            OptionalLong.empty(), OptionalLong.empty(), OptionalLong.empty(),
+            OptionalLong.empty(), OptionalLong.empty(), OptionalLong.empty(),
+            OptionalLong.empty());
+
+    public TelemetryJvmSnapshot {
+        Objects.requireNonNull(heapUsedBytes, "heapUsedBytes");
+        Objects.requireNonNull(heapCommittedBytes, "heapCommittedBytes");
+        Objects.requireNonNull(heapMaxBytes, "heapMaxBytes");
+        Objects.requireNonNull(gcCount, "gcCount");
+        Objects.requireNonNull(gcTimeMillis, "gcTimeMillis");
+        Objects.requireNonNull(liveThreadCount, "liveThreadCount");
+        Objects.requireNonNull(peakThreadCount, "peakThreadCount");
+    }
 }

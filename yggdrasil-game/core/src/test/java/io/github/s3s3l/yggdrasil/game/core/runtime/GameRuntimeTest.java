@@ -14,7 +14,12 @@ import org.junit.jupiter.api.Test;
 import io.github.s3s3l.yggdrasil.game.core.basic.Renderable;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.NoOpTelemetryRegistry;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryConfig;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryFramePhase;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryGauge;
 import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryLevel;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryMetric;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetrySnapshot;
 
 class GameRuntimeTest {
 
@@ -149,6 +154,24 @@ class GameRuntimeTest {
         assertEquals(0L, runtime.telemetry().snapshot().endedFrames());
     }
 
+    @Test
+    void endsTheActivePhaseBeforeCompletingAnExceptionalFrame() {
+        List<String> events = new ArrayList<>();
+        GameRuntime runtime = new GameRuntime(ignored -> { }, new PhaseTrackingRegistry(events));
+        Renderable failing = new RecordingRenderable(new ArrayList<>()) {
+            @Override
+            public void calculate(float delta) {
+                throw new IllegalStateException("calculate");
+            }
+        };
+
+        assertThrows(IllegalStateException.class, () -> runtime.runFrame(failing, 0f));
+
+        assertEquals(List.of("beginFrame", "begin:CALLBACKS", "end:CALLBACKS",
+                "begin:CALCULATE", "end:CALCULATE", "endFrame:false"), events);
+        runtime.close();
+    }
+
     private static TelemetryConfig basicTelemetry() {
         Properties properties = new Properties();
         properties.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "basic");
@@ -240,6 +263,66 @@ class GameRuntimeTest {
 
         @Override
         public void clearDirty() {
+        }
+    }
+
+    private static final class PhaseTrackingRegistry implements TelemetryRegistry {
+
+        private final List<String> events;
+
+        private PhaseTrackingRegistry(List<String> events) {
+            this.events = events;
+        }
+
+        @Override
+        public TelemetryConfig config() {
+            return basicTelemetry();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        @Override
+        public void register(io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryCollector collector) {
+        }
+
+        @Override
+        public void unregister(io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryCollector collector) {
+        }
+
+        @Override
+        public void add(TelemetryMetric metric, long amount) {
+        }
+
+        @Override
+        public void set(TelemetryGauge gauge, long value) {
+        }
+
+        @Override
+        public void beginFrame() {
+            events.add("beginFrame");
+        }
+
+        @Override
+        public void beginPhase(TelemetryFramePhase phase) {
+            events.add("begin:" + phase);
+        }
+
+        @Override
+        public void endPhase(TelemetryFramePhase phase) {
+            events.add("end:" + phase);
+        }
+
+        @Override
+        public void endFrame(boolean completed) {
+            events.add("endFrame:" + completed);
+        }
+
+        @Override
+        public TelemetrySnapshot snapshot() {
+            return TelemetrySnapshot.DISABLED;
         }
     }
 }

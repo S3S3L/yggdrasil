@@ -2,6 +2,7 @@ package io.github.s3s3l.yggdrasil.game.core.telemetry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Properties;
@@ -90,5 +91,19 @@ class TelemetryConfigTest {
         basic.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "basic");
         basic.setProperty(TelemetryConfig.TYPES_PROPERTY, "true");
         assertFalse(TelemetryConfig.fromProperties(basic).typeMetricsEnabled());
+    }
+
+    @Test
+    void normalizesCommaSeparatedBuiltInSinksAndRestrictsOutputToJson() {
+        TelemetryConfig config = new TelemetryConfig(TelemetryLevel.BASIC, 1L,
+                " JMX, json,log ", "target/telemetry.jsonl", false, Set.of(), 1, 0L);
+
+        assertEquals("jmx,json,log", config.sink());
+        assertEquals(Set.of("jmx", "json", "log"), config.sinks());
+        assertThrows(IllegalArgumentException.class, () -> new TelemetryConfig(
+                TelemetryLevel.BASIC, 1L, "log", "target/telemetry.jsonl",
+                false, Set.of(), 1, 0L));
+        assertThrows(IllegalArgumentException.class, () -> new TelemetryConfig(
+                TelemetryLevel.BASIC, 1L, "json", "", false, Set.of(), 1, 0L));
     }
 }
