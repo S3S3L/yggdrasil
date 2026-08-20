@@ -1,0 +1,45 @@
+plugins {
+    id "java"
+}
+
+group = "io.github.s3s3l.samples"
+version = "1.0.0"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform("io.github.s3s3l:yggdrasil-game-bom:3.8.0-SNAPSHOT")
+    implementation "io.github.s3s3l:yggdrasil-game-core"
+    implementation "io.github.s3s3l:yggdrasil-game-gdx"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.named("test") {
+    useJUnitPlatform()
+}
+
+tasks.register("assertAdapterHasNoDesktopBackend") {
+    dependsOn configurations.runtimeClasspath
+    doLast {
+        def forbidden = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.findAll {
+            it.moduleVersion.id.group == "org.lwjgl" ||
+                it.name in ["gdx-backend-lwjgl3", "gdx-platform", "gdx-freetype-platform"]
+        }
+        assert forbidden.empty: "Core/UI consumer resolved desktop backend artifacts: ${forbidden}"
+    }
+}
+
+tasks.named("check") {
+    dependsOn tasks.named("assertAdapterHasNoDesktopBackend")
+}
