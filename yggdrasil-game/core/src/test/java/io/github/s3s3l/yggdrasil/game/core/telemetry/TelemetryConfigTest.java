@@ -78,4 +78,17 @@ class TelemetryConfigTest {
             }
         }
     }
+
+    @Test
+    void enablesTypeCountersOnlyForDetailedOrTraceTrueOptIn() {
+        Properties detailed = new Properties();
+        detailed.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "detailed");
+        detailed.setProperty(TelemetryConfig.TYPES_PROPERTY, "true");
+        assertTrue(TelemetryConfig.fromProperties(detailed).typeMetricsEnabled());
+
+        Properties basic = new Properties();
+        basic.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "basic");
+        basic.setProperty(TelemetryConfig.TYPES_PROPERTY, "true");
+        assertFalse(TelemetryConfig.fromProperties(basic).typeMetricsEnabled());
+    }
 }

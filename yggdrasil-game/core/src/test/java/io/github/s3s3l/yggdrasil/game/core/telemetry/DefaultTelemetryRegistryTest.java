@@ -103,6 +103,30 @@ class DefaultTelemetryRegistryTest {
         assertEquals(TelemetrySnapshot.DISABLED, registry.snapshot());
     }
 
+    @Test
+    void keepsTypeCountersBoundedAndResetsTheirFrameDeltas() {
+        AtomicLong now = new AtomicLong();
+        DefaultTelemetryRegistry registry = new DefaultTelemetryRegistry(new TelemetryConfig(
+                TelemetryLevel.DETAILED, 100L, "none", "", false, java.util.Set.of("true"), 1, 0L),
+                now::get);
+
+        registry.addType(TelemetryMetric.OBJECTS_CREATED, String.class, 1L);
+        registry.addType(TelemetryMetric.OBJECTS_CREATED, Integer.class, 1L);
+        registry.beginFrame();
+        registry.addType(TelemetryMetric.OBJECTS_CALCULATED, String.class, 2L);
+        registry.endFrame(true);
+
+        assertEquals(1, registry.snapshot().typeCounters().size());
+        TelemetryTypeSnapshot type = registry.snapshot().typeCounters().get(0);
+        assertEquals(String.class.getName(), type.typeId());
+        assertEquals(1L, type.cumulative().objectsCreated());
+        assertEquals(2L, type.frameCounters().objectsCalculated());
+
+        registry.beginFrame();
+        registry.endFrame(true);
+        assertEquals(0L, registry.snapshot().typeCounters().get(0).frameCounters().objectsCalculated());
+    }
+
     private static DefaultTelemetryRegistry registry(AtomicLong now) {
         return new DefaultTelemetryRegistry(new TelemetryConfig(TelemetryLevel.BASIC, 100L,
                 "none", "", false, java.util.Set.of(), 10, 0L), now::get);

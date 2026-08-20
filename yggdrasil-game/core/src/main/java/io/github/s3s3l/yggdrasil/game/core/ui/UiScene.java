@@ -12,6 +12,10 @@ import java.util.function.Consumer;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Renderable;
 import io.github.s3s3l.yggdrasil.game.core.layout.LayoutEngine;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.NoOpTelemetryRegistry;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryGauge;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryMetric;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.DrawCommand;
 import io.github.s3s3l.yggdrasil.game.core.ui.input.UiEventType;
 import io.github.s3s3l.yggdrasil.game.core.ui.input.UiInputDispatcher;
@@ -29,6 +33,8 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     private final UiNode root;
     private final UiFocusManager focusManager = new UiFocusManager();
     private final UiEventDispatcher eventDispatcher;
+    private final TelemetryRegistry telemetry;
+    private final boolean telemetryEnabled;
     private final List<UiNode> modals = new ArrayList<>();
     private final Map<UiNode, UiNode> modalPreviousFocus = new HashMap<>();
     private final Set<UiNode> sceneAttachedModals = new LinkedHashSet<>();
@@ -44,6 +50,7 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     private long hitTestCalls;
     private long hitTestNodeVisits;
     private long childOrderCacheBuilds;
+    private int nodeCount;
     private final UiNode.TraversalObserver traversalObserver = new UiNode.TraversalObserver() {
         @Override
         public void onDrawNodeVisit() {
@@ -63,13 +70,32 @@ public final class UiScene implements Renderable, UiInputDispatcher {
 
     public UiScene(UiNode root, UiViewport viewport) {
         this(root, viewport, ignored -> {
-        });
+        }, NoOpTelemetryRegistry.INSTANCE);
     }
 
     public UiScene(UiNode root, UiViewport viewport, Consumer<Throwable> eventFailureHandler) {
+        this(root, viewport, eventFailureHandler, NoOpTelemetryRegistry.INSTANCE);
+    }
+
+    /**
+     * Creates a scene that publishes retained-scene work to a runtime registry.
+     */
+    public UiScene(UiNode root, UiViewport viewport, TelemetryRegistry telemetry) {
+        this(root, viewport, ignored -> {
+        }, telemetry);
+    }
+
+    public UiScene(UiNode root, UiViewport viewport, Consumer<Throwable> eventFailureHandler,
+            TelemetryRegistry telemetry) {
         this.root = Objects.requireNonNull(root, "root");
         this.viewport = Objects.requireNonNull(viewport, "viewport");
         this.eventDispatcher = new UiEventDispatcher(eventFailureHandler);
+        this.telemetry = Objects.requireNonNull(telemetry, "telemetry");
+        this.telemetryEnabled = telemetry.isEnabled();
+        if (telemetryEnabled) {
+            nodeCount = root.attachToScene(this);
+            updateGauges();
+        }
     }
 
     public UiNode getRoot() {
@@ -158,13 +184,24 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     }
 
     public UiNode hitTest(float x, float y) {
+        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
         hitTestCalls++;
         UiNode modal = getActiveModal();
+        UiNode result;
         if (modal != null) {
             UiNode hit = modal.hitTest(x, y, traversalObserver);
-            return hit == null ? modal : hit;
+            result = hit == null ? modal : hit;
+        } else {
+            result = root.hitTest(x, y, traversalObserver);
         }
-        return root.hitTest(x, y, traversalObserver);
+        if (telemetryEnabled) {
+            UiSceneMetrics after = metrics();
+            record(TelemetryMetric.UI_HIT_TEST_NODE_VISITS,
+                    after.hitTestNodeVisits() - before.hitTestNodeVisits());
+            record(TelemetryMetric.UI_CHILD_ORDER_CACHE_BUILDS,
+                    after.childOrderCacheBuilds() - before.childOrderCacheBuilds());
+        }
+        return result;
     }
 
     @Override
@@ -197,8 +234,11 @@ public final class UiScene implements Renderable, UiInputDispatcher {
 
     @Override
     public void calculate(float delta) {
+        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
         long nextLayoutFingerprint = root.layoutTreeFingerprint();
         if (!layoutDirty && nextLayoutFingerprint == layoutFingerprint) {
+            record(TelemetryMetric.UI_LAYOUT_SKIPS);
+            updateGauges();
             return;
         }
         LayoutEngine.layout(root, viewport.uiWidth(), viewport.uiHeight());
@@ -206,15 +246,22 @@ public final class UiScene implements Renderable, UiInputDispatcher {
         layoutDirty = false;
         dirty = true;
         layoutPasses++;
+        if (telemetryEnabled) {
+            record(TelemetryMetric.UI_LAYOUT_PASSES, metrics().layoutPasses() - before.layoutPasses());
+        }
+        updateGauges();
     }
 
     @Override
     public void preRender() {
+        UiSceneMetrics before = telemetryEnabled ? metrics() : null;
         long nextDrawFingerprint = root.drawTreeFingerprint();
         if (nextDrawFingerprint != drawFingerprint) {
             dirty = true;
         }
         if (!dirty) {
+            record(TelemetryMetric.UI_DRAW_SNAPSHOT_SKIPS);
+            updateGauges();
             return;
         }
         List<DrawCommand> commands = new ArrayList<>();
@@ -228,6 +275,17 @@ public final class UiScene implements Renderable, UiInputDispatcher {
         drawFingerprint = root.drawTreeFingerprint();
         commandSnapshotBuilds++;
         clearDirty();
+        if (telemetryEnabled) {
+            UiSceneMetrics after = metrics();
+            record(TelemetryMetric.UI_DRAW_SNAPSHOT_BUILDS,
+                    after.commandSnapshotBuilds() - before.commandSnapshotBuilds());
+            record(TelemetryMetric.UI_COMMAND_SNAPSHOT_NODE_VISITS,
+                    after.drawnNodeVisits() - before.drawnNodeVisits());
+            record(TelemetryMetric.UI_CHILD_ORDER_CACHE_BUILDS,
+                    after.childOrderCacheBuilds() - before.childOrderCacheBuilds());
+            record(TelemetryMetric.UI_DRAW_COMMANDS_BUILT, after.drawCommandCount());
+        }
+        updateGauges();
     }
 
     @Override
@@ -244,6 +302,7 @@ public final class UiScene implements Renderable, UiInputDispatcher {
     public void markDirty() {
         dirty = true;
         layoutDirty = true;
+        updateGauges();
     }
 
     /**
@@ -252,11 +311,47 @@ public final class UiScene implements Renderable, UiInputDispatcher {
      */
     public void invalidateDrawCommands() {
         dirty = true;
+        updateGauges();
     }
 
     @Override
     public void clearDirty() {
         dirty = false;
+        updateGauges();
+    }
+
+    void nodeAttached(UiNode node) {
+        if (telemetryEnabled) {
+            nodeCount += node.attachToScene(this);
+            updateGauges();
+        }
+    }
+
+    void nodeDetached(UiNode node) {
+        if (telemetryEnabled) {
+            nodeCount -= node.detachFromScene(this);
+            updateGauges();
+        }
+    }
+
+    private void record(TelemetryMetric metric) {
+        record(metric, 1L);
+    }
+
+    private void record(TelemetryMetric metric, long amount) {
+        if (telemetryEnabled && amount > 0L) {
+            telemetry.add(metric, amount);
+        }
+    }
+
+    private void updateGauges() {
+        if (!telemetryEnabled) {
+            return;
+        }
+        telemetry.set(TelemetryGauge.UI_SCENE_COUNT, 1L);
+        telemetry.set(TelemetryGauge.UI_NODE_COUNT, nodeCount);
+        telemetry.set(TelemetryGauge.UI_DIRTY_SCENE_COUNT, dirty ? 1L : 0L);
+        telemetry.set(TelemetryGauge.UI_DIRTY_NODE_COUNT, dirty ? nodeCount : 0L);
     }
 
     private UiNode targetFor(UiInputEvent event) {

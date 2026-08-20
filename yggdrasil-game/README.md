@@ -72,13 +72,37 @@ fixed-schema frame collector at process startup with
 | `ygg.telemetry.sink` | `none` | Parsed and retained; no built-in sink is installed |
 | `ygg.telemetry.output` | empty | Parsed and retained; no output is written |
 | `ygg.telemetry.jvm` | `false` | Parsed and retained; JVM collection is not implemented |
-| `ygg.telemetry.types` | empty | Comma-separated type filter retained for future instrumentation |
-| `ygg.telemetry.topN` | `10` | Parsed and retained for future aggregation |
+| `ygg.telemetry.types` | empty | Enables bounded class counters only as `true` at `detailed`/`trace`; `true,fully.qualified.Type` filters them |
+| `ygg.telemetry.topN` | `10` | Maximum accepted class IDs retained by bounded type counters |
 | `ygg.telemetry.slowFrameMs` | `0` | Marks completed frame snapshots slow when positive |
 
 `GameRuntime.telemetry()` exposes the frame-confined registry and
-`TelemetryCollector` SPI. No object/UI/resource instrumentation or log, JSON,
-JMX, and JVM sinks are installed in this initial core.
+`TelemetryCollector` SPI. No log, JSON, JMX, or JVM sink is installed.
+
+### Metric semantics
+
+All `TelemetryCounters` are monotonic cumulatives plus the delta recorded
+between `beginFrame()` and `endFrame()`. Lifecycle work outside a runtime frame
+only changes the cumulative value. Gauges are current values, not frame
+deltas.
+
+| Area | Counters | Gauges / notes |
+| --- | --- | --- |
+| Game objects | `objectsCreated`, `objectsActivated`, `objectsReleased`, `objectsReclaimed`, `objectsCalculated`, `objectsPreRendered`, `objectsRendered`, `objectsDirtyMarked`, `dirtyObjects`, `objectDirtyRoots`, `objectsDirtyPreRendered` | `activeObjectCount`, `releasedRetainedObjectCount`, `objectCount` (their sum), `dirtyObjectCount`, `dirtyRootCount`. `objectsDirtyMarked` is a clean-to-dirty transition observed around manager calculation. Calculate/pre-render/render count manager-dispatched candidates or roots; child recursion remains application behavior and is not counted a second time. |
+| Retained UI | `uiLayoutPasses` / `uiLayoutSkips`, `uiDrawSnapshotBuilds` / `uiDrawSnapshotSkips`, `uiCommandSnapshotNodeVisits`, `uiHitTestNodeVisits`, `uiDrawCommandsBuilt`, `uiChildOrderCacheBuilds` | `uiSceneCount`, `uiNodeCount`, `uiDirtySceneCount`, `uiDirtyNodeCount`. Dirty-node gauges express the scene's retained-snapshot invalidation scope. Command-snapshot visits and commands built are **not** frontend draw calls; frontends own actual command execution. |
+| Resources | `resourcesRegistered`, `resourcesClosed`, `resourcesCloseFailed` | `resourceCount` is currently active registrations. The legacy `resourcesAcquired`/`resourcesReleased` fields mirror successful registrations/closes. Re-closing a scope does not increment counters. |
+
+Released game objects stay as soft references. A `ReferenceQueue` is polled on
+normal manager work and by `reclaimReleasedObjects()`; only the exact retained
+reference is removed and counted as `objectsReclaimed`. JVM reclamation is
+asynchronous and non-deterministic; telemetry never requests `System.gc()`.
+The manager does not invoke `GameObject.finalizeResource()` on release or close,
+so it intentionally exposes no `objectsFinalized` counter.
+
+Type counters are enabled only with `-Dygg.telemetry=detailed` (or `trace`) and
+`-Dygg.telemetry.types=true`. Class IDs are cached with `ClassValue`, and at
+most `topN` first-seen accepted types are retained; this bounded sink SPI is not
+a ranked top-N query and does not allocate a type-name map per frame.
 
 ## Publishing
 

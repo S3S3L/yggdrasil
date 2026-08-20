@@ -72,6 +72,25 @@ public record TelemetryConfig(
         return fromPropertySource(properties::getProperty);
     }
 
+    /**
+     * Type counters are deliberately opt-in because resolving type identities
+     * is not part of the disabled or basic telemetry path.
+     */
+    public boolean typeMetricsEnabled() {
+        return (level == TelemetryLevel.DETAILED || level == TelemetryLevel.TRACE)
+                && types.contains("true");
+    }
+
+    boolean acceptsType(Class<?> type) {
+        if (!typeMetricsEnabled()) {
+            return false;
+        }
+        if (types.size() == 1) {
+            return true;
+        }
+        return types.contains(type.getName());
+    }
+
     private static TelemetryConfig fromPropertySource(Function<String, String> property) {
         TelemetryConfig defaults = defaults();
         return new TelemetryConfig(

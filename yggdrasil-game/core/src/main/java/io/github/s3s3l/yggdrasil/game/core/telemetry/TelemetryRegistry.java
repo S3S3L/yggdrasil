@@ -15,6 +15,13 @@ public interface TelemetryRegistry {
 
     boolean isEnabled();
 
+    /**
+     * Whether bounded per-class counters are enabled for this registry.
+     */
+    default boolean isTypeMetricsEnabled() {
+        return false;
+    }
+
     void register(TelemetryCollector collector);
 
     void unregister(TelemetryCollector collector);
@@ -23,6 +30,16 @@ public interface TelemetryRegistry {
 
     default void increment(TelemetryMetric metric) {
         add(metric, 1L);
+    }
+
+    /**
+     * Adds a per-type counter only. Callers also record the aggregate counter.
+     */
+    default void addType(TelemetryMetric metric, Class<?> type, long amount) {
+    }
+
+    default void incrementType(TelemetryMetric metric, Class<?> type) {
+        addType(metric, type, 1L);
     }
 
     void set(TelemetryGauge gauge, long value);

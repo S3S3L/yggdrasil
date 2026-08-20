@@ -16,7 +16,7 @@ import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
 public final class GameRuntime implements AutoCloseable {
 
     private final Object monitor = new Object();
-    private final ResourceScope resources = new ResourceScope();
+    private final ResourceScope resources;
     private final Queue<Runnable> callbacks = new ArrayDeque<>();
     private final Consumer<Throwable> callbackFailureHandler;
     private final TelemetryConfig telemetryConfig;
@@ -41,12 +41,14 @@ public final class GameRuntime implements AutoCloseable {
         this.callbackFailureHandler = Objects.requireNonNull(callbackFailureHandler, "callbackFailureHandler");
         this.telemetryConfig = Objects.requireNonNull(telemetryConfig, "telemetryConfig");
         this.telemetry = TelemetryRegistry.create(telemetryConfig);
+        this.resources = new ResourceScope(telemetry);
     }
 
     public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryRegistry telemetry) {
         this.callbackFailureHandler = Objects.requireNonNull(callbackFailureHandler, "callbackFailureHandler");
         this.telemetry = Objects.requireNonNull(telemetry, "telemetry");
         this.telemetryConfig = telemetry.config();
+        this.resources = new ResourceScope(telemetry);
     }
 
     public ResourceScope resources() {

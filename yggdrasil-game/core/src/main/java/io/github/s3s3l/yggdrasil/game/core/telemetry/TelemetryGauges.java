@@ -8,7 +8,14 @@ public record TelemetryGauges(
         long activeObjectCount,
         long dirtyObjectCount,
         long resourceCount,
-        long cacheEntryCount) {
+        long cacheEntryCount,
+        long releasedRetainedObjectCount,
+        long dirtyRootCount,
+        long uiSceneCount,
+        long uiNodeCount,
+        long uiDirtySceneCount,
+        long uiDirtyNodeCount) {
 
-    public static final TelemetryGauges ZERO = new TelemetryGauges(0L, 0L, 0L, 0L, 0L);
+    public static final TelemetryGauges ZERO = new TelemetryGauges(
+            0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
 }

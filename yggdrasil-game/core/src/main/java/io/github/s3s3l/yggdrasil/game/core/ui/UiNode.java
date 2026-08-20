@@ -38,6 +38,7 @@ public class UiNode extends LayoutNode {
     private UiNodeDrawHandler drawHandler;
     private boolean childOrderDirty = true;
     private List<UiNode> orderedChildren = List.of();
+    private UiScene scene;
 
     public UiNode() {
         super();
@@ -49,8 +50,12 @@ public class UiNode extends LayoutNode {
 
     @Override
     public void addChild(Layout child) {
+        boolean wasChild = child instanceof UiNode uiChild && uiChild.getUiParent() == this;
         super.addChild(child);
         invalidateChildOrder();
+        if (!wasChild && child instanceof UiNode uiChild && scene != null) {
+            scene.nodeAttached(uiChild);
+        }
     }
 
     public void addChild(UiNode child) {
@@ -59,8 +64,12 @@ public class UiNode extends LayoutNode {
 
     @Override
     public void removeChild(Layout child) {
+        boolean wasChild = child instanceof UiNode uiChild && uiChild.getUiParent() == this;
         super.removeChild(child);
         invalidateChildOrder();
+        if (wasChild && child instanceof UiNode uiChild && scene != null) {
+            scene.nodeDetached(uiChild);
+        }
     }
 
     public void removeChild(UiNode child) {
@@ -293,6 +302,34 @@ public class UiNode extends LayoutNode {
 
     private void invalidateChildOrder() {
         childOrderDirty = true;
+    }
+
+    int attachToScene(UiScene scene) {
+        if (this.scene == scene) {
+            return 0;
+        }
+        this.scene = scene;
+        int attached = 1;
+        for (LayoutNode child : childNodesInOrder()) {
+            if (child instanceof UiNode uiChild) {
+                attached += uiChild.attachToScene(scene);
+            }
+        }
+        return attached;
+    }
+
+    int detachFromScene(UiScene scene) {
+        if (this.scene != scene) {
+            return 0;
+        }
+        this.scene = null;
+        int detached = 1;
+        for (LayoutNode child : childNodesInOrder()) {
+            if (child instanceof UiNode uiChild) {
+                detached += uiChild.detachFromScene(scene);
+            }
+        }
+        return detached;
     }
 
     private static long mix(long hash, long value) {

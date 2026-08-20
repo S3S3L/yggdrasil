@@ -14,8 +14,27 @@ public record TelemetryCounters(
         long cacheHits,
         long cacheMisses,
         long cacheEvictions,
-        long slowFrames) {
+        long slowFrames,
+        long objectsCalculated,
+        long objectsPreRendered,
+        long objectsRendered,
+        long objectsDirtyMarked,
+        long objectDirtyRoots,
+        long objectsDirtyPreRendered,
+        long uiLayoutPasses,
+        long uiLayoutSkips,
+        long uiDrawSnapshotBuilds,
+        long uiDrawSnapshotSkips,
+        long uiCommandSnapshotNodeVisits,
+        long uiHitTestNodeVisits,
+        long uiDrawCommandsBuilt,
+        long uiChildOrderCacheBuilds,
+        long resourcesRegistered,
+        long resourcesClosed,
+        long resourcesCloseFailed) {
 
     public static final TelemetryCounters ZERO = new TelemetryCounters(
-            0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
+            0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L,
+            0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L,
+            0L, 0L, 0L, 0L, 0L, 0L);
 }
