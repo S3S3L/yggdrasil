@@ -7,10 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Renderable;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.NoOpTelemetryRegistry;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryConfig;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryLevel;
 
 class GameRuntimeTest {
 
@@ -70,7 +74,126 @@ class GameRuntimeTest {
         assertEquals(List.of("close-0", "close-1", "close-2"), calls);
     }
 
-    private static final class RecordingRenderable implements Renderable {
+    @Test
+    void explicitTelemetryConfigOverridesSystemProperties() {
+        String property = System.getProperty(TelemetryConfig.TELEMETRY_PROPERTY);
+        System.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "trace");
+        try {
+            GameRuntime runtime = new GameRuntime(TelemetryConfig.defaults());
+
+            assertEquals(TelemetryLevel.OFF, runtime.telemetryConfig().level());
+            assertTrue(runtime.telemetry() instanceof NoOpTelemetryRegistry);
+        } finally {
+            if (property == null) {
+                System.clearProperty(TelemetryConfig.TELEMETRY_PROPERTY);
+            } else {
+                System.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, property);
+            }
+        }
+    }
+
+    @Test
+    void completesTelemetryFrameWhenEachFrameStageFails() {
+        TelemetryConfig config = basicTelemetry();
+        for (FailurePhase phase : FailurePhase.values()) {
+            GameRuntime runtime = new GameRuntime(config);
+
+            assertThrows(IllegalStateException.class,
+                    () -> runtime.runFrame(new FailingRenderable(phase), 0f, () -> {
+                        if (phase == FailurePhase.BEFORE_RENDER) {
+                            throw new IllegalStateException(phase.name());
+                        }
+                    }));
+
+            assertEquals(1L, runtime.telemetry().snapshot().endedFrames(), phase.name());
+            assertFalse(runtime.telemetry().snapshot().frame().completed(), phase.name());
+            assertTrue(runtime.runFrame(new RecordingRenderable(new ArrayList<>()), 0f), phase.name());
+            assertEquals(2L, runtime.telemetry().snapshot().frame().frameNumber(), phase.name());
+        }
+    }
+
+    @Test
+    void completesTelemetryFrameWhenCallbackFails() {
+        GameRuntime runtime = new GameRuntime(ignored -> {
+        }, basicTelemetry());
+        runtime.post(() -> {
+            throw new IllegalStateException("callback");
+        });
+
+        assertTrue(runtime.runFrame(new RecordingRenderable(new ArrayList<>()), 0f));
+        assertEquals(1L, runtime.telemetry().snapshot().endedFrames());
+        assertTrue(runtime.telemetry().snapshot().frame().completed());
+    }
+
+    @Test
+    void rejectsNestedFrameButClosesTheOuterTelemetryFrame() {
+        GameRuntime runtime = new GameRuntime(basicTelemetry());
+        Renderable nested = new RecordingRenderable(new ArrayList<>()) {
+            @Override
+            public void calculate(float delta) {
+                runtime.runFrame(new RecordingRenderable(new ArrayList<>()), delta);
+            }
+        };
+
+        assertThrows(IllegalStateException.class, () -> runtime.runFrame(nested, 0f));
+        assertEquals(1L, runtime.telemetry().snapshot().endedFrames());
+        assertFalse(runtime.telemetry().snapshot().frame().completed());
+    }
+
+    @Test
+    void neverStartsTelemetryAfterClose() {
+        GameRuntime runtime = new GameRuntime(basicTelemetry());
+        runtime.close();
+
+        assertFalse(runtime.runFrame(new RecordingRenderable(new ArrayList<>()), 0f));
+        assertEquals(0L, runtime.telemetry().snapshot().endedFrames());
+    }
+
+    private static TelemetryConfig basicTelemetry() {
+        Properties properties = new Properties();
+        properties.setProperty(TelemetryConfig.TELEMETRY_PROPERTY, "basic");
+        return TelemetryConfig.fromProperties(properties);
+    }
+
+    private enum FailurePhase {
+        CALCULATE,
+        PRE_RENDER,
+        BEFORE_RENDER,
+        RENDER
+    }
+
+    private static final class FailingRenderable extends RecordingRenderable {
+
+        private final FailurePhase failurePhase;
+
+        private FailingRenderable(FailurePhase failurePhase) {
+            super(new ArrayList<>());
+            this.failurePhase = failurePhase;
+        }
+
+        @Override
+        public void calculate(float delta) {
+            fail(FailurePhase.CALCULATE);
+        }
+
+        @Override
+        public void preRender() {
+            fail(FailurePhase.PRE_RENDER);
+        }
+
+        @Override
+        public void render() {
+            fail(FailurePhase.RENDER);
+        }
+
+        private void fail(FailurePhase phase) {
+            if (failurePhase == phase) {
+                throw new IllegalStateException(phase.name());
+            }
+        }
+    }
+
+    private static class RecordingRenderable implements Renderable {
 
         private final List<String> calls;
 

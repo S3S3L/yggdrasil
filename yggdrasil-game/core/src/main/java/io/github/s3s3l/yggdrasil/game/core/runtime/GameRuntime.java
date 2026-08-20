@@ -6,6 +6,9 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 import io.github.s3s3l.yggdrasil.game.core.basic.Renderable;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryConfig;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryFramePhase;
+import io.github.s3s3l.yggdrasil.game.core.telemetry.TelemetryRegistry;
 
 /**
  * Instance-owned runtime state, resource ownership, and UI callback queue.
@@ -16,19 +19,46 @@ public final class GameRuntime implements AutoCloseable {
     private final ResourceScope resources = new ResourceScope();
     private final Queue<Runnable> callbacks = new ArrayDeque<>();
     private final Consumer<Throwable> callbackFailureHandler;
+    private final TelemetryConfig telemetryConfig;
+    private final TelemetryRegistry telemetry;
     private boolean closed;
 
     public GameRuntime() {
         this(ignored -> {
-        });
+        }, TelemetryConfig.fromSystemProperties());
     }
 
     public GameRuntime(Consumer<Throwable> callbackFailureHandler) {
+        this(callbackFailureHandler, TelemetryConfig.fromSystemProperties());
+    }
+
+    public GameRuntime(TelemetryConfig telemetryConfig) {
+        this(ignored -> {
+        }, telemetryConfig);
+    }
+
+    public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryConfig telemetryConfig) {
         this.callbackFailureHandler = Objects.requireNonNull(callbackFailureHandler, "callbackFailureHandler");
+        this.telemetryConfig = Objects.requireNonNull(telemetryConfig, "telemetryConfig");
+        this.telemetry = TelemetryRegistry.create(telemetryConfig);
+    }
+
+    public GameRuntime(Consumer<Throwable> callbackFailureHandler, TelemetryRegistry telemetry) {
+        this.callbackFailureHandler = Objects.requireNonNull(callbackFailureHandler, "callbackFailureHandler");
+        this.telemetry = Objects.requireNonNull(telemetry, "telemetry");
+        this.telemetryConfig = telemetry.config();
     }
 
     public ResourceScope resources() {
         return resources;
+    }
+
+    public TelemetryConfig telemetryConfig() {
+        return telemetryConfig;
+    }
+
+    public TelemetryRegistry telemetry() {
+        return telemetry;
     }
 
     /**
@@ -67,12 +97,52 @@ public final class GameRuntime implements AutoCloseable {
             if (closed) {
                 return false;
             }
-            drainCallbacks();
-            renderable.calculate(delta);
-            renderable.preRender();
-            beforeRender.run();
-            renderable.render();
-            return true;
+            if (!telemetry.isEnabled()) {
+                drainCallbacks();
+                renderable.calculate(delta);
+                renderable.preRender();
+                beforeRender.run();
+                renderable.render();
+                return true;
+            }
+            telemetry.beginFrame();
+            boolean completed = false;
+            try {
+                telemetry.beginPhase(TelemetryFramePhase.CALLBACKS);
+                try {
+                    drainCallbacks();
+                } finally {
+                    telemetry.endPhase(TelemetryFramePhase.CALLBACKS);
+                }
+                telemetry.beginPhase(TelemetryFramePhase.CALCULATE);
+                try {
+                    renderable.calculate(delta);
+                } finally {
+                    telemetry.endPhase(TelemetryFramePhase.CALCULATE);
+                }
+                telemetry.beginPhase(TelemetryFramePhase.PRE_RENDER);
+                try {
+                    renderable.preRender();
+                } finally {
+                    telemetry.endPhase(TelemetryFramePhase.PRE_RENDER);
+                }
+                telemetry.beginPhase(TelemetryFramePhase.BEFORE_RENDER);
+                try {
+                    beforeRender.run();
+                } finally {
+                    telemetry.endPhase(TelemetryFramePhase.BEFORE_RENDER);
+                }
+                telemetry.beginPhase(TelemetryFramePhase.RENDER);
+                try {
+                    renderable.render();
+                } finally {
+                    telemetry.endPhase(TelemetryFramePhase.RENDER);
+                }
+                completed = true;
+                return true;
+            } finally {
+                telemetry.endFrame(completed);
+            }
         }
     }
 

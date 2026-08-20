@@ -58,6 +58,28 @@ var policy = FontFallbackPolicy.builder().dynamicResolver(resolver).build();
 `loadInstalled()` retains working providers and reports malformed or failing
 providers in `failures()` instead of preventing startup.
 
+## Telemetry
+
+Telemetry is disabled by default and is owned by each `GameRuntime`. Enable its
+fixed-schema frame collector at process startup with
+`-Dygg.telemetry=basic` (or `detailed` / `trace`). An explicit
+`TelemetryConfig` constructor argument takes precedence over system properties.
+
+| Property | Default | Current effect |
+| --- | --- | --- |
+| `ygg.telemetry` | `off` | Enables the in-memory frame registry |
+| `ygg.telemetry.interval` | `1000` | Parsed and retained for a future reporting scheduler |
+| `ygg.telemetry.sink` | `none` | Parsed and retained; no built-in sink is installed |
+| `ygg.telemetry.output` | empty | Parsed and retained; no output is written |
+| `ygg.telemetry.jvm` | `false` | Parsed and retained; JVM collection is not implemented |
+| `ygg.telemetry.types` | empty | Comma-separated type filter retained for future instrumentation |
+| `ygg.telemetry.topN` | `10` | Parsed and retained for future aggregation |
+| `ygg.telemetry.slowFrameMs` | `0` | Marks completed frame snapshots slow when positive |
+
+`GameRuntime.telemetry()` exposes the frame-confined registry and
+`TelemetryCollector` SPI. No object/UI/resource instrumentation or log, JSON,
+JMX, and JVM sinks are installed in this initial core.
+
 ## Publishing
 
 See [`doc/publishing.md`](doc/publishing.md) for local verification and remote
