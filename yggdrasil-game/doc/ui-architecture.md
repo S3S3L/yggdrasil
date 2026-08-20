@@ -10,7 +10,8 @@
 - `UiNode`：保序的布局树节点；`zIndex` 从低到高绘制，插入顺序打破同 z 的平局。
   `LayoutResult` 同时决定绘制、clip 与命中测试的矩形。
 - `DrawCommand`：当前包含填充矩形、文本、`PushClipCommand` 和
-  `PopClipCommand`。字体、纹理和实际 GPU 调用属于 renderer。
+  `PopClipCommand`。`TextCommand` 只携带 `FontHandle`（逻辑 source、style、size），
+  字体、纹理和实际 GPU 调用属于 renderer。
 - `UiInputEvent`：capture → target → bubble。`consume()` 会停止传播；监听器异常
   由 scene 的失败处理器隔离。
 
@@ -41,3 +42,28 @@ UI 使用左上为原点、Y 向下的浮点坐标。`UiRect` 和 `UiViewport` �
 
 未来的 My-Term 或其他 frontend 应实现相同的 draw-command consumer 和输入 adapter，
 而不是将终端屏幕 cell/PTY 概念加入 `core/ui`。
+
+## 字体与图集
+
+`core/font` 定义了不依赖图形库的 `FontSource`、`FontRequest`、`FontStyle`、
+`FontFallbackPolicy` 和 `FontSystem`。fallback policy 按 code point 产生有序 source
+候选项；`unicodeLayers` 保持 ASCII 主字体，并提供 CJK、符号、PUA 的分层规则。它缓存
+coverage 与 metrics 的键为 **具体 FontSource + request + code point**，并返回 advance、
+ink bounds、ascent/descent、line height 和 baseline，供任何 UI 对齐策略使用。找不到字形
+时返回明确的 `MissingGlyph`，不隐式替换为终端模型。
+
+需要平台动态 fallback（例如 macOS CoreText）时，应用实现可选的
+`FontFallbackResolver` SPI 并交给 policy；core 不链接 CoreText 或任何 native 库。未提供
+resolver 时 policy 只使用静态层，因而在所有平台具有确定的回退行为。`ImageGlyphSource`
+是 emoji/内联图片的扩展点；图片 id 和 metrics 在 core 中保持纯数据，纹理由 frontend
+所有。
+
+LibGDX 使用 `GdxResources.createFontSystem(...)` 在 render thread 建立
+`GdxFontSystem`。它延迟创建 FreeType face 和增量 atlas，按 DPI 用物理字号生成纹理再缩回
+逻辑尺寸。所有 face、atlas 上传、image glyph texture 和 dispose 都由同一个
+`ResourceScope` 在 render thread 关闭；没有静态 `BitmapFont` 或静态 GL 创建。`FontHandle`
+改变字号、或 framebuffer DPI 改变时，调用 `FontSystem.invalidate()` 或
+`invalidateForFontSizeChange()` 或 `updateDpiScale(...)`，两者都会清除 coverage/metrics
+缓存并释放旧 atlas。实现
+`GdxImageGlyphRenderer` 时，其 loader 交出的 texture 所有权转移给
+`GdxImageGlyphSource`，不得再由调用方释放。

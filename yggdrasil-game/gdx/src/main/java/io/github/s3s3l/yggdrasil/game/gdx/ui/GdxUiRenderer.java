@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -20,6 +19,7 @@ import io.github.s3s3l.yggdrasil.game.core.ui.draw.FillRectCommand;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.PopClipCommand;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.PushClipCommand;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.TextCommand;
+import io.github.s3s3l.yggdrasil.game.gdx.font.GdxFontSystem;
 
 /**
  * Render-thread-only LibGDX consumer for core UI draw commands.
@@ -32,18 +32,18 @@ public final class GdxUiRenderer {
 
     private final ShapeRenderer shapes;
     private final SpriteBatch batch;
-    private final BitmapFont font;
+    private final GdxFontSystem fonts;
     private final Viewport viewport;
     private final UiViewport uiViewport;
     private final Deque<UiRect> clips = new ArrayDeque<>();
     private boolean drawingShapes;
     private boolean drawingText;
 
-    public GdxUiRenderer(ShapeRenderer shapes, SpriteBatch batch, BitmapFont font, Viewport viewport,
+    public GdxUiRenderer(ShapeRenderer shapes, SpriteBatch batch, GdxFontSystem fonts, Viewport viewport,
             UiViewport uiViewport) {
         this.shapes = Objects.requireNonNull(shapes, "shapes");
         this.batch = Objects.requireNonNull(batch, "batch");
-        this.font = Objects.requireNonNull(font, "font");
+        this.fonts = Objects.requireNonNull(fonts, "fonts");
         this.viewport = Objects.requireNonNull(viewport, "viewport");
         this.uiViewport = Objects.requireNonNull(uiViewport, "uiViewport");
     }
@@ -78,8 +78,8 @@ public final class GdxUiRenderer {
             TextCommand text = (TextCommand) command;
             beginText();
             UiColor color = text.getColor();
-            font.setColor(color.red(), color.green(), color.blue(), color.alpha());
-            font.draw(batch, text.getText(), text.getBaseline().x(), toGdxY(text.getBaseline().y(), 0));
+            fonts.draw(batch, text.getFont(), text.getText(), text.getBaseline().x(),
+                    toGdxY(text.getBaseline().y(), 0), color);
         } else if (command instanceof PushClipCommand) {
             endDrawing();
             UiRect requested = ((PushClipCommand) command).getBounds();

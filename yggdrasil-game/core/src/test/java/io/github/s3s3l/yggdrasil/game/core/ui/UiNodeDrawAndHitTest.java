@@ -9,6 +9,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.s3s3l.yggdrasil.game.core.font.FontHandle;
+import io.github.s3s3l.yggdrasil.game.core.font.FontRequest;
+import io.github.s3s3l.yggdrasil.game.core.font.FontSource;
+import io.github.s3s3l.yggdrasil.game.core.font.FontStyle;
 import io.github.s3s3l.yggdrasil.game.core.layout.LayoutResult;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.DrawCommand;
 import io.github.s3s3l.yggdrasil.game.core.ui.draw.FillRectCommand;
@@ -63,6 +67,15 @@ class UiNodeDrawAndHitTest {
         root.addChild(high);
 
         assertSame(high, root.hitTest(20, 20));
+    }
+
+    @Test
+    void keepsFontHandleInBackendIndependentTextCommands() {
+        FontHandle handle = new FontHandle("title",
+                new FontRequest(new FontSource("title.ttf"), FontStyle.BOLD, 20f));
+        TextCommand command = new TextCommand("title", handle, new UiPoint(4, 12), white());
+
+        assertSame(handle, command.getFont());
     }
 
     private static UiColor white() {

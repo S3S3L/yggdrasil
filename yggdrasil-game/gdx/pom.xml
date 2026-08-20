@@ -59,6 +59,17 @@
             <artifactId>gdx-platform</artifactId>
             <classifier>${gdx.platform}</classifier>
         </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype</artifactId>
+            <version>${gdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype-platform</artifactId>
+            <version>${gdx.version}</version>
+            <classifier>${gdx.platform}</classifier>
+        </dependency>
 
         <!-- Compile -->
         <dependency>
